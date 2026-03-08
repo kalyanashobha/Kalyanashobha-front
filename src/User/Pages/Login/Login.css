@@ -2,36 +2,32 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
 :root {
-  /* --- BACKGROUND IMAGES --- */
-  --bg-image-desktop: url('https://res.cloudinary.com/dppiuypop/image/upload/v1772941242/uploads/xpjgz5sv59hs4fgy61zr.png');
-  --bg-image-mobile: url('https://res.cloudinary.com/dppiuypop/image/upload/v1772941278/uploads/kpunzvcu4n6zyafu11zj.png');
-
   /* Brand Colors */
   --auth-primary: #D32F2F;        /* Corporate Red */
   --auth-primary-hover: #b71c1c;
   --auth-accent: #FFCA28;         /* Luxury Amber */
   
   /* Neutral Palette */
+  --auth-bg: #F8F9FA;             /* Professional Light Gray */
+  --auth-card: #FFFFFF;           /* Pure White Card */
   --auth-text-main: #111827;      /* Sharp Black */
   --auth-text-sub: #6B7280;       /* Muted Slate */
   --auth-border: #E5E7EB;
-  --auth-input-bg: #FFFFFF;       /* Pure white to pop against the image */
+  --auth-input-bg: #FAFAFA;
   
   /* Metrics */
   --auth-radius: 12px;
+  --auth-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
   --auth-ease: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* --- 2. LAYOUT & WRAPPER --- */
 .login-wrapper {
   min-height: 100vh;
-  
-  /* Applying the exact same 75% white overlay and desktop background */
-  background-image: linear-gradient(rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0.75)), var(--bg-image-desktop);
-  background-size: cover; 
-  background-position: center top; 
-  background-repeat: no-repeat;
-  background-attachment: fixed;
+  background-color: var(--auth-bg);
+  /* Optional: Subtle geometric background pattern */
+  background-image: radial-gradient(#E5E7EB 1px, transparent 1px);
+  background-size: 24px 24px;
   
   display: flex;
   justify-content: center;
@@ -44,12 +40,12 @@
 .login-card {
   width: 100%;
   max-width: 440px;
-  background: transparent; /* Removed solid white card background */
-  box-shadow: none;        /* Removed card shadow */
-  border: none;
-  padding: 20px;           /* Adjusted padding since there's no visible box */
+  background: var(--auth-card);
+  padding: 48px 40px;
+  border-radius: var(--auth-radius);
+
+  
   position: relative;
-  margin: auto;
 }
 
 /* Header Section */
@@ -80,7 +76,7 @@
 .input-group label {
   display: block;
   font-size: 0.85rem;
-  font-weight: 600; /* Slightly bolder to read well over the background */
+  font-weight: 500;
   color: var(--auth-text-main);
   margin-bottom: 8px;
 }
@@ -94,14 +90,13 @@
 .input-wrapper input {
   width: 100%;
   padding: 14px 16px 14px 44px; /* Left padding for icon */
-  border: 1px solid var(--auth-border);
+  border: 1.5px solid var(--auth-border);
   border-radius: var(--auth-radius);
   font-family: inherit;
   font-size: 1rem;
   color: var(--auth-text-main);
   background: var(--auth-input-bg);
   transition: all 0.2s var(--auth-ease);
-  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.03); /* Soft premium shadow */
 }
 
 /* Icon Position inside input */
@@ -116,23 +111,23 @@
 
 .input-wrapper input:focus {
   outline: none;
-  border-color: var(--auth-primary); /* Use primary color for focus */
+  border-color: var(--auth-text-main); /* Black border on focus (Minimal) */
   background: #fff;
-  box-shadow: 0 4px 20px rgba(211, 47, 47, 0.08); /* Glow effect from reg form */
+  box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.03);
 }
 
 .input-wrapper input:focus + .input-icon {
-  color: var(--auth-primary);
+  color: var(--auth-text-main);
 }
 
 /* --- 5. BUTTONS --- */
 .login-btn {
   width: 100%;
   padding: 16px;
-  background: linear-gradient(135deg, var(--auth-primary), var(--auth-primary-hover));
+  background: var(--auth-primary);
   color: white;
   border: none;
-  border-radius: 50px; /* Pill shape to match reg form */
+  border-radius: var(--auth-radius);
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
@@ -141,22 +136,18 @@
   justify-content: center;
   gap: 10px;
   transition: all 0.2s;
-  box-shadow: 0 4px 14px -4px rgba(211, 47, 47, 0.35); /* Matched refined shadow */
+  box-shadow: 0 4px 6px rgba(211, 47, 47, 0.2);
 }
 
 .login-btn:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px -6px rgba(211, 47, 47, 0.45);
-}
-
-.login-btn:active:not(:disabled) {
-  transform: translateY(1px);
+  background: var(--auth-primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 12px rgba(211, 47, 47, 0.3);
 }
 
 .login-btn:disabled {
-  background: #FCA5A5;
+  opacity: 0.7;
   cursor: not-allowed;
-  box-shadow: none;
 }
 
 /* Secondary Links (Forgot Password) */
@@ -172,7 +163,6 @@
   font-size: 0.9rem;
   cursor: pointer;
   padding: 0;
-  font-weight: 500;
   transition: color 0.2s;
 }
 
@@ -189,11 +179,10 @@
   text-align: center;
   font-size: 0.9rem;
   color: var(--auth-text-sub);
-  font-weight: 500;
 }
 
 .register-link {
-  color: var(--auth-primary); /* Stand out better */
+  color: var(--auth-text-main);
   font-weight: 600;
   text-decoration: none;
   margin-left: 6px;
@@ -201,8 +190,7 @@
 }
 
 .register-link:hover {
-  color: var(--auth-primary-hover);
-  text-decoration: underline;
+  color: var(--auth-primary);
 }
 
 /* --- 6. OTP INPUTS --- */
@@ -231,15 +219,14 @@
 .otp-input {
   width: 48px;
   height: 56px;
-  border: 1px solid var(--auth-border);
-  border-radius: var(--auth-radius);
+  border: 1.5px solid var(--auth-border);
+  border-radius: 8px;
   text-align: center;
   font-size: 1.2rem;
   font-weight: 600;
   background: var(--auth-input-bg);
   color: var(--auth-text-main);
   transition: all 0.2s;
-  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.03);
 }
 
 .otp-input:focus {
@@ -247,7 +234,6 @@
   border-color: var(--auth-primary);
   background: #fff;
   transform: translateY(-2px);
-  box-shadow: 0 4px 20px rgba(211, 47, 47, 0.08);
 }
 
 /* --- 7. ALERTS & SPINNERS --- */
@@ -289,18 +275,15 @@
 /* --- 8. MOBILE RESPONSIVENESS --- */
 @media (max-width: 480px) {
   .login-wrapper {
-    padding: 80px 16px 40px; 
-    /* Switch to mobile image with same 75% overlay */
-    background-image: linear-gradient(rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0.75)), var(--bg-image-mobile);
-    background-attachment: scroll;
+    padding: 80px 16px 40px; /* Reduced padding */
   }
   
   .login-card {
-    padding: 24px 10px; /* Reduced inner padding on mobile */
+    padding: 32px 24px;
   }
 
   .brand-header h2 {
-    font-size: 1.5rem; 
+    font-size: 1.5rem; /* Smaller heading */
   }
 
   .subtitle {
@@ -312,8 +295,8 @@
   }
 
   .input-wrapper input {
-    font-size: 0.95rem; 
-    padding: 12px 14px 12px 40px; 
+    font-size: 0.95rem; /* Slightly smaller text */
+    padding: 12px 14px 12px 40px; /* Adjusted padding */
   }
 
   .login-btn {
@@ -322,7 +305,7 @@
   }
 
   .otp-container {
-    gap: 6px; 
+    gap: 6px; /* Tighter gap for OTP inputs */
   }
 
   .otp-input {
