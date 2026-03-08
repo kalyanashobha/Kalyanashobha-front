@@ -1,0 +1,17 @@
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Force full white background */
+html, body, #root {
+  height: 100%;
+  background-color: #ffffff !important;
+}
+
+/* Optional: remove any inherited background */
+body {
+  background: #ffffff !important;
+}

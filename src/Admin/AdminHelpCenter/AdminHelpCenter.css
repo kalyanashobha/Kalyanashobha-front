@@ -1,0 +1,273 @@
+/* --- VARIABLES --- */
+:root {
+  --kah-primary: #4f46e5; 
+  --kah-primary-hover: #4338ca;
+  --kah-bg: #f8fafc;
+  --kah-card-bg: #ffffff;
+  --kah-text-main: #0f172a;
+  --kah-text-sub: #64748b;
+  --kah-border: #e2e8f0;
+  --kah-radius: 12px;
+  --kah-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+}
+
+/* --- LAYOUT --- */
+.kah-layout {
+  padding: 24px;
+  background-color: var(--kah-bg);
+  min-height: 100vh;
+  font-family: 'Inter', system-ui, sans-serif;
+  color: var(--kah-text-main);
+}
+
+/* --- HEADER --- */
+.kah-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.kah-title-group h2 {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0 0 6px 0;
+  color: var(--kah-text-main);
+}
+.kah-title-group p {
+  color: var(--kah-text-sub);
+  margin: 0;
+  font-size: 14px;
+}
+
+.kah-refresh-btn {
+  display: flex; align-items: center; gap: 6px;
+  background: white;
+  border: 1px solid var(--kah-border);
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--kah-text-sub);
+  cursor: pointer;
+  transition: 0.2s;
+}
+.kah-refresh-btn:hover { border-color: var(--kah-primary); color: var(--kah-primary); }
+
+/* --- CONTENT BOX --- */
+.kah-content {
+  background: var(--kah-card-bg);
+  border-radius: var(--kah-radius);
+  border: 1px solid var(--kah-border);
+  box-shadow: var(--kah-shadow);
+  overflow: hidden; 
+}
+
+/* --- TABLE --- */
+.kah-table-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.kah-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 800px;
+}
+
+.kah-table th {
+  text-align: left;
+  padding: 16px 20px;
+  background: #f8fafc;
+  color: var(--kah-text-sub);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+  border-bottom: 1px solid var(--kah-border);
+}
+
+.kah-table td {
+  padding: 16px 20px;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+  font-size: 14px;
+}
+
+.kah-table tr:last-child td { border-bottom: none; }
+.kah-table tr:hover td { background-color: #fcfcfc; }
+
+/* --- TEXT & BADGES --- */
+.kah-date-cell { display: flex; gap: 8px; align-items: center; }
+.kah-icon-sub { color: var(--kah-text-sub); }
+.kah-date-text { font-size: 14px; font-weight: 500; color: var(--kah-text-main); }
+
+.kah-user-info { display: flex; flex-direction: column; }
+.kah-user-name { font-weight: 600; color: var(--kah-text-main); font-size: 14px; }
+.kah-user-id { font-size: 12px; color: var(--kah-text-sub); margin-top: 2px; }
+
+.kah-subject-text { font-weight: 600; color: var(--kah-text-main); margin-bottom: 4px; }
+.kah-summary-text {
+  color: var(--kah-text-sub); 
+  font-size: 13px;
+  max-width: 300px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.kah-status-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+.kah-status-badge.Resolved { background: #dcfce7; color: #166534; }
+.kah-status-badge.Pending { background: #fff7ed; color: #c2410c; }
+
+/* --- ACTIONS --- */
+.kah-btn-outline-primary {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px;
+  color: var(--kah-primary);
+  background: #eff6ff;
+  border: 1px solid #dbeafe;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: 0.2s;
+  white-space: nowrap;
+}
+.kah-btn-outline-primary:hover { background: #dbeafe; }
+
+/* --- SKELETON --- */
+.kah-skeleton-stack { padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+.kah-skeleton-row { display: flex; gap: 16px; align-items: center; }
+.kah-sk-box {
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+  background-size: 200% 100%;
+  animation: kah-shimmer 1.5s infinite;
+  height: 20px;
+  border-radius: 4px;
+}
+@keyframes kah-shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+
+.kah-sk-date { width: 100px; }
+.kah-sk-user { width: 150px; }
+.kah-sk-subject { width: 250px; }
+.kah-sk-status { width: 80px; }
+.kah-sk-action { width: 90px; margin-left: auto; }
+
+/* --- EMPTY STATE --- */
+.kah-empty-state { text-align: center; padding: 60px 20px; color: var(--kah-text-sub); }
+.kah-empty-icon { color: #cbd5e1; margin-bottom: 12px; }
+.kah-empty-state h3 { color: var(--kah-text-main); margin: 0 0 8px 0; }
+
+/* --- MODAL STYLES --- */
+.kah-modal-overlay {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.2s ease-out;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.kah-modal-content {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  max-width: 600px;
+  width: 100%;
+  box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3);
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.kah-modal-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--kah-border);
+  display: flex; justify-content: space-between; align-items: center;
+  background: #f8fafc;
+}
+.kah-modal-header h3 { margin: 0; font-size: 18px; color: var(--kah-text-main); }
+.kah-modal-close { background: none; border: none; cursor: pointer; color: var(--kah-text-sub); transition: 0.2s; }
+.kah-modal-close:hover { color: #ef4444; }
+
+.kah-modal-body {
+  padding: 24px;
+  overflow-y: auto;
+}
+
+.kah-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+  background: #f1f5f9;
+  padding: 16px;
+  border-radius: 8px;
+}
+
+.kah-info-label { font-size: 12px; color: var(--kah-text-sub); text-transform: uppercase; font-weight: 600; display: block; margin-bottom: 4px; }
+.kah-info-value { font-weight: 600; color: var(--kah-text-main); font-size: 15px; }
+.kah-info-sub { font-size: 13px; color: var(--kah-text-sub); margin-top: 2px; }
+
+.kah-issue-details-box {
+  background: white;
+  border: 1px solid var(--kah-border);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 24px;
+}
+.kah-issue-title { margin: 0 0 8px 0; font-size: 16px; color: var(--kah-text-main); }
+.kah-issue-summary { margin: 0; font-size: 14px; color: var(--kah-text-sub); line-height: 1.6; }
+
+.kah-attachment-wrap { margin-top: 16px; padding-top: 16px; border-top: 1px dashed var(--kah-border); }
+.kah-attachment-toggle {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: none; border: none; color: var(--kah-primary);
+  font-size: 13px; font-weight: 600; cursor: pointer; padding: 0;
+}
+.kah-attachment-toggle:hover { text-decoration: underline; }
+
+.kah-image-preview-box { margin-top: 12px; border-radius: 8px; overflow: hidden; background: #000; display: flex; justify-content: center; }
+.kah-attached-image { max-width: 100%; max-height: 400px; object-fit: contain; }
+
+/* Modal Form */
+.kah-reply-form { display: flex; flex-direction: column; gap: 20px; }
+.kah-form-group { display: flex; flex-direction: column; gap: 8px; }
+.kah-label { font-size: 14px; font-weight: 600; color: var(--kah-text-main); }
+.kah-required { color: #ef4444; }
+.kah-input {
+  width: 100%; padding: 12px; border: 1px solid var(--kah-border);
+  border-radius: 8px; font-family: inherit; font-size: 14px;
+  resize: vertical; transition: 0.2s;
+}
+.kah-input:focus { outline: none; border-color: var(--kah-primary); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
+
+.kah-modal-footer {
+  display: flex; justify-content: flex-end; gap: 12px;
+  padding-top: 16px; border-top: 1px solid var(--kah-border);
+}
+
+.kah-btn-cancel {
+  background: white; border: 1px solid var(--kah-border); color: var(--kah-text-main);
+  padding: 10px 20px; border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s;
+}
+.kah-btn-cancel:hover { background: #f1f5f9; }
+
+.kah-btn-approve {
+  background: #059669; color: white; border: none;
+  padding: 10px 20px; border-radius: 6px; font-weight: 600; cursor: pointer;
+  transition: 0.2s; box-shadow: 0 2px 4px rgba(5, 150, 105, 0.2);
+}
+.kah-btn-

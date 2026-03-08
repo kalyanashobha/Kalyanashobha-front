@@ -1,0 +1,385 @@
+/* =========================================
+   Base Layout & Vercel/Stripe Background
+========================================= */
+.ks-testimonials-section {
+    position: relative;
+    padding: 100px 20px;
+    background-color: #FAFAFA; /* Extremely crisp off-white */
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    overflow: hidden;
+    z-index: 1;
+}
+
+/* Subtle architectural grid pattern */
+.ks-test-bg-grid {
+    position: absolute;
+    inset: 0;
+    background-size: 40px 40px;
+    background-image: 
+        linear-gradient(to right, rgba(0, 0, 0, 0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
+    z-index: -2;
+    mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+    -webkit-mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+}
+
+/* Floating ambient glows */
+.ks-test-glow {
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.4;
+    z-index: -1;
+    pointer-events: none;
+}
+
+.ks-glow-left {
+    background: radial-gradient(circle, rgba(183,28,28,0.15) 0%, rgba(255,255,255,0) 70%);
+    top: -100px;
+    left: -200px;
+}
+
+.ks-glow-right {
+    background: radial-gradient(circle, rgba(255,179,0,0.15) 0%, rgba(255,255,255,0) 70%);
+    bottom: -100px;
+    right: -200px;
+}
+
+.ks-test-container {
+    max-width: 1280px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 10;
+}
+
+/* =========================================
+   Premium Header Styling
+========================================= */
+.ks-test-header {
+    text-align: center;
+    margin-bottom: 70px;
+    animation: ks-fade-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Glassmorphism Badge */
+.ks-test-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 16px;
+    background: rgba(255, 255, 255, 0.6);
+    color: #B71C1C;
+    border-radius: 9999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    border: 1px solid rgba(183, 28, 28, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.ks-test-title {
+    font-size: 3.5rem;
+    color: #0A0A0A;
+    font-weight: 800;
+    margin: 0 0 20px 0;
+    letter-spacing: -0.04em;
+    line-height: 1.1;
+}
+
+/* Stripe-inspired text gradient */
+.ks-text-gradient {
+    background: linear-gradient(135deg, #E53935 0%, #F59E0B 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.ks-test-subtitle {
+    font-size: 1.15rem;
+    color: #52525B;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+    font-weight: 400;
+}
+
+.ks-mobile-break {
+    display: none;
+}
+
+/* =========================================
+   Grid & Premium Card Layout
+========================================= */
+.ks-testimonials-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 32px;
+}
+
+.ks-testimonial-card {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: ks-fade-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.ks-card-inner {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 24px;
+    overflow: hidden;
+    /* Stripe's famous ultra-soft layered box-shadow */
+    box-shadow: 
+        0 4px 6px -1px rgba(0, 0, 0, 0.05), 
+        0 2px 4px -1px rgba(0, 0, 0, 0.03),
+        inset 0 0 0 1px rgba(255, 255, 255, 1);
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Lift and soft color-glow on hover */
+.ks-testimonial-card:hover .ks-card-inner {
+    transform: translateY(-6px);
+    box-shadow: 
+        0 20px 40px -10px rgba(183, 28, 28, 0.08), 
+        0 10px 20px -5px rgba(0, 0, 0, 0.04),
+        inset 0 0 0 1px rgba(255, 255, 255, 1);
+    border: 1px solid rgba(183, 28, 28, 0.1);
+}
+
+/* =========================================
+   Media Handling (Images & Videos)
+========================================= */
+.ks-test-media-wrapper {
+    width: 100%;
+    height: 220px;
+    background-color: #F4F4F5;
+    overflow: hidden;
+    position: relative;
+    border-bottom: 1px solid rgba(0,0,0,0.03);
+}
+
+.ks-test-media {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ks-testimonial-card:hover .ks-test-media {
+    transform: scale(1.03); 
+}
+
+/* =========================================
+   Card Content & Typography
+========================================= */
+.ks-testimonial-content {
+    padding: 32px;
+    position: relative;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.ks-quote-icon {
+    position: absolute;
+    top: 32px;
+    right: 32px;
+    color: #E5E7EB; /* Very faint quote mark */
+    z-index: 0;
+}
+
+.ks-stars {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 16px;
+    position: relative;
+    z-index: 1;
+}
+
+.ks-testimonial-text {
+    color: #3F3F46;
+    font-size: 1rem;
+    line-height: 1.7;
+    margin-bottom: 32px;
+    flex-grow: 1;
+    position: relative;
+    z-index: 1;
+}
+
+/* Avatar Footer Layout */
+.ks-testimonial-footer {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(0,0,0,0.04);
+}
+
+.ks-author-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #FEF2F2 0%, #FEF3C7 100%);
+    color: #B71C1C;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+    border: 1px solid rgba(183, 28, 28, 0.1);
+}
+
+.ks-author-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.ks-testimonial-author {
+    color: #09090B;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.ks-verified-badge {
+    color: #10B981;
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin-top: 2px;
+}
+
+/* =========================================
+   Skeleton Loading Animation
+========================================= */
+.ks-skeleton-card {
+    /* Ensures skeleton cards fade in immediately */
+    animation: ks-fade-up 0.3s ease-out forwards;
+}
+
+.ks-skeleton-media,
+.ks-skeleton-stars,
+.ks-skeleton-line,
+.ks-skeleton-avatar {
+    background: #E4E4E7; /* Light gray base */
+    background: linear-gradient(
+        90deg,
+        #E4E4E7 0%,
+        #F4F4F5 50%,
+        #E4E4E7 100%
+    );
+    background-size: 200% 100%;
+    animation: ks-skeleton-shimmer 1.5s infinite linear;
+}
+
+@keyframes ks-skeleton-shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+.ks-skeleton-stars {
+    width: 80px;
+    height: 14px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+.ks-skeleton-text-block {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 32px;
+    flex-grow: 1;
+}
+
+.ks-skeleton-line {
+    height: 12px;
+    border-radius: 4px;
+}
+
+.ks-skeleton-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+}
+
+.ks-skeleton-author-name {
+    width: 80%;
+    height: 14px;
+    margin-bottom: 6px;
+}
+
+.ks-skeleton-badge {
+    width: 50%;
+    height: 10px;
+}
+
+/* =========================================
+   Error States
+========================================= */
+.ks-test-error {
+    text-align: center;
+    padding: 20px;
+    color: #DC2626;
+    background: #FEF2F2;
+    border: 1px solid #FCA5A5;
+    border-radius: 12px;
+    margin: 40px auto;
+    max-width: 500px;
+    font-weight: 500;
+}
+
+/* =========================================
+   Animations
+========================================= */
+@keyframes ks-fade-up {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* =========================================
+   Responsive Design
+========================================= */
+@media (max-width: 768px) {
+    .ks-testimonials-section {
+        padding: 60px 16px;
+    }
+
+    .ks-test-title {
+        font-size: 2.5rem;
+    }
+    
+    .ks-mobile-break {
+        display: block;
+    }
+
+    .ks-test-subtitle {
+        font-size: 1.05rem;
+    }
+
+    .ks-test-media-wrapper {
+        height: 180px;
+    }
+
+    .ks-testimonial-content {
+        padding: 24px;
+    }
+    
+    .ks-test-glow {
+        width: 300px;
+        height: 300px;
+    }
+}

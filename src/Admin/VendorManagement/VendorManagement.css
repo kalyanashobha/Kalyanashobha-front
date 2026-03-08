@@ -1,0 +1,382 @@
+/* --- 1. Main Container & Layout --- */
+.vm-container {
+  padding: 30px;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.vm-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 25px;
+  flex-wrap: wrap; /* Allows wrapping on smaller screens */
+  gap: 15px;
+}
+
+.vm-title-section h2 {
+  margin: 0 0 5px 0;
+  font-size: 24px;
+  color: #1a1a1a;
+  font-weight: 600;
+}
+
+.vm-title-section p {
+  margin: 0;
+  color: #6c757d;
+  font-size: 14px;
+}
+
+/* --- 2. Actions (Search & Add Button) --- */
+.vm-actions-section {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.vm-search-box {
+  display: flex;
+  align-items: center;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 10px 14px;
+  width: 280px;
+  transition: border-color 0.2s ease;
+}
+
+.vm-search-box:focus-within {
+  border-color: #1a1a1a;
+}
+
+.vm-search-icon {
+  color: #94a3b8;
+  margin-right: 8px;
+}
+
+.vm-search-box input {
+  border: none;
+  outline: none;
+  width: 100%;
+  font-size: 14px;
+  color: #334155;
+  background: transparent;
+}
+
+.vm-add-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: #1a1a1a;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s ease;
+  white-space: nowrap;
+}
+
+.vm-add-btn:hover {
+  background-color: #333;
+}
+
+/* --- 3. Vendor Grid & Cards --- */
+.vm-grid {
+  display: grid;
+  /* Automatically fits as many 280px columns as possible */
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.vm-card {
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e9ecef;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.vm-card:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+.vm-card-image {
+  height: 180px;
+  position: relative;
+  background: #f1f3f5;
+}
+
+.vm-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.placeholder-img {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #adb5bd;
+}
+
+.vm-category-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: #ffc107; /* Warning yellow for good contrast */
+  color: #000;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* --- 4. Card Content --- */
+.vm-card-content {
+  padding: 20px;
+  flex: 1;
+}
+
+.vm-id-badge {
+  display: inline-block;
+  background-color: #f1f3f5;
+  color: #495057;
+  font-family: monospace;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 4px;
+  margin-bottom: 12px;
+  border: 1px solid #dee2e6;
+  letter-spacing: 0.5px;
+}
+
+.vm-card-content h3 {
+  margin: 0 0 12px 0;
+  font-size: 18px;
+  color: #212529;
+}
+
+.vm-detail-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #495057;
+  font-weight: 500;
+}
+
+.icon-gold {
+  color: #d4af37; /* Professional premium gold accent */
+}
+
+.vm-desc {
+  font-size: 14px;
+  color: #6c757d;
+  margin: 12px 0 0 0;
+  line-height: 1.5;
+}
+
+/* --- 5. Card Actions --- */
+.vm-card-actions {
+  padding: 15px 20px;
+  border-top: 1px solid #e9ecef;
+  background: #fdfdfd;
+}
+
+.vm-btn-delete {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 10px;
+  background: transparent;
+  border: 1px solid #dc3545;
+  color: #dc3545;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.vm-btn-delete:hover {
+  background: #dc3545;
+  color: white;
+}
+
+/* --- 6. Modal Overlay & Form --- */
+.vm-modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.vm-modal-content {
+  background: white;
+  width: 100%;
+  max-width: 550px;
+  border-radius: 8px;
+  padding: 30px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.vm-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.vm-modal-header h3 {
+  margin: 0;
+  font-size: 20px;
+  color: #1a1a1a;
+}
+
+.vm-modal-header button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #6c757d;
+  padding: 5px;
+}
+
+.vm-modal-header button:hover {
+  color: #000;
+}
+
+.vm-form-group {
+  margin-bottom: 18px;
+  display: flex;
+  flex-direction: column;
+}
+
+.vm-form-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 6px;
+}
+
+.vm-form-group input,
+.vm-form-group select,
+.vm-form-group textarea {
+  padding: 12px;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 14px;
+  transition: border-color 0.2s ease;
+}
+
+.vm-form-group input:focus,
+.vm-form-group select:focus,
+.vm-form-group textarea:focus {
+  outline: none;
+  border-color: #1a1a1a;
+}
+
+.vm-form-row {
+  display: flex;
+  gap: 15px;
+}
+
+.vm-form-row .vm-form-group {
+  flex: 1;
+}
+
+.vm-submit-btn {
+  width: 100%;
+  padding: 14px;
+  background: #1a1a1a;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background-color 0.2s ease;
+}
+
+.vm-submit-btn:hover {
+  background: #333;
+}
+
+/* --- 7. Status States --- */
+.vm-loading, .vm-no-data {
+  grid-column: 1 / -1; /* Spans full width of grid */
+  text-align: center;
+  padding: 50px 20px;
+  color: #6c757d;
+  font-size: 16px;
+  background: white;
+  border-radius: 8px;
+  border: 1px dashed #ced4da;
+}
+
+/* =========================================
+   RESPONSIVE MEDIA QUERIES
+========================================= */
+
+/* Tablet & Smaller Desktop */
+@media (max-width: 900px) {
+  .vm-search-box {
+    width: 100%;
+    flex: 1; /* Search bar takes remaining space */
+  }
+}
+
+/* Mobile Devices */
+@media (max-width: 600px) {
+  .vm-container {
+    padding: 15px;
+  }
+  
+  .vm-actions-section {
+    width: 100%;
+    flex-direction: column; /* Stack search and add button */
+  }
+
+  .vm-search-box {
+    width: 100%;
+  }
+  
+  .vm-add-btn {
+    width: 100%;
+  }
+
+  /* Stack the form inputs inside the modal vertically */
+  .vm-form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  /* Force grid into a single column on very small screens */
+  .vm-grid {
+    grid-template-columns: 1fr;
+  }
+}

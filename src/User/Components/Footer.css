@@ -1,0 +1,181 @@
+/* --- VARIABLES & SETUP --- */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+:root {
+  /* Brand Consistency */
+  --ks-primary: #D32F2F;        /* Brand Red */
+  --ks-accent: #FFCA28;         /* Brand Amber */
+
+  /* Footer Specific Colors (Dark Corporate Theme) */
+  --footer-bg: #111827;         /* Deep Charcoal/Black */
+  --footer-text-head: #FFFFFF;  /* White Headings */
+  --footer-text-body: #9CA3AF;  /* Muted Gray Text */
+  --footer-border: #1F2937;     /* Dark Border */
+}
+
+/* --- MAIN SECTION --- */
+.ks-footer-section {
+  background-color: var(--footer-bg);
+  color: var(--footer-text-body);
+  font-family: 'Poppins', sans-serif;
+  position: relative;
+  width: 100%;
+}
+
+/* --- CONTAINER & GRID --- */
+.ks-footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 80px 24px 60px;
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1.5fr; /* Brand col is wider */
+  gap: 40px;
+}
+
+/* --- COLUMNS --- */
+.ks-footer-col {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Brand Column Specifics */
+.ks-footer-logo {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--footer-text-head);
+  letter-spacing: -0.5px;
+  background: linear-gradient(90deg, var(--ks-primary), var(--ks-accent));
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+.ks-footer-desc {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  max-width: 300px;
+  color: var(--footer-text-body);
+}
+
+/* Headings */
+.ks-footer-heading {
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--footer-text-head);
+  margin-bottom: 8px; 
+}
+
+/* Links List */
+.ks-footer-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ks-footer-links li a {
+  text-decoration: none;
+  color: var(--footer-text-body);
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  position: relative;
+  display: inline-block;
+}
+
+/* Hover Effect: Slide right & Change color */
+.ks-footer-links li a:hover {
+  color: var(--ks-accent);
+  transform: translateX(4px);
+}
+
+/* Contact Details */
+.ks-contact-item {
+  font-size: 0.9rem;
+  margin: 0;
+  color: var(--footer-text-body);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ks-contact-item:hover {
+  color: var(--ks-accent);
+}
+
+/* Social Icons */
+.ks-social-icons {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.ks-social-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--footer-text-head);
+  text-decoration: none;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.ks-social-btn:hover {
+  background: var(--ks-primary);
+  color: white;
+  transform: translateY(-2px);
+}
+
+/* --- COPYRIGHT AREA --- */
+.ks-footer-bottom {
+  border-top: 1px solid var(--footer-border);
+  padding: 30px 24px;
+  text-align: center;
+  margin-top: 20px;
+}
+
+.ks-footer-bottom p {
+  font-size: 0.85rem;
+  color: rgba(156, 163, 175, 0.6);
+  margin: 0;
+}
+
+/* --- RESPONSIVE DESIGN --- */
+
+/* Tablet */
+@media (max-width: 900px) {
+  .ks-footer-container {
+    grid-template-columns: 1fr 1fr;
+    gap: 50px 30px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .ks-footer-container {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    padding: 60px 24px 40px;
+    text-align: center; 
+  }
+
+  .ks-footer-col {
+    align-items: center; 
+  }
+
+  .ks-footer-links li a:hover {
+    transform: none; 
+  }
+
+  .ks-footer-desc {
+    margin: 0 auto;
+  }
+}

@@ -1,0 +1,271 @@
+/* Ensure your fonts are loaded in your main CSS or index.css 
+   (Inter and Plus Jakarta Sans) */
+
+/* --- 1. LAYOUT & WRAPPER --- */
+.ks-main-wrapper {
+  /* Offset for the fixed navbar height */
+  padding-top: var(--ks-nav-height, 72px);
+  min-height: 100vh;
+  background-color: #F9FAFB; /* Soft off-white to make the white card pop */
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; /* Aligns to top, avoiding perfectly centered floating */
+  padding-bottom: 80px;
+  font-family: var(--ks-font-ui, 'Inter', sans-serif);
+}
+
+/* --- 2. THE CARD --- */
+.ks-auth-card.ks-help-card {
+  background-color: var(--ks-bg-solid, #ffffff);
+  width: 100%;
+  max-width: 640px; /* Optimal reading/form width */
+  margin-top: 60px; /* Space below the navbar */
+  padding: 48px 56px;
+  border-radius: 20px;
+  /* Premium multi-layered shadow */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03), 
+              0 12px 24px -4px rgba(0, 0, 0, 0.05),
+              0 0 0 1px rgba(0,0,0,0.02);
+}
+
+/* --- 3. HEADER & TYPOGRAPHY --- */
+.ks-help-header {
+  margin-bottom: 32px;
+  text-align: center;
+}
+
+.ks-group-title {
+  font-family: var(--ks-font-brand, 'Plus Jakarta Sans', sans-serif);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--ks-text-main, #111827);
+  margin: 0 0 12px 0;
+  letter-spacing: -0.02em;
+}
+
+.ks-step-sub {
+  font-size: 1.05rem;
+  color: var(--ks-text-muted, #4B5563);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* --- 4. ALERTS (Success & Error) --- */
+.ks-alert {
+  padding: 16px 20px;
+  border-radius: 12px;
+  margin-bottom: 32px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  line-height: 1.5;
+}
+
+.ks-alert-error {
+  background-color: #FEF2F2;
+  color: #991B1B;
+  border: 1px solid #F87171;
+}
+
+.ks-alert-success {
+  background-color: #F0FDF4;
+  color: #166534;
+  border: 1px solid #4ADE80;
+}
+
+/* --- 5. FORM ELEMENTS --- */
+.ks-form-content {
+  width: 100%;
+}
+
+.ks-input-block {
+  margin-bottom: 24px;
+}
+
+.ks-label {
+  display: block;
+  font-family: var(--ks-font-brand, 'Plus Jakarta Sans', sans-serif);
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--ks-text-main, #111827);
+  margin-bottom: 8px;
+}
+
+.ks-highlight-red {
+  color: var(--ks-primary-red, #D32F2F);
+  margin-left: 2px;
+}
+
+.ks-control {
+  width: 100%;
+  padding: 14px 16px;
+  font-family: var(--ks-font-ui, 'Inter', sans-serif);
+  font-size: 1rem;
+  color: var(--ks-text-main, #111827);
+  background-color: #ffffff;
+  border: 1px solid #D1D5DB;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+}
+
+.ks-control::placeholder {
+  color: #9CA3AF;
+}
+
+/* Smooth Focus Ring */
+.ks-control:focus {
+  outline: none;
+  border-color: var(--ks-primary-red, #D32F2F);
+  box-shadow: 0 0 0 4px rgba(211, 47, 47, 0.1);
+}
+
+.ks-textarea {
+  resize: vertical;
+  min-height: 120px;
+  line-height: 1.5;
+}
+
+/* --- 6. DRAG & DROP FILE UPLOAD --- */
+.ks-file-upload-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 24px;
+  border: 2px dashed #D1D5DB;
+  border-radius: 16px;
+  background-color: #F9FAFB;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+/* Hover state for the drop zone */
+.ks-file-upload-zone:hover,
+.ks-file-upload-zone:focus-within {
+  border-color: var(--ks-primary-red, #D32F2F);
+  background-color: #FFF5F5;
+}
+
+.ks-file-upload-content {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 1rem;
+  color: var(--ks-text-muted, #4B5563);
+  margin-bottom: 8px;
+}
+
+.ks-file-btn {
+  color: var(--ks-primary-red, #D32F2F);
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.ks-file-btn:hover {
+  color: var(--ks-primary-dark, #b71c1c);
+  text-decoration: underline;
+}
+
+.ks-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.ks-file-hint {
+  font-size: 0.85rem;
+  color: #6B7280;
+  margin: 0;
+}
+
+/* --- 7. FOOTER & BUTTON --- */
+.ks-action-footer {
+  display: flex;
+  justify-content: flex-end; /* Aligns button to the right */
+  align-items: center;
+  border-top: 1px solid #F3F4F6;
+  padding-top: 24px;
+  margin-top: 32px;
+}
+
+.ks-btn {
+  padding: 14px 32px;
+  border-radius: 9999px; /* Matches the pill-shape of your navbar buttons */
+  font-family: var(--ks-font-brand, 'Plus Jakarta Sans', sans-serif);
+  font-weight: 600;
+  font-size: 1rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all var(--ks-transition-fast, 0.2s ease);
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ks-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.ks-btn-primary {
+  background: linear-gradient(180deg, var(--ks-primary-red, #D32F2F) 0%, var(--ks-primary-dark, #b71c1c) 100%);
+  color: white;
+  box-shadow: 0 4px 6px rgba(211, 47, 47, 0.25), 
+              inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.ks-btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(211, 47, 47, 0.3), 
+              inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.ks-btn-primary:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(211, 47, 47, 0.2);
+}
+
+/* --- 8. RESPONSIVE DESIGN --- */
+@media (max-width: 768px) {
+  .ks-auth-card.ks-help-card {
+    margin-top: 24px;
+    padding: 32px 24px;
+    border-radius: 16px;
+    box-shadow: none; /* Flattens on mobile for a cleaner look */
+    border-top: 1px solid var(--ks-border, rgba(0,0,0,0.08));
+    border-bottom: 1px solid var(--ks-border, rgba(0,0,0,0.08));
+  }
+
+  .ks-main-wrapper {
+    padding-top: var(--ks-nav-height, 72px);
+    background-color: var(--ks-bg-solid, #ffffff); /* Blends background with card on mobile */
+  }
+
+  .ks-group-title {
+    font-size: 1.75rem;
+  }
+
+  .ks-step-sub {
+    font-size: 0.95rem;
+  }
+
+  .ks-action-footer {
+    flex-direction: column;
+  }
+
+  .ks-btn {
+    width: 100%; /* Full width button on mobile */
+  }
+}

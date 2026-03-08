@@ -1,0 +1,527 @@
+/* AddCommunity.css */
+
+/* ==========================================================================
+   Base Layout & Surface 
+   ========================================================================== */
+.sys-cfg-layout {
+  padding: 24px;
+  min-height: 100vh;
+  background-color: #F9FAFB; /* Light grey background outside the main card */
+  box-sizing: border-box;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+.sys-cfg-surface {
+  max-width: 1200px;
+  margin: 0 auto;
+  background-color: #FFFFFF;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  padding: 32px;
+  border: 1px solid #E5E7EB;
+}
+
+/* ==========================================================================
+   Controls & Inputs
+   ========================================================================== */
+.sys-cfg-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.sys-cfg-selector-box {
+  width: 100%;
+  max-width: 400px;
+}
+
+.sys-cfg-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.sys-cfg-input-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.sys-cfg-dropdown, 
+.sys-cfg-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #D1D5DB;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  color: #1F2937;
+  background-color: #FFFFFF;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.sys-cfg-dropdown:focus, 
+.sys-cfg-input:focus {
+  border-color: #D32F2F; /* Brand Red */
+  box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.1);
+}
+
+.sys-cfg-refresh {
+  background-color: #FEF2F2;
+  color: #D32F2F;
+  border: 1px solid rgba(211, 47, 47, 0.2);
+  border-radius: 8px;
+  width: 46px;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.sys-cfg-refresh:hover {
+  background-color: #D32F2F;
+  color: #FFFFFF;
+}
+
+/* ==========================================================================
+   Separators & Tabs
+   ========================================================================== */
+.sys-cfg-separator {
+  height: 1px;
+  background-color: #E5E7EB;
+  margin: 24px 0;
+}
+
+.sys-cfg-tab-group {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  border-bottom: 2px solid #F3F4F6;
+  padding-bottom: 8px;
+  overflow-x: auto; /* Allows scrolling on tiny screens */
+}
+
+.sys-cfg-tab {
+  padding: 10px 20px;
+  border: none;
+  background: transparent;
+  color: #6B7280;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.sys-cfg-tab:hover {
+  background-color: #F3F4F6;
+  color: #1F2937;
+}
+
+.sys-cfg-tab.active {
+  background-color: #FEF2F2;
+  color: #D32F2F; /* Brand Red */
+}
+
+/* ==========================================================================
+   Alerts & Forms
+   ========================================================================== */
+.sys-cfg-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background-color: #FFFBEB; /* Soft Gold/Yellow bg */
+  border-left: 4px solid #C5A059; /* Brand Gold */
+  padding: 16px;
+  border-radius: 4px 8px 8px 4px;
+  margin-bottom: 24px;
+  color: #92400E;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.sys-cfg-alert-icon {
+  color: #C5A059;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.sys-cfg-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 600px;
+}
+
+.sys-cfg-field {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ==========================================================================
+   Tag Input Area (For Nested Items)
+   ========================================================================== */
+.sys-cfg-tag-area {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px solid #D1D5DB;
+  border-radius: 8px;
+  min-height: 48px;
+  background-color: #FFFFFF;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.sys-cfg-tag-area:focus-within {
+  border-color: #D32F2F;
+  box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.1);
+}
+
+.sys-cfg-chip {
+  background-color: #FEF2F2;
+  color: #D32F2F;
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid rgba(211, 47, 47, 0.2);
+}
+
+.sys-cfg-chip-close {
+  cursor: pointer;
+  opacity: 0.6;
+  transition: all 0.2s ease;
+}
+
+.sys-cfg-chip-close:hover {
+  opacity: 1;
+  color: #DC2626;
+  transform: scale(1.1);
+}
+
+.sys-cfg-tag-input {
+  border: none;
+  outline: none;
+  flex: 1;
+  min-width: 180px;
+  font-size: 0.9rem;
+  padding: 4px;
+  background: transparent;
+  color: #1F2937;
+}
+
+.sys-cfg-tag-input:disabled {
+  cursor: not-allowed;
+}
+
+/* ==========================================================================
+   Buttons & Loaders
+   ========================================================================== */
+.sys-cfg-btn-primary {
+  background-color: #D32F2F; /* Brand Red */
+  color: #FFFFFF;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+  box-shadow: 0 4px 6px rgba(211, 47, 47, 0.2);
+  align-self: flex-start;
+}
+
+.sys-cfg-btn-primary:hover:not(:disabled) {
+  background-color: #B91C1C;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 8px rgba(211, 47, 47, 0.3);
+}
+
+.sys-cfg-btn-primary:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.sys-cfg-btn-delete {
+  background-color: #FFF1F2;
+  color: #E11D48; /* Alert Pink/Red */
+  border: 1px solid #FFE4E6;
+  border-radius: 6px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.sys-cfg-btn-delete:hover:not(:disabled) {
+  background-color: #E11D48;
+  color: #FFFFFF;
+  border-color: #E11D48;
+}
+
+.sys-cfg-btn-delete:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Spinners */
+.sys-spin { animation: spin 1s linear infinite; }
+.sys-cfg-loader-ring { display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #FFF; animation: spin 1s ease-in-out infinite; }
+.sys-cfg-loader-ring-mini { width: 14px; height: 14px; border: 2px solid rgba(225, 29, 72, 0.3); border-radius: 50%; border-top-color: #E11D48; animation: spin 1s ease-in-out infinite; }
+
+@keyframes spin { 100% { transform: rotate(360deg); } }
+
+/* ==========================================================================
+   Data Grid & Cards
+   ========================================================================== */
+.sys-cfg-data-section {
+  margin-top: 48px;
+}
+
+.sys-cfg-data-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #1F2937;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 24px;
+  border-bottom: 2px solid #F3F4F6;
+  padding-bottom: 12px;
+}
+
+.sys-cfg-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.sys-cfg-data-card {
+  background-color: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  transition: box-shadow 0.2s, border-color 0.2s, transform 0.2s;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.sys-cfg-data-card:hover {
+  border-color: #D1D5DB;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.06);
+  transform: translateY(-2px);
+}
+
+.sys-cfg-record-name {
+  font-weight: 600;
+  color: #1F2937;
+  font-size: 1.05rem;
+}
+
+.sys-cfg-empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 48px 20px;
+  color: #6B7280;
+  background-color: #F9FAFB;
+  border-radius: 8px;
+  border: 1px dashed #D1D5DB;
+  font-style: italic;
+  font-size: 0.95rem;
+}
+
+/* ==========================================================================
+   Skeleton Loading Animation
+   ========================================================================== */
+.sys-cfg-skeleton-card {
+  background-color: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 10px;
+  padding: 16px;
+  min-height: 70px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: pulse 1.5s infinite;
+}
+
+.sys-cfg-skel-text-main {
+  height: 18px;
+  width: 60%;
+  background-color: #E5E7EB;
+  border-radius: 4px;
+}
+
+.sys-cfg-skel-text-sub {
+  height: 12px;
+  width: 40%;
+  background-color: #F3F4F6;
+  border-radius: 4px;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* ==========================================================================
+   Responsive Media Queries
+   ========================================================================== */
+@media (max-width: 768px) {
+  .sys-cfg-layout {
+    padding: 12px;
+  }
+
+  .sys-cfg-surface {
+    padding: 20px;
+  }
+
+  /* Stack inputs and buttons on mobile */
+  .sys-cfg-input-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .sys-cfg-refresh {
+    width: 100%;
+    height: 48px;
+  }
+
+  .sys-cfg-btn-primary {
+    width: 100%; /* Full width submit button on mobile */
+  }
+
+  .sys-cfg-grid {
+    grid-template-columns: 1fr; /* Single column layout */
+  }
+
+  .sys-cfg-tab {
+    padding: 10px 16px;
+    font-size: 0.85rem;
+  }
+}
+/* ==========================================================================
+   Pagination Controls
+   ========================================================================== */
+.sys-cfg-data-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sys-cfg-page-indicator {
+  font-size: 0.85rem;
+  color: #6B7280;
+  font-weight: 500;
+  background-color: #F3F4F6;
+  padding: 4px 12px;
+  border-radius: 16px;
+}
+
+.sys-cfg-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid #E5E7EB;
+}
+
+.sys-cfg-page-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background-color: #FFFFFF;
+  border: 1px solid #D1D5DB;
+  border-radius: 8px;
+  color: #374151;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sys-cfg-page-btn:hover:not(:disabled) {
+  background-color: #F9FAFB;
+  border-color: #9CA3AF;
+  color: #1F2937;
+}
+
+.sys-cfg-page-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: #F3F4F6;
+}
+
+.sys-cfg-page-numbers {
+  display: flex;
+  gap: 8px;
+}
+
+.sys-cfg-page-num {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  background-color: transparent;
+  border-radius: 8px;
+  color: #4B5563;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sys-cfg-page-num:hover:not(.active) {
+  background-color: #F3F4F6;
+}
+
+.sys-cfg-page-num.active {
+  background-color: #FEF2F2;
+  color: #D32F2F; /* Brand Red */
+  border-color: rgba(211, 47, 47, 0.2);
+}
+
+@media (max-width: 768px) {
+  .sys-cfg-pagination {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  
+  .sys-cfg-page-numbers {
+    order: -1; /* Puts numbers on top on mobile */
+    width: 100%;
+    justify-content: center;
+    margin-bottom: 8px;
+  }
+}

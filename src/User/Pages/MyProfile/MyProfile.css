@@ -1,0 +1,340 @@
+/* --- 1. VARIABLES --- */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --mp-red: #D32F2F;
+  --mp-amber: #FFCA28;
+  --mp-green: #059669;
+  --mp-bg: #F3F4F6;
+  --mp-sheet-bg: #FFFFFF;
+  --mp-text-main: #111827;
+  --mp-text-sub: #6B7280;
+  --mp-border: #E5E7EB;
+  --mp-radius: 8px;
+  --mp-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+}
+
+/* --- 2. LAYOUT --- */
+.mp-container {
+  max-width: 900px;
+  margin: 100px auto 60px;
+  padding: 0 20px;
+  font-family: 'Poppins', sans-serif;
+  color: var(--mp-text-main);
+}
+
+/* --- 3. UNIFIED PROFILE SHEET --- */
+.mp-profile-sheet {
+  background: var(--mp-sheet-bg);
+  border-radius: var(--mp-radius);
+  border: 1px solid var(--mp-border);
+  overflow: hidden;
+  box-shadow: var(--mp-shadow);
+}
+
+/* --- 4. SHEET HEADER --- */
+.mp-sheet-header {
+  padding: 40px;
+  display: flex;
+  align-items: center; /* Aligns avatar and text vertically */
+  gap: 32px;
+  background: linear-gradient(to bottom, #fff, #fafafa);
+}
+
+.mp-avatar-group {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.mp-sheet-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Green Tick Badge */
+.mp-verified-badge {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background: var(--mp-green);
+  color: #fff;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.mp-verified-badge svg {
+  width: 16px;
+  height: 16px;
+}
+
+.mp-header-text {
+  flex-grow: 1;
+}
+
+.mp-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.mp-sheet-name {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--mp-text-main);
+  letter-spacing: -0.5px;
+}
+
+/* Edit Button */
+.mp-icon-btn {
+  background: transparent;
+  border: 1px solid var(--mp-border);
+  color: var(--mp-text-sub);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.mp-icon-btn:hover {
+  background: var(--mp-bg);
+  color: var(--mp-text-main);
+  border-color: var(--mp-text-main);
+}
+
+.mp-meta-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.95rem;
+  color: var(--mp-text-sub);
+}
+
+.mp-divider {
+  height: 1px;
+  background: var(--mp-border);
+  margin: 0;
+}
+
+/* --- 5. SHEET BODY --- */
+.mp-sheet-body {
+  padding: 40px;
+}
+
+.mp-section-wrapper {
+  margin-bottom: 24px;
+}
+
+.mp-sheet-heading {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #D32F2F;
+  font-weight: 600;
+  margin: 0 0 20px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mp-sheet-heading::after {
+  content: '';
+  flex-grow: 1;
+  height: 1px;
+  background: #f3f4f6;
+}
+
+.mp-details-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  row-gap: 24px;
+  column-gap: 32px;
+}
+
+.mp-data-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.mp-data-field label {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--mp-text-sub);
+  margin-bottom: 4px;
+}
+
+.mp-data-field p {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--mp-text-main);
+  margin: 0;
+}
+
+.text-muted { font-size: 0.85em; color: #9CA3AF; }
+
+.mp-divider-subtle {
+  height: 1px;
+  background: transparent;
+  margin: 32px 0;
+}
+
+/* --- 6. EDIT FORM STYLES --- */
+.mp-edit-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.mp-input-wrap {
+  display: flex;
+  flex-direction: column;
+}
+
+.mp-input-wrap label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.mp-input-wrap input,
+.mp-input-wrap select,
+.mp-input-wrap textarea {
+  padding: 10px 12px;
+  border: 1px solid var(--mp-border);
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  transition: all 0.2s;
+  background: #fff;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.mp-input-wrap input:focus {
+  border-color: var(--mp-text-main);
+  outline: none;
+}
+
+.mp-sheet-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-top: 40px;
+  padding-top: 24px;
+  border-top: 1px solid var(--mp-border);
+}
+
+.mp-btn-text {
+  background: none;
+  border: none;
+  color: var(--mp-text-sub);
+  font-weight: 600;
+  cursor: pointer;
+  padding: 10px 20px;
+}
+
+.mp-btn-solid {
+  background: var(--mp-text-main);
+  color: #fff;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+/* --- 7. SKELETON (Condensed) --- */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.shimmer {
+  background: #f6f7f8;
+  background-image: linear-gradient(to right, #f6f7f8 0%, #edeef1 20%, #f6f7f8 40%, #f6f7f8 100%);
+  background-repeat: no-repeat;
+  background-size: 200% 100%; 
+  animation: shimmer 1.5s infinite linear;
+}
+.skeleton-sheet { padding: 0; }
+.skeleton-avatar { width: 100px; height: 100px; border-radius: 50%; }
+.skeleton-line { background: #eee; height: 14px; margin-bottom: 10px; border-radius: 4px; }
+.skeleton-line.title { height: 28px; width: 40%; margin-bottom: 12px; }
+
+/* --- 8. RESPONSIVE --- */
+.fade-in { animation: fadeIn 0.4s ease-out; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+@media (max-width: 768px) {
+  .mp-container { padding: 0 10px; }
+
+  .mp-sheet-header {
+    flex-direction: column;
+    text-align: center; /* This centers text content */
+    padding: 30px 20px;
+  }
+  
+  .mp-avatar-group { margin: 0 auto; }
+  
+  /* CENTER THE HEADER CONTENT ON MOBILE */
+  .mp-header-text {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centers flex children horizontally */
+    margin-top: 16px;
+  }
+
+  .mp-title-row {
+    width: 100%;
+    justify-content: center; /* Centers name and button together */
+    align-items: center;
+    gap: 12px; /* Nice gap between Name and Edit Button */
+    margin-bottom: 8px;
+    position: static; /* Removes previous relative/absolute logic */
+  }
+
+  .mp-icon-btn {
+    position: static; /* Forces it into flow next to name */
+    background: #f9fafb; /* Slight bg to make it touchable */
+  }
+
+  .mp-meta-info { 
+    justify-content: center; /* Centers the ID */
+  }
+  
+  .mp-sheet-name { font-size: 1.5rem; }
+
+  /* Grid Adjustments */
+  .mp-details-grid { grid-template-columns: 1fr 1fr; }
+  .mp-data-field label { font-size: 0.75rem; }
+  .mp-data-field p { font-size: 0.9rem; }
+}
+
+@media (max-width: 500px) {
+  .mp-details-grid { grid-template-columns: 1fr; row-gap: 20px; }
+  .mp-edit-grid { grid-template-columns: 1fr; }
+  
+  .mp-edit-container .mp-input-wrap {
+    align-items: center; 
+    text-align: center;
+  }
+  .mp-edit-container .mp-input-wrap input,
+  .mp-edit-container .mp-input-wrap select { text-align: center; }
+  
+  .mp-sheet-actions { justify-content: center; }
+}

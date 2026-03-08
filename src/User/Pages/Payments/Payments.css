@@ -1,0 +1,315 @@
+/* --- 1. MAIN LAYOUT --- */
+.pmt-dashboard {
+  /* Offset for navbar */
+  padding-top: calc(var(--ks-nav-height, 72px) + 40px);
+  min-height: 100vh;
+  background-color: #F9FAFB;
+  font-family: var(--ks-font-ui, 'Inter', sans-serif);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 80px;
+}
+
+.pmt-header {
+  width: 100%;
+  max-width: 1000px;
+  padding: 0 24px;
+  margin-bottom: 32px;
+}
+
+.pmt-title {
+  font-family: var(--ks-font-brand, 'Plus Jakarta Sans', sans-serif);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--ks-text-main, #111827);
+  margin: 0 0 8px 0;
+  letter-spacing: -0.02em;
+}
+
+.pmt-subtitle {
+  color: var(--ks-text-muted, #4B5563);
+  font-size: 1.05rem;
+  margin: 0;
+}
+
+/* --- 2. TABLE CONTAINER & CARD --- */
+.pmt-table-container {
+  width: 100%;
+  max-width: 1000px;
+  padding: 0 24px;
+}
+
+.ks-card-shadow {
+  background-color: #ffffff;
+  border-radius: 16px;
+  /* Premium multi-layered shadow to match your HelpCenter */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03), 
+              0 12px 24px -4px rgba(0, 0, 0, 0.05),
+              0 0 0 1px rgba(0,0,0,0.02);
+  overflow: hidden; /* Keeps rows constrained inside the rounded card */
+}
+
+/* --- 3. GRID LAYOUT (DESKTOP) --- */
+.pmt-row {
+  display: grid;
+  /* Proportional widths for columns: Date | Amount | Ref | Status */
+  grid-template-columns: 1.2fr 1fr 1.5fr 1fr;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 24px;
+  border-bottom: 1px solid #F3F4F6;
+}
+
+.pmt-row:last-child {
+  border-bottom: none;
+}
+
+/* --- 4. HEADER ROW & MULTI-COLOR ICONS --- */
+.pmt-header-row {
+  background-color: #F9FAFB;
+  border-bottom: 1px solid #E5E7EB;
+  border-radius: 16px 16px 0 0;
+}
+
+.pmt-header-row .pmt-col {
+  font-family: var(--ks-font-brand, 'Plus Jakarta Sans', sans-serif);
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--ks-text-muted, #4B5563);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Small colored boxes for table header icons */
+.ks-icon-box-small {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+}
+
+/* Inherited Colors */
+.ks-bg-blue { background-color: #eff6ff; color: #3b82f6; }
+.ks-bg-green { background-color: #f0fdf4; color: #22c55e; }
+.ks-bg-purple { background-color: #f5f3ff; color: #8b5cf6; }
+.ks-bg-orange { background-color: #fff7ed; color: #f97316; }
+
+/* --- 5. DATA ROWS --- */
+.pmt-data-row {
+  transition: background-color 0.2s ease;
+}
+
+.pmt-data-row:hover {
+  background-color: #F8FAFC; /* Subtle hover effect */
+}
+
+.pmt-cell-wrap {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+}
+
+.pmt-text-primary {
+  font-weight: 600;
+  color: var(--ks-text-main, #111827);
+  font-size: 0.95rem;
+}
+
+.pmt-text-secondary {
+  color: #9CA3AF;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.pmt-amount {
+  font-family: var(--ks-font-brand, 'Plus Jakarta Sans', sans-serif);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--ks-text-main, #111827);
+}
+
+.pmt-ref-badge {
+  font-family: monospace;
+  background-color: #F3F4F6;
+  color: #4B5563;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+  display: inline-block;
+}
+
+/* --- 6. STATUS PILLS --- */
+.pmt-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 9999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: var(--ks-font-brand, 'Plus Jakarta Sans', sans-serif);
+  text-transform: capitalize;
+}
+
+.pmt-status-success {
+  background-color: #DCFCE7;
+  color: #166534;
+}
+
+.pmt-status-failed {
+  background-color: #FEE2E2;
+  color: #991B1B;
+}
+
+.pmt-status-pending {
+  background-color: #FEF3C7;
+  color: #92400E;
+}
+
+/* --- 7. EMPTY STATE --- */
+.pmt-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 24px;
+  text-align: center;
+}
+
+.pmt-empty-icon {
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.pmt-empty-title {
+  font-family: var(--ks-font-brand, 'Plus Jakarta Sans', sans-serif);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--ks-text-main, #111827);
+  margin: 0 0 8px 0;
+}
+
+.pmt-empty-sub {
+  color: var(--ks-text-muted, #4B5563);
+  font-size: 0.95rem;
+  margin: 0;
+  max-width: 300px;
+}
+
+/* --- 8. SKELETON SHIMMER ANIMATION --- */
+.skeleton-header {
+  border-radius: 16px 16px 0 0;
+  background-color: #ffffff;
+}
+
+.skeleton-row {
+  background-color: #ffffff;
+}
+
+.skeleton-line {
+  background-color: #E5E7EB;
+  border-radius: 4px;
+  height: 14px;
+}
+
+.shimmer {
+  background: linear-gradient(90deg, #F3F4F6 25%, #E5E7EB 50%, #F3F4F6 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite linear;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Fade In Animation for content load */
+.fade-in {
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- 9. MOBILE RESPONSIVE (STACKED CARDS) --- */
+@media (max-width: 768px) {
+  .pmt-header {
+    margin-bottom: 24px;
+  }
+  
+  .pmt-title {
+    font-size: 1.75rem;
+  }
+  
+  .pmt-table-container {
+    padding: 0 16px;
+  }
+
+  /* Remove desktop card shadow and let background show through */
+  .ks-card-shadow {
+    box-shadow: none;
+    background-color: transparent;
+  }
+
+  /* Hide Desktop Header */
+  .pmt-header-row {
+    display: none;
+  }
+
+  /* Convert rows into individual stacked cards */
+  .pmt-row.pmt-data-row {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 20px;
+    background-color: #ffffff;
+    border: 1px solid var(--ks-border, rgba(0,0,0,0.08));
+    border-radius: 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+  }
+
+  /* Also format the skeleton to match the stacked card look on mobile */
+  .pmt-row.skeleton-row {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 20px;
+    border: 1px solid #E5E7EB;
+    border-radius: 16px;
+    margin-bottom: 16px;
+  }
+
+  .pmt-col {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
+
+  /* Inject "data-label" to mimic a table header on the left side of mobile cards */
+  .pmt-col::before {
+    content: attr(data-label);
+    font-weight: 500;
+    color: #6B7280;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  /* Right-align the actual data on mobile */
+  .pmt-cell-wrap {
+    align-items: flex-end;
+    text-align: right;
+  }
+}

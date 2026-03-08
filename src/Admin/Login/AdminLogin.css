@@ -1,0 +1,210 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --admin-primary: #D32F2F;       /* Brand Red */
+  --admin-dark: #111827;          /* Deep Black */
+  --admin-gray: #6B7280;          /* Muted Text */
+  --admin-border: #E5E7EB;        /* Light Gray Border */
+  --admin-bg: #FFFFFF;
+  --admin-input-bg: #FFFFFF;
+  --admin-radius: 12px;           /* Modern rounded corners */
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background-color: var(--admin-bg);
+  color: var(--admin-dark);
+}
+
+/* --- MAIN CONTAINER & BACKGROUND --- */
+.admin-login-container {
+  min-height: calc(100vh - 80px); /* Adjust based on navbar height */
+  display: flex;
+  justify-content: center;
+  align-items: center; /* Center vertically like the image */
+  position: relative;
+  padding: 20px;
+  overflow: hidden;
+}
+
+/* The Dot Matrix Background */
+.admin-login-container::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image: radial-gradient(#E5E7EB 1.5px, transparent 1.5px);
+  background-size: 24px 24px;
+  z-index: -1;
+  pointer-events: none;
+  /* Fade out at edges for a clean look */
+  mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
+}
+
+/* --- FORM WRAPPER (No Card style) --- */
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  position: relative;
+  z-index: 1;
+  background: transparent; /* No card background as requested */
+  border:none;
+}
+
+/* --- HEADER --- */
+.login-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.login-header h2 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--admin-dark);
+  margin: 0 0 8px 0;
+  letter-spacing: -0.5px;
+}
+
+.login-header p {
+  font-size: 0.95rem;
+  color: var(--admin-gray);
+  margin: 0;
+  font-weight: 400;
+}
+
+/* --- INPUT FIELDS --- */
+.form-group {
+  margin-bottom: 24px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--admin-dark);
+  margin-bottom: 8px;
+}
+
+/* Input Styling with Icon placeholders */
+.form-control {
+  width: 100%;
+  padding: 14px 16px 14px 44px; /* Left padding for the icon */
+  font-size: 1rem;
+  font-family: 'Inter', sans-serif;
+  color: var(--admin-dark);
+  background-color: var(--admin-input-bg);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius);
+  outline: none;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+  
+  /* Default Icon: User/Generic */
+  background-repeat: no-repeat;
+  background-position: 14px center;
+  background-size: 20px;
+}
+
+/* Focus State */
+.form-control:focus {
+  border-color: var(--admin-primary);
+  box-shadow: 0 0 0 4px rgba(211, 47, 47, 0.1);
+}
+
+/* --- ICONS VIA CSS (Matches Image) --- */
+
+/* 1. Email Input Icon (Envelope) */
+.form-group input[type="email"] {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236B7280' stroke-width='1.5'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z' /%3E%3C/svg%3E");
+}
+
+/* 2. Password Input Icon (Lock) */
+.form-group input[type="password"] {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236B7280' stroke-width='1.5'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z' /%3E%3C/svg%3E");
+}
+
+/* 3. OTP Input Icon (Hash/Key) */
+.form-group input[type="number"] {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236B7280' stroke-width='1.5'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.131A8 8 0 008 8m0 0a8 8 0 00-8 8c0 2.472.345 4.865.99 7.131M8 8a8 8 0 004 7m4-7a8 8 0 00-8 0' /%3E%3C/svg%3E");
+}
+
+/* Change icon color to red when input is focused */
+.form-group input:focus {
+  /* This swaps the gray stroke (%236B7280) for the red stroke (%23D32F2F) in the SVG data */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23D32F2F' stroke-width='1.5'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z' /%3E%3C/svg%3E");
+}
+/* Note: You would replicate the SVG swap for password/OTP focus states similarly if desired, or keep generic */
+
+
+/* --- BUTTONS --- */
+.btn-primary {
+  width: 100%;
+  background-color: var(--admin-primary);
+  color: white;
+  border: none;
+  padding: 16px;
+  border-radius: 100px; /* Pill shape like image */
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 12px;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(211, 47, 47, 0.3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: #B71C1C;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(211, 47, 47, 0.4);
+}
+
+.btn-primary:disabled {
+  background-color: #E5E7EB;
+  color: #9CA3AF;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+/* --- ALERTS --- */
+.alert {
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-align: center;
+}
+.alert-error { background: #FEF2F2; color: #EF4444; border: 1px solid #FECACA; }
+.alert-success { background: #F0FDF4; color: #16A34A; border: 1px solid #BBF7D0; }
+
+/* --- LINKS --- */
+.back-link {
+  text-align: center;
+  margin-top: 24px;
+  font-size: 0.9rem;
+  color: var(--admin-gray);
+  cursor: pointer;
+  transition: color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.back-link:hover {
+  color: var(--admin-primary);
+}
+
+/* Mobile Adjustments */
+@media (max-width: 480px) {
+  .admin-login-container {
+    padding: 20px;
+    align-items: flex-start;
+    padding-top: 60px;
+  }
+  .login-header h2 { font-size: 1.5rem; }
+}

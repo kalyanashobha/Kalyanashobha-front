@@ -1,0 +1,166 @@
+/* =========================================
+   Base Page Layout - Clean & Minimal
+========================================= */
+.ks-terms-page {
+  background-color: #F9FAFB; 
+  min-height: 100vh;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  padding-bottom: 60px;
+  margin-top: 60px; 
+}
+
+/* =========================================
+   Premium Hero Banner (Modern Red)
+========================================= */
+.ks-terms-hero {
+  background: linear-gradient(135deg, #E53935 0%, #B71C1C 100%);
+  padding: 60px 5% 80px 5%; 
+  text-align: center;
+  position: relative;
+}
+
+.ks-terms-hero__content {
+  max-width: 1400px; 
+  margin: 0 auto;
+}
+
+.ks-terms-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+  letter-spacing: -0.5px;
+  color: #FFFFFF;
+}
+
+.ks-terms-subtitle {
+  font-size: 1.1rem;
+  margin: 0;
+  font-weight: 400;
+  color: #FFCDD2; 
+}
+
+/* =========================================
+   Document Container (Full Width for Large Screens)
+========================================= */
+.ks-terms-container {
+  max-width: 1400px; 
+  width: 95%; 
+  margin: -40px auto 0; 
+  position: relative;
+  z-index: 10;
+}
+
+.ks-terms-document {
+  background: #FFFFFF;
+  border-radius: 12px; 
+  padding: 50px 60px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); 
+}
+
+/* =========================================
+   Dynamic Content Formatting
+========================================= */
+.ks-dynamic-html-content {
+  color: #374151; 
+  line-height: 1.8;
+  font-size: 1.05rem;
+  white-space: pre-wrap; 
+  word-wrap: break-word;
+}
+
+/* =========================================
+   Forced Heading Styles (Dark Black)
+========================================= */
+.ks-dynamic-html-content h2.ks-section-heading {
+  color: #111827 !important; /* Very dark black as requested */
+  font-weight: 800 !important; /* Extra bold */
+  font-size: 1.5rem !important;
+  margin-top: 2.5em !important; 
+  margin-bottom: 0.5em !important;
+  border-bottom: 2px solid #E5E7EB !important; /* Adds a clean underline separator */
+  padding-bottom: 8px !important;
+  display: block !important;
+}
+
+/* Remove top margin for the very first element */
+.ks-dynamic-html-content > *:first-child {
+  margin-top: 0 !important;
+}
+
+/* Bold text inside lists or paragraphs */
+.ks-dynamic-html-content strong,
+.ks-dynamic-html-content b {
+  color: #111827; 
+  font-weight: 700;
+}
+
+/* =========================================
+   Loading Skeleton Animation
+========================================= */
+.ks-terms-loading {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px 0;
+}
+
+.ks-skeleton-line {
+  height: 16px;
+  background: #E5E7EB;
+  border-radius: 4px;
+  animation: ks-pulse 1.5s infinite ease-in-out;
+}
+
+.ks-skeleton-line.title {
+  height: 24px;
+  width: 40%;
+  margin-bottom: 16px;
+  background: #D1D5DB;
+}
+
+.ks-skeleton-line.short {
+  width: 65%;
+}
+
+@keyframes ks-pulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
+/* =========================================
+   Responsive Design (Mobile Fixes)
+========================================= */
+@media (max-width: 768px) {
+  .ks-terms-page {
+    margin-top: 50px; 
+  }
+
+  .ks-terms-hero {
+    padding: 40px 15px 60px 15px; 
+  }
+  
+  .ks-terms-title {
+    font-size: 1.75rem;
+  }
+  
+  .ks-terms-container {
+    width: 100%; 
+    padding: 0 15px; 
+  }
+
+  .ks-terms-document {
+    padding: 25px 20px; 
+    border-radius: 8px;
+  }
+  
+  .ks-dynamic-html-content {
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  .ks-dynamic-html-content h2.ks-section-heading {
+    font-size: 1.25rem !important; 
+    margin-top: 2em !important;
+  }
+}

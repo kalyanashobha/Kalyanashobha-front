@@ -1,0 +1,243 @@
+.admin-leads-container {
+  padding: 30px;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.admin-leads-header {
+  margin-bottom: 25px;
+}
+
+.admin-leads-header h2 {
+  margin: 0 0 5px 0;
+  font-size: 24px;
+  color: #1a1a1a;
+  font-weight: 600;
+}
+
+.admin-leads-header p {
+  margin: 0;
+  color: #6c757d;
+  font-size: 14px;
+}
+
+.admin-error-banner {
+  background-color: #fee2e2;
+  color: #b91c1c;
+  padding: 12px 15px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+/* --- Table Wrapper --- */
+.admin-table-wrapper {
+  background: #ffffff;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  overflow-x: auto;
+}
+
+.admin-loading,
+.admin-empty-state {
+  padding: 40px;
+  text-align: center;
+  color: #6c757d;
+  font-size: 15px;
+}
+
+/* --- The Table --- */
+.admin-leads-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.admin-leads-table th {
+  background-color: #f8f9fa;
+  color: #495057;
+  font-weight: 600;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 15px 20px;
+  border-bottom: 2px solid #dee2e6;
+}
+
+.admin-leads-table td {
+  padding: 15px 20px;
+  border-bottom: 1px solid #e9ecef;
+  vertical-align: top;
+}
+
+.admin-leads-table tr:hover {
+  background-color: #fdfdfd;
+}
+
+/* --- Cell Typography --- */
+.lead-date {
+  font-size: 14px;
+  color: #495057;
+  white-space: nowrap;
+}
+
+.lead-client strong,
+.lead-vendor strong {
+  display: block;
+  font-size: 15px;
+  color: #212529;
+  margin-bottom: 4px;
+}
+
+.lead-client span,
+.lead-vendor span {
+  display: block;
+  font-size: 13px;
+  color: #6c757d;
+  margin-bottom: 2px;
+}
+
+.vendor-category {
+  display: inline-block;
+  background: #f1f3f5;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 11px !important;
+  color: #495057 !important;
+  margin-top: 4px;
+}
+
+.lead-message p {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  color: #212529;
+  line-height: 1.5;
+  max-width: 400px;
+}
+
+.lead-meta {
+  display: flex;
+  gap: 15px;
+}
+
+.lead-meta span {
+  font-size: 12px;
+  color: #6c757d;
+  background: #f8f9fa;
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid #e9ecef;
+}
+
+/* --- Status Badges --- */
+.status-badge {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Colors for different statuses */
+.status-new {
+  background-color: #e0f2fe;
+  color: #0369a1;
+  border: 1px solid #bae6fd;
+}
+
+.status-contacted {
+  background-color: #fef08a;
+  color: #854d0e;
+  border: 1px solid #fde047;
+}
+
+.status-forwarded {
+  background-color: #dcfce7;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+
+.status-closed {
+  background-color: #f3f4f6;
+  color: #4b5563;
+  border: 1px solid #e5e7eb;
+}
+/* Add this to your existing AdminVendorLeads.css file */
+
+.vendor-custom-id {
+  display: inline-block;
+  background-color: #f1f3f5;
+  color: #495057;
+  font-family: monospace; /* Gives it a technical/system ID feel */
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 6px;
+  border-radius: 4px;
+  margin-bottom: 6px;
+  border: 1px solid #dee2e6;
+}
+
+.vendor-contact {
+  display: block;
+  font-size: 12px !important;
+  color: #0369a1 !important; /* A subtle blue to indicate contact info */
+  margin-top: 4px;
+  font-weight: 500;
+}
+/* --- Header Updates for Cleaner Structure --- */
+.admin-leads-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.lead-count-badge {
+  background: #e9ecef;
+  color: #495057;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* --- Skeleton Loading Animation --- */
+@keyframes shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+.v-skel-box {
+  background: #f6f7f8;
+  background-image: linear-gradient(
+    to right, 
+    #f6f7f8 0%, 
+    #edeef1 20%, 
+    #f6f7f8 40%, 
+    #f6f7f8 100%
+  );
+  background-repeat: no-repeat;
+  background-size: 800px 100%; 
+  animation: shimmer 1.5s infinite linear forwards;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+/* Specific Skeleton Shapes */
+.v-skel-date { height: 16px; width: 80px; }
+.v-skel-title { height: 18px; width: 140px; margin-bottom: 6px; }
+.v-skel-text { height: 14px; width: 100px; }
+.v-skel-text.short { width: 70px; }
+.v-skel-badge { height: 22px; width: 80px; border-radius: 4px; margin-bottom: 6px; }
+.v-skel-desc { height: 16px; width: 100%; margin-bottom: 6px; }
+.v-skel-desc.half { width: 60%; }
+.v-skel-status { height: 26px; width: 90px; border-radius: 4px; }
+
+/* Keep table rows vertically aligned during loading */
+.v-skeleton-row td {
+  vertical-align: top;
+  padding: 15px 20px;
+}
