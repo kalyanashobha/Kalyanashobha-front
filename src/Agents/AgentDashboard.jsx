@@ -266,11 +266,62 @@ const AgentDashboard = () => {
     }
   };
 
-  const nextRegStep = () => setRegStep(prev => Math.min(prev + 1, TOTAL_STEPS));
+  // --- VALIDATION LOGIC ADDED HERE ---
+  const validateStep = (step) => {
+    switch(step) {
+      case 1:
+        return regData.profileFor && regData.gender;
+      case 2:
+        if (!regData.mobileNumber || regData.mobileNumber.length < 10) {
+           toast.error("Please enter a valid mobile number"); return false;
+        }
+        if (!regData.email || !regData.email.includes('@')) {
+           toast.error("Please enter a valid email address"); return false;
+        }
+        if (!regData.password) {
+           toast.error("Please create a password"); return false;
+        }
+        return true;
+      case 3:
+        if (!regData.firstName || !regData.lastName || !regData.dob || !regData.maritalStatus) {
+           toast.error("Please fill in all required personal details"); return false;
+        }
+        return true;
+      case 4:
+        if (!regData.community || !regData.caste) {
+           toast.error("Please select a Community and Sub-Community/Caste"); return false;
+        }
+        return true;
+      case 5:
+        if (!regData.highestQualification) {
+           toast.error("Please select the highest qualification"); return false;
+        }
+        return true;
+      case 6:
+        if (!regData.height || !regData.diet || !regData.country || !regData.state || !regData.city) {
+           toast.error("Please fill in all required physical and location details"); return false;
+        }
+        return true;
+      default:
+        return true;
+    }
+  };
+
+  // --- UPDATED NEXT STEP FUNCTION ---
+  const nextRegStep = () => {
+    if (validateStep(regStep)) {
+      setRegStep(prev => Math.min(prev + 1, TOTAL_STEPS));
+    }
+  };
+
   const prevRegStep = () => setRegStep(prev => Math.max(prev - 1, 1));
 
   const handleRegisterSubmit = async (e) => {
     e.preventDefault();
+
+    // Validate the final step before submission
+    if (!validateStep(regStep)) return; 
+
     if(regStep < TOTAL_STEPS) {
         nextRegStep();
         return;
