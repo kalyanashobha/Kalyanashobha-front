@@ -30,26 +30,26 @@ const Testimonials = () => {
 
     // Skeleton loader component
     const SkeletonCard = () => (
-        <div className="ks-testimonial-card ks-skeleton-card">
-            <div className="ks-card-inner">
+        <div className="story-testimonial-card story-skeleton-card">
+            <div className="story-card-inner">
                 {/* Skeleton Media Area */}
-                <div className="ks-test-media-wrapper ks-skeleton-media"></div>
+                <div className="story-test-media-wrapper story-skeleton-media"></div>
                 
                 {/* Skeleton Content Area */}
-                <div className="ks-testimonial-content">
-                    <div className="ks-skeleton-stars"></div>
+                <div className="story-testimonial-content">
+                    <div className="story-skeleton-stars"></div>
                     
-                    <div className="ks-skeleton-text-block">
-                        <div className="ks-skeleton-line" style={{ width: '90%' }}></div>
-                        <div className="ks-skeleton-line" style={{ width: '100%' }}></div>
-                        <div className="ks-skeleton-line" style={{ width: '75%' }}></div>
+                    <div className="story-skeleton-text-block">
+                        <div className="story-skeleton-line" style={{ width: '90%' }}></div>
+                        <div className="story-skeleton-line" style={{ width: '100%' }}></div>
+                        <div className="story-skeleton-line" style={{ width: '75%' }}></div>
                     </div>
                     
-                    <div className="ks-testimonial-footer">
-                        <div className="ks-skeleton-avatar"></div>
-                        <div className="ks-author-details" style={{ width: '60%' }}>
-                            <div className="ks-skeleton-line ks-skeleton-author-name"></div>
-                            <div className="ks-skeleton-line ks-skeleton-badge"></div>
+                    <div className="story-testimonial-footer">
+                        <div className="story-skeleton-avatar"></div>
+                        <div className="story-author-details" style={{ width: '60%' }}>
+                            <div className="story-skeleton-line story-skeleton-author-name"></div>
+                            <div className="story-skeleton-line story-skeleton-badge"></div>
                         </div>
                     </div>
                 </div>
@@ -58,7 +58,7 @@ const Testimonials = () => {
     );
 
     if (error) {
-        return <div className="ks-test-error">{error}</div>;
+        return <div className="story-test-error">{error}</div>;
     }
 
     if (!isLoading && testimonials.length === 0) {
@@ -66,28 +66,28 @@ const Testimonials = () => {
     }
 
     return (
-        <section className="ks-testimonials-section">
+        <section className="story-testimonials-section">
             {/* Vercel-style Background Elements */}
-            <div className="ks-test-bg-grid"></div>
-            <div className="ks-test-glow ks-glow-left"></div>
-            <div className="ks-test-glow ks-glow-right"></div>
+            <div className="story-test-bg-grid"></div>
+            <div className="story-test-glow story-glow-left"></div>
+            <div className="story-test-glow story-glow-right"></div>
 
-            <div className="ks-test-container">
+            <div className="story-test-container">
                 
                 {/* Premium Header */}
-                <div className="ks-test-header">
-                    <div className="ks-test-badge">Success Stories</div>
-                    <h2 className="ks-test-title">
-                        Matches Made in <br className="ks-mobile-break" />
-                        <span className="ks-text-gradient">Heaven</span>
+                <div className="story-test-header">
+                    <div className="story-test-badge">Success Stories</div>
+                    <h2 className="story-test-title">
+                        Matches Made in <br className="story-mobile-break" />
+                        <span className="story-text-gradient">Heaven</span>
                     </h2>
-                    <p className="ks-test-subtitle">
+                    <p className="story-test-subtitle">
                         Read the beautiful journeys of couples who found their forever on KalyanaShobha.
                     </p>
                 </div>
                 
                 {/* Grid */}
-                <div className="ks-testimonials-grid">
+                <div className="story-testimonials-grid">
                     {isLoading ? (
                         /* Render 3 skeleton cards while loading */
                         <>
@@ -99,25 +99,25 @@ const Testimonials = () => {
                         /* Render actual data when loaded */
                         testimonials.map((item, index) => (
                             <div 
-                                className="ks-testimonial-card" 
+                                className="story-testimonial-card" 
                                 key={item._id}
                                 style={{ animationDelay: `${index * 0.1}s` }} 
                             >
-                                <div className="ks-card-inner">
+                                <div className="story-card-inner">
                                     {/* Media Section */}
                                     {item.mediaUrl && item.mediaType === 'video' ? (
-                                        <div className="ks-test-media-wrapper">
+                                        <div className="story-test-media-wrapper">
                                             <video 
-                                                className="ks-test-media" 
+                                                className="story-test-media" 
                                                 src={item.mediaUrl} 
                                                 controls 
                                                 preload="metadata"
                                             />
                                         </div>
                                     ) : item.mediaUrl ? (
-                                        <div className="ks-test-media-wrapper">
+                                        <div className="story-test-media-wrapper">
                                             <img 
-                                                className="ks-test-media" 
+                                                className="story-test-media" 
                                                 src={item.mediaUrl} 
                                                 alt={`Testimonial from ${item.authorName}`} 
                                             />
@@ -125,24 +125,24 @@ const Testimonials = () => {
                                     ) : null}
 
                                     {/* Content Section */}
-                                    <div className="ks-testimonial-content">
-                                        <Quote className="ks-quote-icon" size={24} strokeWidth={1.5} />
+                                    <div className="story-testimonial-content">
+                                        <Quote className="story-quote-icon" size={24} strokeWidth={1.5} />
                                         
-                                        <div className="ks-stars">
+                                        <div className="story-stars">
                                             {[...Array(5)].map((_, i) => (
                                                 <Star key={i} size={14} fill="#F59E0B" color="#F59E0B" />
                                             ))}
                                         </div>
 
-                                        <p className="ks-testimonial-text">"{item.content}"</p>
+                                        <p className="story-testimonial-text">"{item.content}"</p>
                                         
-                                        <div className="ks-testimonial-footer">
-                                            <div className="ks-author-avatar">
+                                        <div className="story-testimonial-footer">
+                                            <div className="story-author-avatar">
                                                 {item.authorName.charAt(0)}
                                             </div>
-                                            <div className="ks-author-details">
-                                                <span className="ks-testimonial-author">{item.authorName}</span>
-                                                <span className="ks-verified-badge">Verified Match</span>
+                                            <div className="story-author-details">
+                                                <span className="story-testimonial-author">{item.authorName}</span>
+                                                <span className="story-verified-badge">Verified Match</span>
                                             </div>
                                         </div>
                                     </div>
