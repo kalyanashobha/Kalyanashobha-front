@@ -98,10 +98,13 @@ const Interests = () => {
     ), { duration: Infinity, position: 'top-center' });
   };
 
-    const performAction = async (interestId, action, toastId) => {
+  const performAction = async (interestId, action, toastId) => {
+    // 1. Gracefully dismiss the confirmation toast
     toast.dismiss(toastId); 
     
-    const loadingToast = toast.loading("Processing..."); 
+    // 2. Trigger the processing toast
+    const loadingToast = toast.loading("Processing...");
+    
     const token = localStorage.getItem('token');
 
     try {
@@ -112,23 +115,19 @@ const Interests = () => {
       });
       const data = await res.json();
 
+      // 3. Dismiss the processing toast as soon as we get a response
+      toast.dismiss(loadingToast);
+
       if (data.success) {
-        toast.success(`Request ${action}ed`, { 
-            id: loadingToast, 
-            duration: 2000 
-        });
+        // Just refresh the data, no stuck success toast
         fetchInterests(true); 
       } else {
-        toast.error(data.message || "Action failed", { 
-            id: loadingToast, 
-            duration: 3000 
-        });
+        toast.error(data.message || "Action failed");
       }
     } catch (err) {
-      toast.error("Network error", { 
-          id: loadingToast, 
-          duration: 3000 
-      });
+      // Make sure to dismiss the processing toast if there's an error too
+      toast.dismiss(loadingToast);
+      toast.error("Network error");
     }
   };
 
@@ -163,7 +162,6 @@ const Interests = () => {
 
     return (
       <div className="ui-row fade-in">
-        {/* 1. Avatar Section */}
         <div className="ui-row__avatar-wrapper">
           <img src={neutralAvatar} alt="Avatar" className="ui-row__avatar" />
           {isConnected && (
@@ -173,7 +171,6 @@ const Interests = () => {
           )}
         </div>
 
-        {/* 2. Main Identity Section */}
         <div className="ui-row__identity">
           <div className="ui-row__name-group">
             <h3 className="ui-row__name">
@@ -187,7 +184,6 @@ const Interests = () => {
           </p>
         </div>
 
-        {/* 3. Details Section */}
         <div className="ui-row__details">
           <div className="row-detail">
             <CalendarDays size={14} className="icon-age" />
@@ -203,7 +199,6 @@ const Interests = () => {
           </div>
         </div>
 
-        {/* 4. Actions & Status Section */}
         <div className="ui-row__actions">
           {isConnected ? (
              <span className="ui-status ui-status--finalized">
