@@ -15,9 +15,9 @@ const CustomTimePicker = ({ isOpen, onClose, onSet, initialTime }) => {
     if (isOpen && initialTime) {
       const match = initialTime.match(/(\d+):(\d+)\s*(AM|PM)/i);
       if (match) {
-        setHour(match[1]);
-        setMinute(match[2]);
-        setPeriod(match[3].toUpperCase());
+        setHour(match);
+        setMinute(match);
+        setPeriod(match.toUpperCase());
       }
     }
   }, [isOpen, initialTime]);
@@ -99,11 +99,11 @@ const ProfileSkeleton = () => (
       </div>
     </div>
     <div className="mp-grid">
-      {[1, 2, 3, 4].map(i => (
+      {.map(i => (
         <div key={i} className="mp-card">
           <div className="mp-skeleton" style={{ width: '40%', height: '20px', marginBottom: '1.5rem' }}></div>
           <div className="mp-info-grid">
-            {[1, 2, 3, 4].map(j => (
+            {.map(j => (
               <div key={j}>
                 <div className="mp-skeleton" style={{ width: '50%', height: '10px', marginBottom: '8px' }}></div>
                 <div className="mp-skeleton" style={{ width: '80%', height: '16px' }}></div>
@@ -191,13 +191,13 @@ const MyProfile = () => {
       );
       
       setMasterData({
-        communities: responses[0]?.success ? (responses[0].data || []) : [],
-        countries: responses[1]?.success ? (responses[1].data || []) : [],
-        educations: responses[2]?.success ? (responses[2].data || []) : [],
-        occupations: responses[3]?.success ? (responses[3].data || []) : [],
-        motherTongues: responses[4]?.success ? (responses[4].data || []) : [],
-        stars: responses[5]?.success ? (responses[5].data || []) : [],
-        moonsigns: responses[6]?.success ? (responses[6].data || []) : []
+        communities: responses?.success ? (responses.data || []) : [],
+        countries: responses?.success ? (responses.data || []) : [],
+        educations: responses?.success ? (responses.data || []) : [],
+        occupations: responses?.success ? (responses.data || []) : [],
+        motherTongues: responses?.success ? (responses.data || []) : [],
+        stars: responses?.success ? (responses.data || []) : [],
+        moonsigns: responses?.success ? (responses.data || []) : []
       });
     } catch (err) {
       console.error("Failed to load master data", err);
@@ -365,7 +365,7 @@ const MyProfile = () => {
           
           <div className="mp-hero">
             <div className="mp-avatar-wrapper">
-              <img src={user?.photos?.[0] || "https://cdn-icons-png.flaticon.com/512/847/847969.png"} alt="Profile" className="mp-avatar" />
+              <img src={user?.photos?. || "https://cdn-icons-png.flaticon.com/512/847/847969.png"} alt="Profile" className="mp-avatar" />
               {user?.isPaidMember && (
                 <div className="mp-badge" title="Verified Member"><BadgeCheck size={24} fill="#10B981" color="#fff" /></div>
               )}
@@ -528,9 +528,26 @@ const MyProfile = () => {
                   <h3 className="mp-card-title">Family Details</h3>
                   <div className="mp-form-grid">
                     <InputField label="Father's Name" name="familyDetails.fatherName" value={formData.familyDetails?.fatherName} onChange={handleChange} />
-                    <InputField label="Father's Occ." name="familyDetails.fatherOccupation" value={formData.familyDetails?.fatherOccupation} onChange={handleChange} />
+                    
+                    {/* UPDATED TO SELECTFIELD FOR FATHER'S OCCUPATION */}
+                    <SelectField 
+                      label="Father's Occ." 
+                      name="familyDetails.fatherOccupation" 
+                      value={formData.familyDetails?.fatherOccupation} 
+                      options={masterData.occupations} 
+                      onChange={handleChange} 
+                    />
+
                     <InputField label="Mother's Name" name="familyDetails.motherName" value={formData.familyDetails?.motherName} onChange={handleChange} />
-                    <InputField label="Mother's Occ." name="familyDetails.motherOccupation" value={formData.familyDetails?.motherOccupation} onChange={handleChange} />
+                    
+                    {/* UPDATED TO SELECTFIELD FOR MOTHER'S OCCUPATION */}
+                    <SelectField 
+                      label="Mother's Occ." 
+                      name="familyDetails.motherOccupation" 
+                      value={formData.familyDetails?.motherOccupation} 
+                      options={masterData.occupations} 
+                      onChange={handleChange} 
+                    />
                     
                     {/* CHANGED TO DROPDOWNS 0-10 */}
                     <SelectField label="Total Brothers" name="familyDetails.noOfBrothers" value={formData.familyDetails?.noOfBrothers} options={countOptions} onChange={handleChange} />
