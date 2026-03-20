@@ -162,7 +162,6 @@ const AdminUserManagement = () => {
   const [masterStars, setMasterStars] = useState([]);
   const [masterMoonsigns, setMasterMoonsigns] = useState([]);
 
-  // --- NEW: Dynamic State for Location Hierarchy in Advanced Filters ---
   const [advStates, setAdvStates] = useState([]);
   const [advCities, setAdvCities] = useState([]);
 
@@ -173,7 +172,6 @@ const AdminUserManagement = () => {
   useEffect(() => {
     const fetchInitialMasterData = async () => {
       try {
-        // Removed State and City from initial load to save bandwidth
         const [
           commRes, countryRes, eduRes, occRes, mtRes, starRes, moonRes
         ] = await Promise.all([
@@ -232,10 +230,8 @@ const AdminUserManagement = () => {
         const timer = setTimeout(() => fetchUsers(), 500);
         return () => clearTimeout(timer);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchTerm, referralFilter, page, showAdvanced]);
 
-  // --- UPDATED: Advanced Filter Change Handler for Hierarchy ---
   const handleAdvChange = async (e) => {
     const { name, value } = e.target;
     
@@ -248,7 +244,6 @@ const AdminUserManagement = () => {
         setAvailableSubCommunities([]);
       }
     } else if (name === 'country') {
-      // Clear state and city when country changes
       setAdvFilters({ ...advFilters, country: value, state: '', city: '' });
       setAdvCities([]); 
       
@@ -261,7 +256,6 @@ const AdminUserManagement = () => {
         setAdvStates([]);
       }
     } else if (name === 'state') {
-      // Clear city when state changes
       setAdvFilters({ ...advFilters, state: value, city: '' });
       if (value) {
         try {
@@ -303,7 +297,7 @@ const AdminUserManagement = () => {
   const clearAdvanced = () => {
     setAdvFilters(INITIAL_FILTERS);
     setAvailableSubCommunities([]); 
-    setAdvStates([]); // Clear location dropdowns
+    setAdvStates([]); 
     setAdvCities([]);
     setShowAdvanced(false); 
     setPage(1);
@@ -424,7 +418,6 @@ const AdminUserManagement = () => {
                     {masterOccupations.map((o, idx) => <option key={idx} value={o.name}>{o.name}</option>)}
                 </select>
 
-                {/* --- UPDATED LOCATION SELECTS --- */}
                 <select name="country" value={advFilters.country} onChange={handleAdvChange} className="um-input">
                     <option value="">Country (Any)</option>
                     {masterCountries.map((c, idx) => <option key={idx} value={c.name}>{c.name}</option>)}
@@ -526,7 +519,6 @@ const AdminUserManagement = () => {
   );
 };
 
-// --- SKELETON COMPONENT ---
 const UserSkeleton = () => (
   <div className="user-card skeleton-card">
     <div className="uc-header skeleton-header">
@@ -551,7 +543,6 @@ const UserSkeleton = () => (
   </div>
 );
 
-// --- USER BLOCK ---
 const UserBlock = ({ user, isProcessing, onView, onBlock, onDelete }) => {
   const getAge = (dob) => dob ? Math.abs(new Date(Date.now() - new Date(dob).getTime()).getUTCFullYear() - 1970) : "N/A";
 
@@ -623,7 +614,6 @@ const UserBlock = ({ user, isProcessing, onView, onBlock, onDelete }) => {
   );
 };
 
-// --- HELPER COMPONENT FOR LABELS ---
 const FormGroup = ({ label, children }) => (
   <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
     <label style={{ fontSize: '12px', color: '#666', fontWeight: '500' }}>{label}</label>
@@ -631,18 +621,15 @@ const FormGroup = ({ label, children }) => (
   </div>
 );
 
-// --- UPDATED DETAIL & EDIT MODAL ---
 const UserDetailModal = ({ user, onClose, onUpdateSuccess, masterData }) => {
   const [activeImg, setActiveImg] = useState(user.photos && user.photos.length > 0 ? user.photos[0] : null);
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false); 
 
-  // --- NEW: Local State for Hierarchical Data in Modal ---
   const [editStates, setEditStates] = useState([]);
   const [editCities, setEditCities] = useState([]);
 
-  // Form State initialized with user data
   const [formData, setFormData] = useState({
     firstName: user.firstName || '', lastName: user.lastName || '', gender: user.gender || '',
     dob: user.dob ? new Date(user.dob).toISOString().split('T')[0] : '', maritalStatus: user.maritalStatus || '',
@@ -668,7 +655,6 @@ const UserDetailModal = ({ user, onClose, onUpdateSuccess, masterData }) => {
   const [existingPhotos, setExistingPhotos] = useState(user.photos || []);
   const [newPhotos, setNewPhotos] = useState([]);
 
-  // --- NEW: Load Initial Location Hierarchy on Open ---
   useEffect(() => {
     const loadInitialLocations = async () => {
       if (formData.country) {
@@ -685,7 +671,7 @@ const UserDetailModal = ({ user, onClose, onUpdateSuccess, masterData }) => {
       }
     };
     loadInitialLocations();
-  }, []); // Run only once when modal opens
+  }, []); 
 
   const selectedCommObj = masterData?.communities.find(c => c.name === formData.community);
   const editModeSubCommunities = selectedCommObj ? selectedCommObj.subCommunities : [];
@@ -695,7 +681,6 @@ const UserDetailModal = ({ user, onClose, onUpdateSuccess, masterData }) => {
   const agentName = hasAgent ? user.referredByAgentId.name : user.referredByAgentName;
   const agentCode = hasAgent ? user.referredByAgentId.agentCode : "Manual";
 
-  // --- UPDATED: Handle Input Change with Location Hierarchy ---
   const handleInputChange = async (e) => {
     const { name, value } = e.target;
     
@@ -705,11 +690,7 @@ const UserDetailModal = ({ user, onClose, onUpdateSuccess, masterData }) => {
     else if (name === 'country') {
         setFormData(prev => ({ ...prev, country: value, state: '', city: '' }));
         setEditCities([]);
-        
-        // Safety check to prevent rapid API calls while typing in datalist
-        const isValidCountry = masterData?.countries?.find(c => c.name.toLowerCase() === value.toLowerCase());
-        
-        if (isValidCountry) {
+        if (value) {
             try {
                 const res = await axios.get(`${API_BASE_URL}/public/master-data/State?parent=${value}`);
                 setEditStates(res.data.success ? res.data.data : []);
@@ -720,11 +701,7 @@ const UserDetailModal = ({ user, onClose, onUpdateSuccess, masterData }) => {
     } 
     else if (name === 'state') {
         setFormData(prev => ({ ...prev, state: value, city: '' }));
-        
-        // Check if the typed state matches our loaded state list
-        const isValidState = editStates.find(s => s.name.toLowerCase() === value.toLowerCase());
-        
-        if (isValidState) {
+        if (value) {
             try {
                 const res = await axios.get(`${API_BASE_URL}/public/master-data/City?parent=${value}`);
                 setEditCities(res.data.success ? res.data.data : []);
@@ -826,7 +803,6 @@ const UserDetailModal = ({ user, onClose, onUpdateSuccess, masterData }) => {
       submitData.append('familyDetails', JSON.stringify(familyData));
 
       existingPhotos.forEach(photo => submitData.append('existingPhotos', photo));
-      
       newPhotos.forEach(file => submitData.append('newPhotos', file, file.name || 'uploaded_photo.jpg')); 
 
       const response = await axios.put(`${API_BASE_URL}/admin/users/${user._id}/update`, submitData, {
@@ -844,7 +820,6 @@ const UserDetailModal = ({ user, onClose, onUpdateSuccess, masterData }) => {
       setLoading(false);
     }
   };
-
 
   return (
     <div className="um-modal-overlay" onClick={onClose}>
@@ -890,6 +865,7 @@ const UserDetailModal = ({ user, onClose, onUpdateSuccess, masterData }) => {
         <div className="um-modal-body">
           {!isEditing ? (
             <>
+              {/* VIEW MODE CODE REMAINS THE SAME */}
               <div className="um-modal-top-bar">
                  <div className="um-top-chips">
                     <span className={`um-chip ${user.isPaidMember ? 'gold-chip' : ''}`}>
@@ -1001,6 +977,7 @@ const UserDetailModal = ({ user, onClose, onUpdateSuccess, masterData }) => {
           ) : (
             
           <div className="um-edit-form">
+            {/* THIS SECTION IS COMPLETELY UPDATED TO USE <select> TAGS */}
             <h3 className="um-column-title" style={{marginBottom: '15px'}}><User size={16} /> Basic Details</h3>
             <div className="um-form-grid" style={{marginBottom: '20px'}}>
               <FormGroup label="First Name"><input name="firstName" value={formData.firstName} onChange={handleInputChange} placeholder="First Name" className="um-input" /></FormGroup>
@@ -1023,18 +1000,20 @@ const UserDetailModal = ({ user, onClose, onUpdateSuccess, masterData }) => {
             <h3 className="um-column-title" style={{marginBottom: '15px'}}><Users size={16} /> Religion & Community</h3>
             <div className="um-form-grid" style={{marginBottom: '20px'}}>
               <FormGroup label="Community">
-                <input list="edit-community-list" name="community" value={formData.community} onChange={handleInputChange} placeholder="Community" className="um-input" />
-                <datalist id="edit-community-list">{masterData?.communities.map((c, i) => <option key={i} value={c.name} />)}</datalist>
+                <select name="community" value={formData.community} onChange={handleInputChange} className="um-input">
+                  <option value="">Select Community</option>
+                  {masterData?.communities.map((c, i) => <option key={i} value={c.name}>{c.name}</option>)}
+                </select>
               </FormGroup>
               
               <FormGroup label="Sub-Community / Caste">
-                <input list="edit-subcomm-list" name="subCommunity" value={formData.subCommunity} onChange={handleInputChange} placeholder="Sub-Community / Caste" className="um-input" />
-                <datalist id="edit-subcomm-list">
+                <select name="subCommunity" value={formData.subCommunity} onChange={handleInputChange} className="um-input" disabled={!formData.community}>
+                  <option value="">Select Sub-Community</option>
                   {editModeSubCommunities.map((sub, idx) => {
                     const val = typeof sub === 'string' ? sub : sub.name;
-                    return <option key={idx} value={val} />;
+                    return <option key={idx} value={val}>{val}</option>;
                   })}
-                </datalist>
+                </select>
               </FormGroup>
 
               <FormGroup label="Gothra"><input name="gothra" value={formData.gothra} onChange={handleInputChange} placeholder="Gothra" className="um-input" /></FormGroup>
@@ -1052,33 +1031,42 @@ const UserDetailModal = ({ user, onClose, onUpdateSuccess, masterData }) => {
             <h3 className="um-column-title" style={{marginBottom: '15px'}}><Briefcase size={16} /> Professional & Location</h3>
             <div className="um-form-grid" style={{marginBottom: '20px'}}>
               <FormGroup label="Education">
-                <input list="edit-edu-list" name="highestQualification" value={formData.highestQualification} onChange={handleInputChange} placeholder="Education" className="um-input" />
-                <datalist id="edit-edu-list">{masterData?.educations.map((e, idx) => <option key={idx} value={e.name} />)}</datalist>
+                <select name="highestQualification" value={formData.highestQualification} onChange={handleInputChange} className="um-input">
+                  <option value="">Select Education</option>
+                  {masterData?.educations.map((e, idx) => <option key={idx} value={e.name}>{e.name}</option>)}
+                </select>
               </FormGroup>
 
               <FormGroup label="Occupation">
-                <input list="edit-job-list" name="jobRole" value={formData.jobRole} onChange={handleInputChange} placeholder="Occupation" className="um-input" />
-                <datalist id="edit-job-list">{masterData?.occupations.map((o, idx) => <option key={idx} value={o.name} />)}</datalist>
+                <select name="jobRole" value={formData.jobRole} onChange={handleInputChange} className="um-input">
+                  <option value="">Select Occupation</option>
+                  {masterData?.occupations.map((o, idx) => <option key={idx} value={o.name}>{o.name}</option>)}
+                </select>
               </FormGroup>
 
               <FormGroup label="College Name"><input name="collegeName" value={formData.collegeName} onChange={handleInputChange} placeholder="College Name" className="um-input" /></FormGroup>
               <FormGroup label="Company Name"><input name="companyName" value={formData.companyName} onChange={handleInputChange} placeholder="Company Name" className="um-input" /></FormGroup>
               <FormGroup label="Annual Income"><input name="annualIncome" value={formData.annualIncome} onChange={handleInputChange} placeholder="Annual Income" className="um-input" /></FormGroup>
               
-              {/* --- UPDATED: Edit Modal Location DataLists --- */}
               <FormGroup label="Country">
-                <input list="edit-country-list" name="country" value={formData.country} onChange={handleInputChange} placeholder="Country" className="um-input" />
-                <datalist id="edit-country-list">{masterData?.countries.map((c, idx) => <option key={idx} value={c.name} />)}</datalist>
+                <select name="country" value={formData.country} onChange={handleInputChange} className="um-input">
+                  <option value="">Select Country</option>
+                  {masterData?.countries.map((c, idx) => <option key={idx} value={c.name}>{c.name}</option>)}
+                </select>
               </FormGroup>
 
               <FormGroup label="State">
-                <input list="edit-state-list" name="state" value={formData.state} onChange={handleInputChange} placeholder="State" className="um-input" />
-                <datalist id="edit-state-list">{editStates.map((s, idx) => <option key={idx} value={s.name} />)}</datalist>
+                <select name="state" value={formData.state} onChange={handleInputChange} className="um-input" disabled={!formData.country}>
+                  <option value="">Select State</option>
+                  {editStates.map((s, idx) => <option key={idx} value={s.name}>{s.name}</option>)}
+                </select>
               </FormGroup>
 
               <FormGroup label="City">
-                <input list="edit-city-list" name="city" value={formData.city} onChange={handleInputChange} placeholder="City" className="um-input" />
-                <datalist id="edit-city-list">{editCities.map((c, idx) => <option key={idx} value={c.name} />)}</datalist>
+                <select name="city" value={formData.city} onChange={handleInputChange} className="um-input" disabled={!formData.state}>
+                  <option value="">Select City</option>
+                  {editCities.map((c, idx) => <option key={idx} value={c.name}>{c.name}</option>)}
+                </select>
               </FormGroup>
 
               <FormGroup label="Residing In">
@@ -1095,12 +1083,16 @@ const UserDetailModal = ({ user, onClose, onUpdateSuccess, masterData }) => {
             <h3 className="um-column-title" style={{marginBottom: '15px'}}><Moon size={16} /> Astrology Details</h3>
             <div className="um-form-grid" style={{marginBottom: '20px'}}>
                <FormGroup label="Star">
-                 <input list="edit-star-list" name="star" value={formData.star} onChange={handleInputChange} placeholder="Star" className="um-input" />
-                 <datalist id="edit-star-list">{masterData?.stars?.map((s, idx) => <option key={idx} value={s.name} />)}</datalist>
+                 <select name="star" value={formData.star} onChange={handleInputChange} className="um-input">
+                   <option value="">Select Star</option>
+                   {masterData?.stars?.map((s, idx) => <option key={idx} value={s.name}>{s.name}</option>)}
+                 </select>
                </FormGroup>
                <FormGroup label="Moonsign">
-                 <input list="edit-moon-list" name="moonsign" value={formData.moonsign} onChange={handleInputChange} placeholder="Moonsign" className="um-input" />
-                 <datalist id="edit-moon-list">{masterData?.moonsigns?.map((m, idx) => <option key={idx} value={m.name} />)}</datalist>
+                 <select name="moonsign" value={formData.moonsign} onChange={handleInputChange} className="um-input">
+                   <option value="">Select Moonsign</option>
+                   {masterData?.moonsigns?.map((m, idx) => <option key={idx} value={m.name}>{m.name}</option>)}
+                 </select>
                </FormGroup>
                <FormGroup label="Pada">
                   <select name="pada" value={formData.pada} onChange={handleInputChange} className="um-input">
@@ -1112,8 +1104,10 @@ const UserDetailModal = ({ user, onClose, onUpdateSuccess, masterData }) => {
                   </select>
                </FormGroup>
                <FormGroup label="Mother Tongue">
-                 <input list="edit-mt-list" name="motherTongue" value={formData.motherTongue} onChange={handleInputChange} placeholder="Mother Tongue" className="um-input" />
-                 <datalist id="edit-mt-list">{masterData?.motherTongues?.map((m, idx) => <option key={idx} value={m.name} />)}</datalist>
+                 <select name="motherTongue" value={formData.motherTongue} onChange={handleInputChange} className="um-input">
+                   <option value="">Select Mother Tongue</option>
+                   {masterData?.motherTongues?.map((m, idx) => <option key={idx} value={m.name}>{m.name}</option>)}
+                 </select>
                </FormGroup>
 
                <FormGroup label="Time of Birth">
@@ -1159,13 +1153,13 @@ const UserDetailModal = ({ user, onClose, onUpdateSuccess, masterData }) => {
                 <FormGroup label="Father's Name"><input name="fatherName" value={formData.fatherName} onChange={handleInputChange} placeholder="Father's Name" className="um-input" /></FormGroup>
                 
                 <FormGroup label="Father's Occupation">
-                  <input list="edit-job-list" name="fatherOccupation" value={formData.fatherOccupation} onChange={handleInputChange} placeholder="Select or type..." className="um-input" />
+                  <input name="fatherOccupation" value={formData.fatherOccupation} onChange={handleInputChange} placeholder="Father's Occupation" className="um-input" />
                 </FormGroup>
 
                 <FormGroup label="Mother's Name"><input name="motherName" value={formData.motherName} onChange={handleInputChange} placeholder="Mother's Name" className="um-input" /></FormGroup>
                 
                 <FormGroup label="Mother's Occupation">
-                  <input list="edit-job-list" name="motherOccupation" value={formData.motherOccupation} onChange={handleInputChange} placeholder="Select or type..." className="um-input" />
+                  <input name="motherOccupation" value={formData.motherOccupation} onChange={handleInputChange} placeholder="Mother's Occupation" className="um-input" />
                 </FormGroup>
 
                 <FormGroup label="No. of Brothers">
