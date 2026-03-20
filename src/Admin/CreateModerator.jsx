@@ -161,27 +161,27 @@ export default function CreateModerator() {
   };
 
   return (
-    <div className="admin-mod-wrapper">
+    <div className="role-mgr-wrapper">
       
       {/* FORM SECTION */}
-      <div className="admin-mod-card">
-        <div className="admin-mod-header">
+      <div className="role-mgr-card">
+        <div className="role-mgr-header">
           <h2>{editingModId ? 'Edit Moderator Access' : 'Create Moderator Access'}</h2>
           <p>{editingModId ? 'Update administrative roles and permissions.' : 'Assign administrative roles and configure dashboard permissions.'}</p>
         </div>
         
         {message.text && (
-          <div className={`admin-mod-alert admin-mod-alert-${message.type}`}>
+          <div className={`role-mgr-alert role-mgr-alert-${message.type}`}>
             {message.text}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="admin-mod-form">
-          <div className="admin-mod-input-grid">
-            <div className="admin-mod-form-group">
-              <label htmlFor="mod-username">Moderator Username</label>
+        <form onSubmit={handleSubmit} className="role-mgr-form">
+          <div className="role-mgr-input-grid">
+            <div className="role-mgr-form-group">
+              <label htmlFor="mgr-username">Moderator Username</label>
               <input 
-                id="mod-username"
+                id="mgr-username"
                 type="text" 
                 name="username" 
                 value={formData.username} 
@@ -191,10 +191,10 @@ export default function CreateModerator() {
               />
             </div>
 
-            <div className="admin-mod-form-group">
-              <label htmlFor="mod-email">Official Email</label>
+            <div className="role-mgr-form-group">
+              <label htmlFor="mgr-email">Official Email</label>
               <input 
-                id="mod-email"
+                id="mgr-email"
                 type="email" 
                 name="email" 
                 value={formData.email} 
@@ -205,12 +205,12 @@ export default function CreateModerator() {
             </div>
           </div>
 
-          <div className="admin-mod-form-group">
-            <label htmlFor="mod-password">
+          <div className="role-mgr-form-group">
+            <label htmlFor="mgr-password">
               {editingModId ? 'New Password (leave blank to keep current)' : 'Temporary Password'}
             </label>
             <input 
-              id="mod-password"
+              id="mgr-password"
               type="password" 
               name="password" 
               value={formData.password} 
@@ -220,40 +220,40 @@ export default function CreateModerator() {
             />
           </div>
 
-          <div className="admin-mod-permissions-panel">
-            <div className="admin-mod-permissions-header">
-              <div className="admin-mod-perm-titles">
+          <div className="role-mgr-permissions-panel">
+            <div className="role-mgr-permissions-header">
+              <div className="role-mgr-perm-titles">
                 <h3>Module Permissions</h3>
                 <p>Select the areas this moderator can access.</p>
               </div>
-              <button type="button" onClick={handleSelectAll} className="admin-mod-btn-outline">
+              <button type="button" onClick={handleSelectAll} className="role-mgr-btn-outline">
                 {selectedPermissions.length === availablePermissions.length ? 'Deselect All' : 'Select All'}
               </button>
             </div>
             
-            <div className="admin-mod-permissions-grid">
+            <div className="role-mgr-permissions-grid">
               {availablePermissions.map((perm) => (
-                <label key={perm.id} className={`admin-mod-checkbox-wrapper ${selectedPermissions.includes(perm.id) ? 'active' : ''}`}>
+                <label key={perm.id} className={`role-mgr-checkbox-wrapper ${selectedPermissions.includes(perm.id) ? 'active' : ''}`}>
                   <input 
                     type="checkbox" 
                     id={`perm-${perm.id}`}
                     checked={selectedPermissions.includes(perm.id)}
                     onChange={() => handleCheckboxChange(perm.id)}
                   />
-                  <span className="admin-mod-checkbox-text">{perm.label}</span>
+                  <span className="role-mgr-checkbox-text">{perm.label}</span>
                 </label>
               ))}
             </div>
           </div>
 
-          <div className="admin-mod-form-actions">
-            <button type="submit" disabled={isLoading} className="admin-mod-btn-primary">
+          <div className="role-mgr-form-actions">
+            <button type="submit" disabled={isLoading} className="role-mgr-btn-primary">
               {isLoading 
                 ? (editingModId ? 'Updating...' : 'Provisioning Account...') 
                 : (editingModId ? 'Update Moderator' : 'Create Moderator Profile')}
             </button>
             {editingModId && (
-              <button type="button" onClick={handleCancelEdit} className="admin-mod-btn-cancel">
+              <button type="button" onClick={handleCancelEdit} className="role-mgr-btn-cancel">
                 Cancel Edit
               </button>
             )}
@@ -262,14 +262,14 @@ export default function CreateModerator() {
       </div>
 
       {/* TABLE SECTION */}
-      <div className="admin-mod-card admin-mod-table-card">
-        <div className="admin-mod-header">
+      <div className="role-mgr-card role-mgr-table-card">
+        <div className="role-mgr-header">
           <h2>Active Moderators</h2>
           <p>Manage existing sub-admins and their permissions.</p>
         </div>
 
-        <div className="admin-mod-table-container">
-          <table className="admin-mod-table">
+        <div className="role-mgr-table-container">
+          <table className="role-mgr-table">
             <thead>
               <tr>
                 <th>Username</th>
@@ -282,23 +282,23 @@ export default function CreateModerator() {
               {moderators.length > 0 ? (
                 moderators.map(mod => (
                   <tr key={mod._id}>
-                    <td className="admin-mod-td-bold">{mod.username}</td>
-                    <td className="admin-mod-td-muted">{mod.email}</td>
+                    <td className="role-mgr-td-bold">{mod.username}</td>
+                    <td className="role-mgr-td-muted">{mod.email}</td>
                     <td>
-                      <span className="admin-mod-badge">
+                      <span className="role-mgr-badge">
                         {mod.permissions?.length || 0} Modules
                       </span>
                     </td>
-                    <td className="admin-mod-actions-cell">
+                    <td className="role-mgr-actions-cell">
                       <button 
                         onClick={() => handleEditClick(mod)}
-                        className="admin-mod-btn-edit"
+                        className="role-mgr-btn-edit"
                       >
                         Edit
                       </button>
                       <button 
                         onClick={() => handleDelete(mod._id)}
-                        className="admin-mod-btn-delete"
+                        className="role-mgr-btn-delete"
                       >
                         Delete
                       </button>
@@ -307,7 +307,7 @@ export default function CreateModerator() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="4" className="admin-mod-empty-state">
+                  <td colSpan="4" className="role-mgr-empty-state">
                     No moderators found.
                   </td>
                 </tr>
