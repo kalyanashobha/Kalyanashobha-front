@@ -3,8 +3,9 @@ import Navbar from "../../Components/Navbar.jsx";
 import { useNavigate } from 'react-router-dom';
 import QRCode from "react-qr-code"; 
 import toast, { Toaster } from 'react-hot-toast'; 
-import { CheckCircle, ShieldCheck, AlertTriangle, Clock, ArrowRight } from 'lucide-react';
+import { CheckCircle, ShieldCheck, AlertTriangle, ArrowRight } from 'lucide-react';
 import { BsPatchCheck } from "react-icons/bs"; 
+import { MdPendingActions } from "react-icons/md"; // Added professional pending verification icon
 import './Payment.css'; 
 
 const PaymentRegistration = () => {
@@ -78,7 +79,6 @@ const PaymentRegistration = () => {
 
   const upiLink = `upi://pay?pa=8897714968@axl&pn=Kalyana%20Shobha&am=${amount}&cu=INR`; 
 
-  // --- UPDATED FUNCTION HERE ---
   const handlePayClick = () => {
     toast.success("Opening UPI App...", { duration: 3000 });
     
@@ -89,7 +89,6 @@ const PaymentRegistration = () => {
     // REMOVED the setTimeout state change. 
     // By keeping the browser state completely quiet, the OS won't pull focus back to the browser.
   };
-  // -----------------------------
 
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
@@ -235,9 +234,10 @@ const PaymentRegistration = () => {
             {existingStatus ? (
               <div className="ks-action-content ks-fade-in ks-status-view">
                 <div className="ks-status-icon">
+                   {/* UPDATED ICON HERE */}
                    {existingStatus === 'Success' 
                      ? <BsPatchCheck size={72} color="var(--ks-success)" /> 
-                     : <Clock size={64} strokeWidth={1.5} color="var(--ks-warning)" />}
+                     : <MdPendingActions size={72} color="var(--ks-warning)" />}
                 </div>
                 <h3 className={existingStatus === 'Success' ? 'ks-text-success' : 'ks-text-warning'}>
                    {existingStatus === 'Success' ? 'Payment Approved' : 'Verification Pending'}
