@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-// --- NEW: Imported Search icon ---
 import { Plus, Trash2, Phone, Tag, X, Image as ImageIcon, Search } from "lucide-react";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+// --- NEW: Import image compression ---
+import imageCompression from 'browser-image-compression';
 import "./VendorManagement.css";
 
 export default function VendorManagement() {
@@ -11,20 +12,21 @@ export default function VendorManagement() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   
-  // --- NEW: Search State ---
   const [searchTerm, setSearchTerm] = useState("");
 
   // Form State
   const [formData, setFormData] = useState({
     businessName: "",
-    category: "Catering", // Default
+    category: "Catering",
     contactNumber: "",
     priceRange: "",
     description: "",
   });
   const [files, setFiles] = useState([]);
+  
+  // --- NEW: Compression loading state ---
+  const [isCompressing, setIsCompressing] = useState(false);
 
-  // Categories based on your Schema Enum
   const categories = [
     'Catering', 'Wedding halls', 'Photography', 'Decoration', 
     'Mehendi artists', 'Makeup', 'Event management', 'Travel', 'Pandit'
@@ -57,8 +59,46 @@ export default function VendorManagement() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleFileChange = (e) => {
-    setFiles(e.target.files); // Stores FileList
+  // --- NEW: Handle file change with compression ---
+  const handleFileChange = async (e) => {
+    const selectedFiles = Array.from(e.target.files);
+    if (selectedFiles.length === 0) return;
+
+    setIsCompressing(true);
+    const toastId = toast.loading("Compressing images...");
+
+    try {
+      const options = {
+        maxSizeMB: 1, // Max size 1MB per image
+        maxWidthOrHeight: 1920,
+        useWebWorker: true, // Speeds up compression in the browser
+        alwaysKeepResolution: true
+      };
+
+      // Compress all selected images in parallel
+      const compressedFiles = await Promise.all(
+        selectedFiles.map(async (file) => {
+          try {
+            // Only attempt to compress image files
+            if (file.type.startsWith('image/')) {
+               return await imageCompression(file, options);
+            }
+            return file;
+          } catch (err) {
+            console.error(`Failed to compress ${file.name}`, err);
+            return file; // Fallback to original if compression fails for a specific file
+          }
+        })
+      );
+
+      setFiles(compressedFiles);
+      toast.update(toastId, { render: "Images compressed and ready!", type: "success", isLoading: false, autoClose: 2000 });
+    } catch (error) {
+      console.error("Overall Compression Error:", error);
+      toast.update(toastId, { render: "Failed to process some images.", type: "error", isLoading: false, autoClose: 3000 });
+    } finally {
+      setIsCompressing(false);
+    }
   };
 
   // 3. Submit Vendor (Multipart Form Data)
@@ -73,7 +113,6 @@ export default function VendorManagement() {
     data.append("priceRange", formData.priceRange);
     data.append("description", formData.description);
 
-    // Append images
     for (let i = 0; i < files.length; i++) {
       data.append("images", files[i]);
     }
@@ -117,8 +156,6 @@ export default function VendorManagement() {
     }
   };
 
-  // --- NEW: Filter Logic ---
-  // This filters the vendors array based on Vendor ID OR Business Name
   const filteredVendors = vendors.filter((vendor) => {
     const searchLower = searchTerm.toLowerCase();
     const matchesId = vendor.vendorId?.toLowerCase().includes(searchLower);
@@ -136,7 +173,6 @@ export default function VendorManagement() {
           <p>Manage wedding service providers and listings.</p>
         </div>
         
-        {/* --- NEW: Search Bar and Add Button Wrapper --- */}
         <div className="vm-actions-section">
           <div className="vm-search-box">
             <Search size={16} className="vm-search-icon" />
@@ -163,41 +199,33 @@ export default function VendorManagement() {
             {searchTerm ? "No vendors match your search." : "No vendors found. Add one to get started."}
           </div>
         ) : (
-          // --- NEW: Render filteredVendors instead of vendors ---
           filteredVendors.map((vendor) => (
             <div key={vendor._id} className="vm-card">
-              {/* Image Section */}
               <div className="vm-card-image">
                 {vendor.images && vendor.images.length > 0 ? (
-                  <img src={vendor.images[0]} alt={vendor.businessName} />
+                  <img src={vendor.images} alt={vendor.businessName} />
                 ) : (
                   <div className="placeholder-img"><ImageIcon size={32} /></div>
                 )}
                 <span className="vm-category-badge">{vendor.category}</span>
               </div>
 
-              {/* Content Section */}
               <div className="vm-card-content">
                 <div className="vm-id-badge">{vendor.vendorId || "No ID"}</div>
-
                 <h3>{vendor.businessName}</h3>
-
                 <div className="vm-detail-row">
                   <Phone size={14} className="icon-gold" />
                   <span>{vendor.contactNumber}</span>
                 </div>
-
                 <div className="vm-detail-row">
                   <Tag size={14} className="icon-gold" />
                   <span>{vendor.priceRange || "Price on Request"}</span>
                 </div>
-
                 <p className="vm-desc">
                   {vendor.description ? vendor.description.substring(0, 60) + "..." : "No description available."}
                 </p>
               </div>
 
-              {/* Actions */}
               <div className="vm-card-actions">
                 <button className="vm-btn-delete" onClick={() => handleDelete(vendor._id)}>
                   <Trash2 size={16} /> Remove
@@ -249,15 +277,21 @@ export default function VendorManagement() {
               <div className="vm-form-group">
                 <label>Upload Image</label>
                 <div className="file-input-wrapper">
-                  <input type="file" multiple accept="image/*" onChange={handleFileChange} />
-                  <div className="file-dummy">
+                  {/* --- NEW: Disabled input while compressing --- */}
+                  <input type="file" multiple accept="image/*" onChange={handleFileChange} disabled={isCompressing} />
+                  <div className="file-dummy" style={{ opacity: isCompressing ? 0.6 : 1 }}>
                     <ImageIcon size={18} />
-                    <span>{files.length > 0 ? `${files.length} files selected` : "Choose files..."}</span>
+                    <span>
+                       {isCompressing ? "Compressing images..." : files.length > 0 ? `${files.length} files compressed & selected` : "Choose files..."}
+                    </span>
                   </div>
                 </div>
               </div>
 
-              <button type="submit" className="vm-submit-btn">Add Vendor</button>
+              {/* --- NEW: Disable submit button during compression --- */}
+              <button type="submit" className="vm-submit-btn" disabled={isCompressing}>
+                {isCompressing ? "Please wait..." : "Add Vendor"}
+              </button>
             </form>
           </div>
         </div>
