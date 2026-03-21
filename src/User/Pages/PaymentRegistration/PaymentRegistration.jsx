@@ -80,17 +80,14 @@ const PaymentRegistration = () => {
 
   // --- UPDATED FUNCTION HERE ---
   const handlePayClick = () => {
-    toast.loading("Opening UPI App...", { duration: 2000 });
+    toast.success("Opening UPI App...", { duration: 3000 });
     
-    // Create a temporary anchor element for a more reliable deep link trigger
-    const link = document.createElement('a');
-    link.href = upiLink;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    // Using standard location assignment. Deep links directly attached to a user 
+    // click event are generally allowed by browsers without popup warnings.
+    window.location.href = upiLink;
 
-    // Move to step 2 after initiating the payment intent
-    setTimeout(() => { setStep(2); }, 3000);
+    // REMOVED the setTimeout state change. 
+    // By keeping the browser state completely quiet, the OS won't pull focus back to the browser.
   };
   // -----------------------------
 
