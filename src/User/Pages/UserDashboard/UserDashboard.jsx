@@ -1443,28 +1443,7 @@ const UserDashboard = () => {
                        <h4 className="dash-section-title" style={{ border: 'none', marginBottom: '0.5rem', padding: 0 }}>Current Location</h4>
                      </div>
 
-                     <DashboardComboInput label="Country" name="country" value={extraDetailsForm.country || ''} onChange={handleExtraDetailsChange} options={dynamicOptions.Country} required={false} onKeyDown={handleEnterToNext}/>
                      
-                     {/* CHANGED TO COMBO INPUTS */}
-                     <DashboardComboInput
-                        label="State"
-                        name="state"
-                        value={extraDetailsForm.state || ''}
-                        onChange={handleExtraDetailsChange}
-                        disabled={!extraDetailsForm.country}
-                        options={extraDetailsStates} 
-                        errorMessage="Please select a Country first"
-                      />
-
-                      <DashboardComboInput
-                        label="City"
-                        name="city"
-                        value={extraDetailsForm.city || ''}
-                        onChange={handleExtraDetailsChange}
-                        disabled={!extraDetailsForm.state}
-                        options={extraDetailsCities}
-                        errorMessage="Please select a State first"
-                      />
                    </div>
                  </div>
 
