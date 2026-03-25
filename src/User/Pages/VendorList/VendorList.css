@@ -2,431 +2,448 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
 :root {
-  /* Core Colors */
-  --ks-primary-dark: #1a1a1a;
-  --ks-primary-hover: #333333;
-  --ks-accent-amber: #FFCA28;
-  --ks-accent-gold: #B7791F;
+  /* Brand Colors */
+  --wd-primary: #1a1a1a;
+  --wd-accent: #FFCA28;
+  --wd-success-bg: #f0fdf4;
+  --wd-success-text: #166534;
+  --wd-error-text: #dc2626;
   
   /* UI Colors */
-  --ks-bg-main: #FFFFFF;
-  --ks-bg-card: #FFFFFF;
-  --ks-bg-muted: #f9fafb;
-  --ks-text-main: #111827;
-  --ks-text-sub: #6B7280;
-  --ks-border: #E5E7EB;
+  --wd-bg: #FAFAFA;
+  --wd-card-bg: #FFFFFF;
+  --wd-text-main: #111827;
+  --wd-text-sub: #6B7280;
+  --wd-border: #E5E7EB;
+  --wd-input-border: #D1D5DB;
   
   /* Effects */
-  --ks-shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-  --ks-shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  --ks-shadow-modal: 0 10px 30px rgba(0, 0, 0, 0.2);
-  --ks-radius: 12px;
-  --ks-transition: all 0.3s ease-in-out;
+  --wd-shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  --wd-shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --wd-radius: 12px;
+  --wd-transition: all 0.3s ease-in-out;
 }
 
-/* --- 2. LAYOUT CONTAINER --- */
-.ks-vendor-page {
+/* --- 2. MAIN CONTAINER --- */
+.wd-directory-wrapper {
   max-width: 1200px;        
   width: 100%;
   margin: 100px auto 60px;
-  padding: 0 24px;
+  padding: 24px;
   box-sizing: border-box;
   font-family: 'Poppins', sans-serif;
-  color: var(--ks-text-main);
-  background-color: var(--ks-bg-main);
+  color: var(--wd-text-main);
+  background-color: transparent;
 }
 
 /* --- 3. HEADER SECTION --- */
-.ks-vendor-header {
+.wd-header-section {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
-  margin-bottom: 50px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid var(--ks-border);
+  justify-content: center;
+  text-align: center;
+  margin-bottom: 40px;
+  gap: 20px;
 }
 
-.ks-header-text h1 {
+.wd-header-text h1 {
   font-size: 2.2rem;
   font-weight: 700;
-  color: var(--ks-text-main);
+  color: var(--wd-primary);
   text-transform: uppercase;
   letter-spacing: 1px;
-  margin: 0 0 8px 0;
+  margin: 0 0 12px 0;
+  position: relative;
+  display: inline-block;
   line-height: 1.2;
 }
 
-.ks-header-text h1::after {
+.wd-header-text h1::after {
   content: '';
   display: block;
   width: 70px;
   height: 4px;
-  background: var(--ks-accent-amber);
-  margin-top: 10px;
+  background: var(--wd-accent);
+  margin: 10px auto 0;
   border-radius: 2px;
 }
 
-.ks-header-text p {
+.wd-header-text p {
   font-size: 1.1rem;
-  color: var(--ks-text-sub);
-  margin: 0;
+  color: var(--wd-text-sub);
+  max-width: 600px;
+  margin: 0 auto;
   line-height: 1.6;
 }
 
-/* Header Button */
-.ks-btn-primary {
-  display: flex;
+/* Main Call-to-Action Buttons */
+.wd-action-btn {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
   padding: 12px 24px;
-  font-size: 16px;
-  background-color: var(--ks-primary-dark);
-  color: #fff;
+  background-color: var(--wd-primary);
+  color: white;
   border: none;
   border-radius: 8px;
   font-weight: 600;
+  font-size: 1rem;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: var(--wd-transition);
 }
 
-.ks-btn-primary:hover {
-  background-color: var(--ks-primary-hover);
+.wd-action-btn:hover {
+  background-color: #333;
+  transform: translateY(-2px);
 }
 
-.ks-btn-primary:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-/* --- 4. GRID SYSTEM --- */
-.ks-vendor-grid {
+/* --- 4. GRID LAYOUT --- */
+.wd-vendor-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 32px;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 30px;
   width: 100%;
 }
 
-.ks-empty-state {
+.wd-empty-state {
   grid-column: 1 / -1;
   text-align: center;
-  padding: 80px 20px;
-  border: 2px dashed var(--ks-border);
-  border-radius: var(--ks-radius);
-  color: var(--ks-text-sub);
+  padding: 60px 20px;
+  background: var(--wd-card-bg);
+  border: 2px dashed var(--wd-border);
+  border-radius: var(--wd-radius);
+  color: var(--wd-text-sub);
 }
 
-/* --- 5. CARD DESIGN --- */
-.ks-vendor-card {
-  background: var(--ks-bg-card);
-  border: 1px solid var(--ks-border);
-  border-radius: var(--ks-radius);
+/* --- 5. VENDOR CARD --- */
+.wd-vendor-card {
+  background: var(--wd-card-bg);
+  border: 1px solid var(--wd-border);
+  border-radius: var(--wd-radius);
   overflow: hidden;
-  transition: var(--ks-transition);
+  transition: var(--wd-transition);
   display: flex;
   flex-direction: column;
-  position: relative;
+  box-shadow: var(--wd-shadow-sm);
   height: 100%; 
 }
 
-.ks-vendor-card:hover {
-  transform: translateY(-8px);
-  box-shadow: var(--ks-shadow-hover);
-  border-color: var(--ks-accent-amber); 
+.wd-vendor-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--wd-shadow-hover);
+  border-color: var(--wd-accent); 
 }
 
-/* Image Area */
-.ks-card-img-wrapper {
-  height: 220px;
+/* Card Image */
+.wd-card-hero {
+  height: 240px;
   width: 100%;
   position: relative;
   overflow: hidden;
-  background: var(--ks-bg-muted);
+  background: #f3f4f6;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.ks-card-img-wrapper img {
+.wd-card-hero img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.6s ease;
+  object-position: center top; /* Keeps faces centered usually */
+  transition: transform 0.5s ease;
 }
 
-.ks-vendor-card:hover .ks-card-img-wrapper img {
-  transform: scale(1.08); 
+.wd-vendor-card:hover .wd-card-hero img {
+  transform: scale(1.05); 
 }
 
-.ks-img-placeholder {
-  color: var(--ks-text-sub);
-  opacity: 0.5;
+.wd-img-placeholder {
+  color: #9CA3AF;
 }
 
 /* Category Badge */
-.ks-badge {
+.wd-category-tag {
   position: absolute;
-  top: 12px;
-  right: 12px;
-  background: var(--ks-accent-amber);
+  top: 15px;
+  right: 15px;
+  background: var(--wd-accent);
   color: #000;
   font-size: 0.75rem;
   font-weight: 700;
-  padding: 6px 12px;
+  padding: 6px 14px;
   border-radius: 20px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  box-shadow: var(--ks-shadow-sm);
-  z-index: 10;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  z-index: 2;
 }
 
-/* Content Area */
-.ks-card-body {
+/* Card Content */
+.wd-card-body {
   padding: 24px;
   flex-grow: 1;
   display: flex;
   flex-direction: column;
 }
 
-.ks-card-title {
+.wd-card-body h3 {
   font-size: 1.25rem;
   font-weight: 700;
-  color: var(--ks-text-main);
-  margin: 0 0 10px 0;
+  color: var(--wd-text-main);
+  margin: 0 0 8px 0;
   line-height: 1.3;
 }
 
-.ks-card-desc {
+.wd-card-body p {
   font-size: 0.95rem;
-  color: var(--ks-text-sub);
+  color: var(--wd-text-sub);
   margin-bottom: 20px;
   line-height: 1.6;
   flex-grow: 1;
 }
 
-.ks-btn-outline {
+.wd-card-btn {
   width: 100%;
   padding: 12px;
   background-color: transparent;
-  color: var(--ks-primary-dark);
-  border: 1px solid var(--ks-primary-dark);
+  color: var(--wd-primary);
+  border: 1px solid var(--wd-primary);
   border-radius: 6px;
   font-weight: 600;
   cursor: pointer;
-  transition: var(--ks-transition);
+  transition: var(--wd-transition);
+  margin-top: auto;
 }
 
-.ks-btn-outline:hover {
-  background-color: var(--ks-primary-dark);
-  color: #fff;
+.wd-card-btn:hover {
+  background-color: var(--wd-primary);
+  color: white;
 }
 
-/* --- 6. SKELETON ANIMATION --- */
-@keyframes ks-shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+/* --- 6. SKELETON (PULSE EFFECT - NO SHIMMER) --- */
+@keyframes wd-pulse {
+  0% { opacity: 0.5; background-color: #e5e7eb; }
+  50% { opacity: 1; background-color: #f3f4f6; }
+  100% { opacity: 0.5; background-color: #e5e7eb; }
 }
 
-.ks-skeleton-card {
+.wd-skeleton-card {
   height: 420px;
-  background: #f6f7f8;
-  background-image: linear-gradient(to right, #f6f7f8 0%, #edeef1 20%, #f6f7f8 40%, #f6f7f8 100%);
-  background-repeat: no-repeat;
-  background-size: 200% 100%; 
-  animation: ks-shimmer 1.5s infinite linear;
-  border: none;
-  border-radius: var(--ks-radius);
+  border-radius: var(--wd-radius);
+  animation: wd-pulse 1.5s ease-in-out infinite;
+  border: 1px solid var(--wd-border);
 }
 
 /* --- 7. MODALS --- */
-.ks-modal-overlay {
+.wd-modal-backdrop {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: rgba(0, 0, 0, 0.6);
+  background-color: rgba(0, 0, 0, 0.7);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
-  backdrop-filter: blur(4px);
+  z-index: 9999;
+  backdrop-filter: blur(5px);
   padding: 20px;
   box-sizing: border-box;
 }
 
-.ks-modal-box {
-  background-color: #fff;
+.wd-modal-box {
+  background-color: white;
   width: 100%;
   max-width: 500px;
   max-height: 90vh;
   overflow-y: auto;
   padding: 30px;
-  border-radius: var(--ks-radius);
+  border-radius: 12px;
   position: relative;
-  box-shadow: var(--ks-shadow-modal);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
   box-sizing: border-box;
 }
 
-.ks-modal-box.large {
+/* Tweak for wider join modal */
+.wd-modal-box.wd-large-modal {
   max-width: 650px;
 }
 
-.ks-modal-box h2 {
+.wd-modal-box h2 {
   margin: 0 0 8px 0;
   font-size: 1.5rem;
-  color: var(--ks-primary-dark);
+  color: var(--wd-primary);
+  font-weight: 700;
 }
 
-.ks-modal-box p {
+.wd-modal-box p.wd-modal-subtitle {
   margin: 0 0 24px 0;
   font-size: 0.95rem;
-  color: var(--ks-text-sub);
+  color: var(--wd-text-sub);
 }
 
-.ks-modal-close {
+.wd-btn-close {
   position: absolute;
   top: 20px;
   right: 20px;
-  background: none;
+  background: #f3f4f6;
   border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  color: var(--ks-text-sub);
-  padding: 5px;
-  transition: color 0.2s;
+  color: var(--wd-text-sub);
+  transition: var(--wd-transition);
 }
 
-.ks-modal-close:hover {
-  color: var(--ks-text-main);
+.wd-btn-close:hover {
+  background: #e5e7eb;
+  color: var(--wd-primary);
 }
 
 /* --- 8. FORMS --- */
-.ks-form {
+.wd-form-container {
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
-.ks-form-row {
-  display: flex;
+.wd-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 16px;
 }
 
-.ks-form-group {
-  flex: 1;
+.wd-input-group {
   display: flex;
   flex-direction: column;
+  gap: 6px;
+  width: 100%;
 }
 
-.ks-form-group label {
+.wd-input-group label {
   font-size: 0.85rem;
   font-weight: 500;
-  color: var(--ks-text-main);
-  margin-bottom: 6px;
+  color: var(--wd-text-main);
 }
 
-.ks-form input,
-.ks-form textarea,
-.ks-form select {
+.wd-form-container input,
+.wd-form-container select,
+.wd-form-container textarea {
   width: 100%;
   padding: 12px 14px;
-  border: 1px solid var(--ks-border);
+  border: 1px solid var(--wd-input-border);
   border-radius: 8px;
   font-family: inherit;
   font-size: 0.95rem;
   box-sizing: border-box;
-  background-color: var(--ks-bg-main);
+  background-color: #fff;
   transition: border-color 0.2s;
 }
 
-.ks-form input:focus,
-.ks-form textarea:focus,
-.ks-form select:focus {
+.wd-form-container input:focus,
+.wd-form-container select:focus,
+.wd-form-container textarea:focus {
   outline: none;
-  border-color: var(--ks-primary-dark);
+  border-color: var(--wd-primary);
+  box-shadow: 0 0 0 3px rgba(26, 26, 26, 0.1);
 }
 
-.ks-file-upload {
+.wd-file-upload {
   padding: 16px;
-  border: 2px dashed var(--ks-border);
+  border: 2px dashed var(--wd-input-border);
   border-radius: 8px;
   text-align: center;
-  background-color: var(--ks-bg-muted);
+  background-color: #f9fafb;
   cursor: pointer;
 }
 
-.ks-file-upload input {
-  display: none;
-}
-
-.ks-file-label {
-  display: block;
-  font-size: 0.9rem;
-  color: var(--ks-text-sub);
+.wd-file-upload input[type="file"] {
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: transparent;
   cursor: pointer;
 }
 
-.ks-file-count {
-  display: block;
-  margin-top: 8px;
+.wd-file-hint {
   font-size: 0.8rem;
-  color: var(--ks-primary-dark);
-  font-weight: 600;
+  color: var(--wd-text-sub);
+  margin-top: 6px;
+  display: block;
 }
 
-.ks-btn-submit {
-  margin-top: 10px;
+.wd-submit-btn {
+  padding: 14px;
+  background-color: var(--wd-primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: var(--wd-transition);
+  margin-top: 8px;
   width: 100%;
 }
 
-/* Messages */
-.ks-msg-success {
+.wd-submit-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.wd-msg-success {
   padding: 20px;
-  background-color: #f0fdf4;
-  color: #166534;
+  background-color: var(--wd-success-bg);
+  color: var(--wd-success-text);
   border: 1px solid #bbf7d0;
   border-radius: 8px;
   text-align: center;
   font-weight: 500;
+  margin-top: 10px;
 }
 
-.ks-msg-error {
-  color: #dc2626;
+.wd-msg-error {
+  color: var(--wd-error-text);
   font-size: 0.85rem;
   margin-top: -8px;
+  font-weight: 500;
 }
 
 /* --- 9. RESPONSIVE QUERIES --- */
 @media (max-width: 768px) {
-  .ks-vendor-page {
-    padding: 0 16px;
+  .wd-directory-wrapper {
+    padding: 16px;
     margin-top: 80px;
   }
   
-  .ks-vendor-header {
+  .wd-header-text h1 {
+    font-size: 1.5rem;
+  }
+
+  .wd-header-text p {
+    font-size: 0.9rem;
+  }
+  
+  /* Make header flex row drop to column cleanly */
+  .wd-header-section {
     flex-direction: column;
     text-align: center;
-    gap: 20px;
   }
 
-  .ks-header-text h1::after {
-    margin: 10px auto 0; /* Centers underline */
-  }
-
-  .ks-btn-primary {
-    width: 100%;
-  }
-
-  .ks-vendor-grid {
-    grid-template-columns: 1fr; 
-  }
-
-  .ks-form-row {
-    flex-direction: column; /* Stacks inputs properly on mobile */
+  /* Force side-by-side inputs to stack on mobile */
+  .wd-form-row {
+    grid-template-columns: 1fr;
     gap: 16px;
   }
   
-  .ks-modal-box {
+  .wd-modal-box {
     padding: 24px 20px;
   }
 }
