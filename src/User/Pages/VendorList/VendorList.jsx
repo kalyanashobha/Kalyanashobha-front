@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Tag, Image as ImageIcon, X, Plus, UploadCloud } from "lucide-react"; 
+import { Tag, Image as ImageIcon, X, Plus } from "lucide-react"; 
 import "./VendorList.css";
 import Navbar from "../../Components/Navbar";
 
@@ -156,7 +156,7 @@ export default function VendorList() {
         setJoinSubmitStatus({ loading: false, success: true, error: "" });
         setTimeout(() => {
           handleCloseJoinModal();
-        }, 3000); 
+        }, 3000);
       }
     } catch (err) {
       setJoinSubmitStatus({
@@ -207,7 +207,7 @@ export default function VendorList() {
                   <p className="v-card-desc">
                     {vendor.description ? vendor.description.substring(0, 80) + "..." : "No description available."}
                   </p>
-
+                  
                   {/* Contact Button */}
                   <button 
                     className="v-contact-btn" 
@@ -221,10 +221,18 @@ export default function VendorList() {
           )}
         </div>
 
-        {/* --- CONTACT VENDOR MODAL --- */}
+        {/* --- FIXED FLOATING BUTTON --- */}
+        <button 
+          className="v-fixed-join-btn" 
+          onClick={handleOpenJoinModal}
+        >
+          <Plus size={20} /> Join as Vendor
+        </button>
+
+        {/* --- EXISTING: Contact Vendor Modal --- */}
         {selectedVendor && (
-          <div className="v-modal-overlay" onClick={handleCloseModal}>
-            <div className="v-modal-content" onClick={(e) => e.stopPropagation()}>
+          <div className="v-modal-overlay">
+            <div className="v-modal-content">
               <button className="v-modal-close" onClick={handleCloseModal}>
                 <X size={20} />
               </button>
@@ -266,10 +274,10 @@ export default function VendorList() {
           </div>
         )}
 
-        {/* --- JOIN AS VENDOR MODAL --- */}
+        {/* --- NEW: Join as Vendor Modal --- */}
         {showJoinModal && (
-          <div className="v-modal-overlay" onClick={handleCloseJoinModal}>
-            <div className="v-modal-content large" onClick={(e) => e.stopPropagation()}>
+          <div className="v-modal-overlay">
+            <div className="v-modal-content" style={{ maxWidth: '600px' }}>
               <button className="v-modal-close" onClick={handleCloseJoinModal}>
                 <X size={20} />
               </button>
@@ -279,14 +287,14 @@ export default function VendorList() {
 
               {joinSubmitStatus.success ? (
                 <div className="v-success-message">
-                  <h3>Registration Submitted!</h3>
-                  <p>Our admin team will review your application. You will receive an email once your profile is approved and live.</p>
+                  <h3 style={{ margin: '0 0 10px 0' }}>Registration Submitted!</h3>
+                  <p style={{ margin: 0 }}>Our admin team will review your application. You will receive an email once your profile is approved and live.</p>
                 </div>
               ) : (
                 <form onSubmit={handleJoinSubmit} className="v-lead-form">
                   
-                  {/* Fixed Flex Layout with v-form-row */}
-                  <div className="v-form-row">
+                  {/* Clean Grid Layout replacing inline styles */}
+                  <div className="v-form-grid">
                     <input 
                       type="text" name="businessName" placeholder="Business Name *" 
                       value={joinFormData.businessName} onChange={handleJoinInputChange} required 
@@ -295,9 +303,7 @@ export default function VendorList() {
                       type="email" name="email" placeholder="Business Email *" 
                       value={joinFormData.email} onChange={handleJoinInputChange} required 
                     />
-                  </div>
-                  
-                  <div className="v-form-row">
+                    
                     <input 
                       type="text" name="category" list="vendor-categories" placeholder="Select Category *" 
                       value={joinFormData.category} onChange={handleJoinInputChange} required 
@@ -323,22 +329,17 @@ export default function VendorList() {
                   ></textarea>
 
                   <div>
-                    <label style={{ fontSize: '14px', color: '#4b5563', marginBottom: '8px', display: 'block', fontWeight: 500 }}>
+                    <label style={{ fontSize: '13px', fontWeight: '600', color: '#4b5563', marginBottom: '8px', display: 'block' }}>
                       Upload Portfolio Images (Max 5)
                     </label>
-                    <div className="v-file-upload" onClick={() => document.getElementById('fileUpload').click()}>
-                      <UploadCloud size={24} color="#6b7280" style={{ marginBottom: '8px' }} />
-                      <p style={{ margin: 0, color: '#6b7280' }}>Click to browse files</p>
-                      <input 
-                        id="fileUpload"
-                        type="file" multiple accept="image/*" 
-                        onChange={handleJoinFileChange} 
-                        style={{ display: 'none' }}
-                      />
-                    </div>
+                    <input 
+                      type="file" multiple accept="image/*" 
+                      onChange={handleJoinFileChange} 
+                      className="v-file-upload"
+                    />
                     {joinFiles.length > 0 && (
-                      <small style={{ color: '#059669', display: 'block', marginTop: '8px', fontWeight: 500 }}>
-                        {joinFiles.length} file(s) selected
+                      <small style={{ color: '#10b981', display: 'block', marginTop: '6px', fontWeight: '500' }}>
+                        ✓ {joinFiles.length} file(s) selected
                       </small>
                     )}
                   </div>
@@ -355,13 +356,6 @@ export default function VendorList() {
         )}
 
       </div>
-
-      {/* FIXED BOTTOM RIGHT BUTTON */}
-      <button className="v-fab-join" onClick={handleOpenJoinModal}>
-        <Plus size={20} strokeWidth={2.5} />
-        <span>Join as Vendor</span>
-      </button>
-
     </>
   );
 }
