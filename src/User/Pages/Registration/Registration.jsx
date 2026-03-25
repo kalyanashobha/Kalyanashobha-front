@@ -198,6 +198,8 @@ const KsInput = ({ label, name, type="text", placeholder, value, onChange, error
 
 const Register = () => {
   const [step, setStep] = useState(1);
+  const stepRef = useRef(step); // ADDED: To track the step inside event listeners without closure staleness
+  
   const [animDirection, setAnimDirection] = useState('ks-reg-new-slide-fwd');
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
@@ -239,6 +241,30 @@ const Register = () => {
     highestQualification: '', college: '', annualIncome: '', workWith: '', workAs: '', companyName: '', nri: 'No'
   });
 
+  // --- NEW: Keep ref synced with current step ---
+  useEffect(() => {
+    stepRef.current = step;
+  }, [step]);
+
+  // --- NEW: History Interception Logic ---
+  useEffect(() => {
+    const handlePopState = () => {
+      // If we are on step 2 or higher, intercept the back button and go back one step 
+      // instead of leaving the page
+      if (stepRef.current > 1) {
+        setAnimDirection('ks-reg-new-slide-bck');
+        setStep((prev) => prev - 1);
+      }
+    };
+    
+    // Listen to the browser's hardware/software back navigation
+    window.addEventListener('popstate', handlePopState);
+    
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, []);
+
   useEffect(() => {
     const fetchCommunities = async () => {
       try {
@@ -251,7 +277,6 @@ const Register = () => {
     };
 
     const fetchIndependentData = async () => {
-      // Excluded 'State' and 'City' since they will be fetched dynamically on-change
       const categories = [
         'Country', 'MaritalStatus', 'Height', 
         'Diet', 'Education', 'Income', 'Sector', 'Designation'
@@ -369,8 +394,6 @@ const Register = () => {
       case 1: require("profileFor"); require("gender"); break;
       case 2: 
         require("firstName"); require("lastName"); require("dobDay"); require("dobMonth"); require("dobYear"); 
-        
-        // Age validation based on gender
         if (formData.dobDay && formData.dobMonth && formData.dobYear) {
             const dobDate = new Date(`${formData.dobYear}-${formData.dobMonth}-${formData.dobDay}`);
             const today = new Date();
@@ -430,13 +453,18 @@ const Register = () => {
 
   const nextStep = () => {
     if (validateStep(step)) {
+      // --- UPDATED: Push a new history state to intercept the back button ---
+      window.history.pushState(null, '', window.location.href);
+      
       setAnimDirection('ks-reg-new-slide-fwd');
       setStep(step + 1);
     }
   };
+
   const prevStep = () => {
-    setAnimDirection('ks-reg-new-slide-bck');
-    setStep(step - 1);
+    // --- UPDATED: Native browser back to maintain a clean history stack ---
+    // This will trigger the 'popstate' listener above, which safely decrements the step.
+    window.history.back();
   };
 
   const handleSubmit = async (e) => {
@@ -449,7 +477,6 @@ const Register = () => {
     try {
       const dobDate = new Date(`${formData.dobYear}-${formData.dobMonth}-${formData.dobDay}`);
       
-      // Calculate age specifically to send to backend if needed
       const today = new Date();
       let calculatedAge = today.getFullYear() - dobDate.getFullYear();
       const m = today.getMonth() - dobDate.getMonth();
@@ -460,7 +487,6 @@ const Register = () => {
 
       const data = new FormData();
       
-      // 1. Basic Fields
       data.append('firstName', formData.firstName);
       data.append('lastName', formData.lastName);
       data.append('email', formData.email);
@@ -480,16 +506,12 @@ const Register = () => {
       data.append('height', heightVal);
       
       if(formData.college) data.append('collegeName', formData.college);
-
-      // Simply append whatever the user selected for workType
       if (formData.workWith) data.append('workType', formData.workWith);
-
       if(formData.companyName) data.append('companyName', formData.companyName);
       if(formData.annualIncome) data.append('annualIncome', formData.annualIncome);
       
       data.append('nri', formData.nri);
 
-      // 2. The specific fields requested for Master Data checks
       data.append('community', formData.community);
       if(formData.subCommunity) {
           data.append('subCommunity', formData.subCommunity);
@@ -776,7 +798,6 @@ const Register = () => {
   return (
     <>
       <Navbar/>
-      {/* Added extremely high zIndex just to guarantee the toast isn't hidden by navbars */}
       <Toaster 
         position="top-center" 
         containerStyle={{ zIndex: 9999999 }} 
