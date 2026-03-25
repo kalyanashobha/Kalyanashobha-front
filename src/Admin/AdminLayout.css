@@ -100,3 +100,54 @@
     z-index: 99;
   }
 }
+/* ---- MOBILE SIDEBAR CSS ---- */
+@media screen and (max-width: 768px) {
+  /* 1. Hide the sidebar off the screen by default */
+  .sidebar-wrapper {
+    position: fixed;
+    top: 0;
+    left: -100%; /* This pushes it completely off the left side of the screen */
+    height: 100vh;
+    z-index: 1000; /* Keeps it on top of everything */
+    transition: left 0.3s ease-in-out; /* Smooth sliding animation */
+  }
+
+  /* 2. When the 'open' class is added via React, slide it into view */
+  .sidebar-wrapper.open {
+    left: 0; 
+  }
+
+  /* 3. The dark overlay behind the sidebar */
+  .sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+    z-index: 999; /* Just below the sidebar (1000) */
+    backdrop-filter: blur(2px); /* Optional: blurs the background slightly */
+  }
+
+  /* 4. Hide desktop layout stuff on mobile if needed */
+  .mobile-header {
+    display: flex; /* Make sure your hamburger menu shows up */
+  }
+}
+
+/* ---- DESKTOP CSS ---- */
+@media screen and (min-width: 769px) {
+  /* Ensure the sidebar behaves normally on big screens */
+  .sidebar-wrapper {
+    position: static;
+    left: 0;
+    display: block;
+  }
+  
+  /* Hide mobile elements on desktop */
+  .mobile-header,
+  .mobile-close-btn,
+  .sidebar-overlay {
+    display: none;
+  }
+}
