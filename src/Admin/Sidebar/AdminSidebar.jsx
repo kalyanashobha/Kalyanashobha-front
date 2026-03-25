@@ -8,7 +8,7 @@ import {
 import axios from "axios";
 import "./AdminSidebar.css";
 
-// --- ADDED closeSidebar PROP HERE ---
+// 1. Accept 'closeSidebar' as a prop here
 export default function AdminSidebar({ closeSidebar }) {
   const navigate = useNavigate();
   const location = useLocation(); 
@@ -70,7 +70,7 @@ export default function AdminSidebar({ closeSidebar }) {
     } catch (e) {
       console.error("Failed to fetch sidebar stats", e);
     }
-  }, []); 
+  }, []);
 
   useEffect(() => {
     fetchCounts();
@@ -101,6 +101,7 @@ export default function AdminSidebar({ closeSidebar }) {
   const handleLogout = () => {
     localStorage.removeItem('adminToken');
     localStorage.removeItem('adminInfo');
+    if (closeSidebar) closeSidebar(); // Close sidebar on logout too!
     navigate('/admin/login');
   };
 
@@ -142,7 +143,7 @@ export default function AdminSidebar({ closeSidebar }) {
         <ul>
           {filteredLinks.map((link) => (
             <li key={link.id}>
-              {/* --- ADDED onClick HANDLER HERE --- */}
+              {/* 2. Added onClick to trigger closeSidebar when a link is tapped */}
               <NavLink 
                 to={link.path} 
                 className={({ isActive }) => (isActive ? "ks-nav-link active" : "ks-nav-link")}
