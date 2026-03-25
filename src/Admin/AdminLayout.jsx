@@ -1,45 +1,44 @@
 import React, { useState } from "react";
+import { Outlet } from "react-router-dom";
 import AdminSidebar from "./AdminSidebar";
-import { Outlet } from "react-router-dom"; 
-import { Menu } from "lucide-react"; 
-import "./AdminLayout.css"; 
+import { Menu, X } from "lucide-react";
+import "./AdminLayout.css"; // Make sure to add basic styling for this layout
 
 export default function AdminLayout() {
-  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const handleCloseSidebar = () => {
-    setIsMobileSidebarOpen(false);
+  // This function gets passed into the Sidebar
+  const closeSidebar = () => {
+    setIsMobileMenuOpen(false);
   };
 
   return (
-    // Fixed: Matches .admin-root-layout in CSS
-    <div className="admin-root-layout"> 
-      
-      {/* Fixed: Matches .admin-mobile-header in CSS */}
-      <div className="admin-mobile-header">
-        <h3 style={{ margin: 0 }}>KalyanaShobha</h3>
+    <div className="admin-layout-container">
+      {/* Mobile Top Bar with Hamburger Menu */}
+      <div className="mobile-topbar">
         <button 
-           className="mobile-menu-btn" 
-           onClick={() => setIsMobileSidebarOpen(true)}
+          className="mobile-menu-toggle" 
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         >
-          <Menu size={24} />
+          {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
+        <span className="mobile-title">KalyanaShobha Admin</span>
       </div>
 
-      {/* Fixed: Toggles "mobile-open" to match your CSS */}
-      <div className={`sidebar-wrapper ${isMobileSidebarOpen ? "mobile-open" : ""}`}>
-        
-        <AdminSidebar closeSidebar={handleCloseSidebar} />
-        
-        {/* Fixed: Moved overlay inside sidebar-wrapper so your CSS selector (.sidebar-wrapper.mobile-open .sidebar-overlay) works! */}
-        <div className="sidebar-overlay" onClick={handleCloseSidebar}></div>
+      {/* Sidebar - Controlled by State */}
+      <div className={`sidebar-wrapper ${isMobileMenuOpen ? "open" : ""}`}>
+        <AdminSidebar onClose={closeSidebar} />
       </div>
 
-      {/* Fixed: Matches .admin-main-content in CSS */}
+      {/* Overlay to close sidebar by clicking outside (optional but good practice) */}
+      {isMobileMenuOpen && (
+        <div className="mobile-overlay" onClick={closeSidebar}></div>
+      )}
+
+      {/* Main Content Area */}
       <main className="admin-main-content">
-        <Outlet /> 
+        <Outlet /> {/* This renders your nested routes like Dashboard, Users, etc. */}
       </main>
-      
     </div>
   );
 }
