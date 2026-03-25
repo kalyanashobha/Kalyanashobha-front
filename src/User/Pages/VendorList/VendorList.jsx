@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Image as ImageIcon, X, Plus, UploadCloud } from "lucide-react"; 
+import { Tag, Image as ImageIcon, X, Plus } from "lucide-react"; 
 import "./VendorList.css";
 import Navbar from "../../Components/Navbar";
 
@@ -170,49 +170,52 @@ export default function VendorList() {
   return (
     <>
       <Navbar />
-      <div className="ks-wrapper">
+      <div className="vendor-page-wrapper">
         
         {/* HEADER SECTION */}
-        <div className="ks-header-section">
-          <div className="ks-header-content">
-            <h1>Premium Vendors</h1>
-            <p>Curated services to make your special day perfect.</p>
-          </div>
-          <button className="ks-btn-primary" onClick={handleOpenJoinModal}>
-            <Plus size={18} /> Join as Vendor
+        <div className="vendor-header-section">
+          <h1 className="vendor-main-title">Premium Wedding Vendors</h1>
+          <p className="vendor-subtitle">Curated services to make your special day perfect.</p>
+          
+          <button className="vendor-action-btn header-join-btn" onClick={handleOpenJoinModal}>
+            <Plus size={20} /> Join as Vendor
           </button>
         </div>
 
         {/* VENDOR GRID */}
-        <div className="ks-vendor-grid">
+        <div className="vendor-card-grid">
           {loading ? (
-             [1,2,3,4].map(n => <div key={n} className="ks-card ks-skeleton"></div>)
+             [1,2,3,4].map(n => <div key={n} className="vendor-skeleton-card"></div>)
           ) : vendors.length === 0 ? (
-            <div className="ks-empty-state">
+            <div className="vendor-empty-state">
               <h3>No Vendors Found</h3>
               <p>Check back later for new listings.</p>
             </div>
           ) : (
             vendors.map((vendor) => (
-              <div key={vendor._id} className="ks-card">
+              <div key={vendor._id} className="vendor-profile-card">
                 
                 {/* Image Section */}
-                <div className="ks-card-img-wrapper">
+                <div className="vendor-img-wrapper">
                   {vendor.images && vendor.images.length > 0 ? (
                     <img src={vendor.images[0]} alt={vendor.businessName} />
                   ) : (
-                    <div className="ks-img-placeholder"><ImageIcon size={40} /></div>
+                    <div className="vendor-img-placeholder"><ImageIcon size={40} /></div>
                   )}
-                  <span className="ks-badge">{vendor.category}</span>
+                  <span className="vendor-category-badge">{vendor.category}</span>
                 </div>
 
                 {/* Content Section */}
-                <div className="ks-card-body">
-                  <h3 className="ks-card-title">{vendor.businessName}</h3>
-                  <p className="ks-card-desc">
+                <div className="vendor-card-body">
+                  <h3 className="vendor-card-title">{vendor.businessName}</h3>
+                  <p className="vendor-card-desc">
                     {vendor.description ? vendor.description.substring(0, 80) + "..." : "No description available."}
                   </p>
-                  <button className="ks-btn-primary" onClick={() => handleOpenModal(vendor)}>
+                  
+                  <button 
+                    className="vendor-action-btn" 
+                    onClick={() => handleOpenModal(vendor)}
+                  >
                     Contact Now
                   </button>
                 </div>
@@ -223,124 +226,134 @@ export default function VendorList() {
 
         {/* --- EXISTING: Contact Vendor Modal --- */}
         {selectedVendor && (
-          <div className="ks-modal-backdrop">
-            <div className="ks-modal-panel">
-              <button className="ks-close-btn" onClick={handleCloseModal}>
-                <X size={20} />
+          <div className="vendor-modal-backdrop">
+            <div className="vendor-modal-box">
+              <button className="vendor-modal-close-btn" onClick={handleCloseModal}>
+                <X size={24} />
               </button>
               
-              <div className="ks-modal-header">
-                <h2>Contact {selectedVendor.businessName}</h2>
-                <p>Our concierge team will connect you.</p>
-              </div>
+              <h2 className="vendor-modal-title">Contact {selectedVendor.businessName}</h2>
+              <p className="vendor-modal-subtitle">Our concierge team will connect you.</p>
 
-              <div className="ks-modal-body">
-                {submitStatus.success ? (
-                  <div className="ks-alert-success">
-                    Request sent successfully! We will be in touch soon.
-                  </div>
-                ) : (
-                  <form onSubmit={handleSubmit} className="ks-form">
-                    <div className="ks-input-group">
-                      <input className="ks-input" type="text" name="name" placeholder="Full Name *" value={formData.name} onChange={handleInputChange} required />
-                    </div>
-                    <div className="ks-input-group">
-                      <input className="ks-input" type="tel" name="phone" placeholder="Phone Number *" value={formData.phone} onChange={handleInputChange} required />
-                    </div>
-                    <div className="ks-input-group">
-                      <input className="ks-input" type="email" name="email" placeholder="Email Address (Optional)" value={formData.email} onChange={handleInputChange} />
-                    </div>
-                    <div className="ks-input-group">
-                      <textarea className="ks-input" name="message" placeholder="What are your requirements? (e.g., Dates, Venue) *" value={formData.message} onChange={handleInputChange} required></textarea>
-                    </div>
+              {submitStatus.success ? (
+                <div className="vendor-feedback-success">
+                  Request sent successfully! We will be in touch soon.
+                </div>
+              ) : (
+                <form onSubmit={handleSubmit} className="vendor-form-container">
+                  <input 
+                    className="vendor-input-field"
+                    type="text" name="name" placeholder="Full Name" 
+                    value={formData.name} onChange={handleInputChange} required 
+                  />
+                  <input 
+                    className="vendor-input-field"
+                    type="tel" name="phone" placeholder="Phone Number" 
+                    value={formData.phone} onChange={handleInputChange} required 
+                  />
+                  <input 
+                    className="vendor-input-field"
+                    type="email" name="email" placeholder="Email Address" 
+                    value={formData.email} onChange={handleInputChange} 
+                  />
+                  <textarea 
+                    className="vendor-input-field"
+                    name="message" placeholder="What are your requirements? (e.g., Dates, Venue)" 
+                    value={formData.message} onChange={handleInputChange} required rows="3"
+                  ></textarea>
 
-                    {submitStatus.error && <div className="ks-alert-error">{submitStatus.error}</div>}
+                  {submitStatus.error && <div className="vendor-feedback-error">{submitStatus.error}</div>}
 
-                    <button type="submit" className="ks-btn-primary" disabled={submitStatus.loading}>
-                      {submitStatus.loading ? "Sending..." : "Send Request"}
-                    </button>
-                  </form>
-                )}
-              </div>
+                  <button type="submit" className="vendor-action-btn" disabled={submitStatus.loading}>
+                    {submitStatus.loading ? "Sending..." : "Send Request"}
+                  </button>
+                </form>
+              )}
             </div>
           </div>
         )}
 
         {/* --- NEW: Join as Vendor Modal --- */}
         {showJoinModal && (
-          <div className="ks-modal-backdrop">
-            <div className="ks-modal-panel ks-large">
-              <button className="ks-close-btn" onClick={handleCloseJoinModal}>
-                <X size={20} />
+          <div className="vendor-modal-backdrop">
+            <div className="vendor-modal-box">
+              <button className="vendor-modal-close-btn" onClick={handleCloseJoinModal}>
+                <X size={24} />
               </button>
               
-              <div className="ks-modal-header">
-                <h2>Register Your Business</h2>
-                <p>Join KalyanaShobha and connect with thousands of couples.</p>
-              </div>
+              <h2 className="vendor-modal-title">Register Your Business</h2>
+              <p className="vendor-modal-subtitle">Join KalyanaShobha and connect with thousands of couples.</p>
 
-              <div className="ks-modal-body">
-                {joinSubmitStatus.success ? (
-                  <div className="ks-alert-success">
-                    <h3 style={{marginTop: 0}}>Registration Submitted!</h3>
-                    <p style={{marginBottom: 0}}>Our admin team will review your application. You will receive an email once your profile is approved and live.</p>
+              {joinSubmitStatus.success ? (
+                <div className="vendor-feedback-success">
+                  <h3>Registration Submitted!</h3>
+                  <p>Our admin team will review your application. You will receive an email once your profile is approved and live.</p>
+                </div>
+              ) : (
+                <form onSubmit={handleJoinSubmit} className="vendor-form-container">
+                  
+                  {/* Row 1: Name & Email */}
+                  <div className="vendor-form-row">
+                    <input 
+                      className="vendor-input-field"
+                      type="text" name="businessName" placeholder="Business Name" 
+                      value={joinFormData.businessName} onChange={handleJoinInputChange} required 
+                    />
+                    <input 
+                      className="vendor-input-field"
+                      type="email" name="email" placeholder="Business Email" 
+                      value={joinFormData.email} onChange={handleJoinInputChange} required 
+                    />
                   </div>
-                ) : (
-                  <form onSubmit={handleJoinSubmit} className="ks-form">
-                    
-                    {/* Replaced inline styles with a responsive CSS grid row */}
-                    <div className="ks-form-row">
-                      <div className="ks-input-group">
-                        <input className="ks-input" type="text" name="businessName" placeholder="Business Name *" value={joinFormData.businessName} onChange={handleJoinInputChange} required />
-                      </div>
-                      <div className="ks-input-group">
-                        <input className="ks-input" type="email" name="email" placeholder="Business Email *" value={joinFormData.email} onChange={handleJoinInputChange} required />
-                      </div>
-                    </div>
-                    
-                    <div className="ks-form-row">
-                      <div className="ks-input-group">
-                        <input className="ks-input" type="text" name="category" list="vendor-categories" placeholder="Select Category *" value={joinFormData.category} onChange={handleJoinInputChange} required />
-                        <datalist id="vendor-categories">
-                          {categories.map(cat => <option key={cat} value={cat} />)}
-                        </datalist>
-                      </div>
-                      <div className="ks-input-group">
-                        <input className="ks-input" type="tel" name="contactNumber" placeholder="Contact Number *" value={joinFormData.contactNumber} onChange={handleJoinInputChange} required />
-                      </div>
-                    </div>
+                  
+                  {/* Row 2: Category & Contact */}
+                  <div className="vendor-form-row">
+                    <input 
+                      className="vendor-input-field"
+                      type="text" name="category" list="vendor-categories" placeholder="Select Category" 
+                      value={joinFormData.category} onChange={handleJoinInputChange} required 
+                    />
+                    <datalist id="vendor-categories">
+                      {categories.map(cat => <option key={cat} value={cat} />)}
+                    </datalist>
 
-                    <div className="ks-input-group">
-                      <input className="ks-input" type="text" name="priceRange" placeholder="Price Range (e.g. ₹50,000 - ₹1 Lakh)" value={joinFormData.priceRange} onChange={handleJoinInputChange} />
-                    </div>
-                    
-                    <div className="ks-input-group">
-                      <textarea className="ks-input" name="description" placeholder="Describe your services..." value={joinFormData.description} onChange={handleJoinInputChange}></textarea>
-                    </div>
+                    <input 
+                      className="vendor-input-field"
+                      type="tel" name="contactNumber" placeholder="Contact Number" 
+                      value={joinFormData.contactNumber} onChange={handleJoinInputChange} required 
+                    />
+                  </div>
 
-                    {/* Styled File Upload */}
-                    <div className="ks-input-group">
-                      <div className="ks-file-upload-wrapper">
-                        <input type="file" multiple accept="image/*" onChange={handleJoinFileChange} className="ks-file-input" />
-                        <UploadCloud size={28} color="#6B7280" style={{marginBottom: '8px'}} />
-                        <span className="ks-file-label">Click or drag images to upload</span>
-                        <span className="ks-file-subtext">Max 5 portfolio images</span>
-                        {joinFiles.length > 0 && (
-                          <div style={{ marginTop: '12px', color: '#111827', fontWeight: '600' }}>
-                            {joinFiles.length} file(s) selected
-                          </div>
-                        )}
-                      </div>
-                    </div>
+                  {/* Single column inputs */}
+                  <input 
+                    className="vendor-input-field"
+                    type="text" name="priceRange" placeholder="Price Range (e.g. ₹50,000 - ₹1 Lakh)" 
+                    value={joinFormData.priceRange} onChange={handleJoinInputChange} 
+                  />
+                  
+                  <textarea 
+                    className="vendor-input-field"
+                    name="description" placeholder="Describe your services..." 
+                    value={joinFormData.description} onChange={handleJoinInputChange} rows="3"
+                  ></textarea>
 
-                    {joinSubmitStatus.error && <div className="ks-alert-error">{joinSubmitStatus.error}</div>}
+                  {/* File Upload Section */}
+                  <div className="vendor-file-upload-wrapper">
+                    <label className="vendor-file-label">Upload Portfolio Images (Max 5)</label>
+                    <input 
+                      className="vendor-file-input"
+                      type="file" multiple accept="image/*" 
+                      onChange={handleJoinFileChange} 
+                    />
+                  </div>
 
-                    <button type="submit" className="ks-btn-primary" disabled={joinSubmitStatus.loading} style={{marginTop: '8px'}}>
-                      {joinSubmitStatus.loading ? "Submitting Application..." : "Submit Registration"}
-                    </button>
-                  </form>
-                )}
-              </div>
+                  {joinSubmitStatus.error && <div className="vendor-feedback-error">{joinSubmitStatus.error}</div>}
+
+                  <button type="submit" className="vendor-action-btn" disabled={joinSubmitStatus.loading}>
+                    {joinSubmitStatus.loading ? "Submitting Application..." : "Submit Registration"}
+                  </button>
+                </form>
+              )}
             </div>
           </div>
         )}
