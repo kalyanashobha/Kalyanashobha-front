@@ -3,9 +3,9 @@
 
 :root {
   /* Core Brand Colors */
-  --vp-red: #D32F2F;        /* Brand Red */
-  --vp-amber: #FFCA28;      /* Brand Amber */
-  --vp-gold-text: #B7791F;  /* Dark Gold text */
+  --vp-red: #D32F2F;
+  --vp-amber: #FFC107;      /* Adjusted to match the exact yellow in your screenshot */
+  --vp-gold-text: #B7791F;
   
   /* UI Colors */
   --vp-bg: #FFFFFF;
@@ -13,11 +13,12 @@
   --vp-text-main: #111827;
   --vp-text-sub: #6B7280;
   --vp-border: #E5E7EB;
+  --vp-btn-dark: #1A1A1A;   /* Deep charcoal/black for buttons */
   
   /* Effects */
   --vp-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
   --vp-hover-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  --vp-radius: 12px;
+  --vp-radius: 8px;         /* Slightly sharper corners to match screenshot */
   --vp-transition: all 0.3s ease-in-out;
 }
 
@@ -25,33 +26,30 @@
 .v-premium-container {
   max-width: 1200px;        
   width: 100%;
-  margin: 100px auto 60px;  /* Top margin clears Navbar */
-  padding: 25px 24px !important;
+  margin: 80px auto 60px;
+  padding: 20px 24px;
   box-sizing: border-box;
   font-family: 'Poppins', sans-serif;
   color: var(--vp-text-main);
   background-color: var(--vp-bg);
-  display: block;           /* Ensures it behaves as a block */
 }
 
-/* --- 3. HEADER (Renamed & Fixed) --- */
+/* --- 3. HEADER SECTION --- */
 .v-premium-header {
   display: flex;            
-  flex-direction: column;   /* FORCE VERTICAL STACK */
-  align-items: center;      /* Center Horizontally */
-  justify-content: center;  
-  text-align: center;       /* Text Center */
-  margin-bottom: 50px;
+  flex-direction: column; 
+  align-items: center;      
+  text-align: center;       
+  margin-bottom: 40px;
   width: 100%;
-  clear: both;              /* Clears any floats */
 }
 
 .v-premium-header h1 {
-  font-size: 2.2rem;
-  font-weight: 700;
-  color: black;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--vp-text-main);
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
   margin: 0 0 12px 0;
   position: relative;
   display: inline-block;
@@ -62,33 +60,56 @@
 .v-premium-header h1::after {
   content: '';
   display: block;
-  width: 70px;
+  width: 60px;
   height: 4px;
   background: var(--vp-amber);
-  margin: 10px auto 0;      /* Auto margin centers it */
+  margin: 12px auto 0;
   border-radius: 2px;
 }
 
 .v-premium-header p {
-  font-size: 1.1rem;
+  font-size: 0.95rem;
   color: var(--vp-text-sub);
   max-width: 600px;
-  margin: 0 auto;           /* Center the paragraph itself */
-  line-height: 1.6;
+  margin: 0 auto 20px auto;
+  line-height: 1.5;
+}
+
+/* Primary Join Button */
+.v-join-btn {
+  background-color: var(--vp-btn-dark);
+  color: #fff;
+  border: none;
+  border-radius: var(--vp-radius);
+  padding: 14px 24px;
+  font-size: 1rem;
+  font-weight: 600;
+  width: 100%;
+  max-width: 350px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: var(--vp-transition);
+}
+
+.v-join-btn:hover {
+  background-color: #000;
 }
 
 /* --- 4. GRID SYSTEM --- */
 .v-premium-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 32px;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
   width: 100%;
 }
 
 .v-no-data {
   grid-column: 1 / -1;
   text-align: center;
-  padding: 80px;
+  padding: 60px;
   border: 2px dashed var(--vp-border);
   border-radius: var(--vp-radius);
   color: var(--vp-text-sub);
@@ -107,15 +128,8 @@
   height: 100%; 
 }
 
-.v-premium-card:hover {
-  transform: translateY(-8px);
-  box-shadow: var(--vp-hover-shadow);
-  border-color: var(--vp-amber); 
-}
-
-/* Image Area */
 .v-card-image {
-  height: 220px;
+  height: 250px;
   width: 100%;
   position: relative;
   overflow: hidden;
@@ -126,144 +140,65 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.6s ease;
 }
 
-.v-premium-card:hover .v-card-image img {
-  transform: scale(1.08); 
-}
-
-.v-placeholder {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--vp-text-sub);
-}
-
-/* Category Badge */
 .v-badge-category {
   position: absolute;
-  top: 12px;
-  right: 12px;
+  top: 15px;
+  right: 15px;
   background: var(--vp-amber);
   color: #000;
   font-size: 0.75rem;
   font-weight: 700;
-  padding: 6px 12px;
+  padding: 6px 14px;
   border-radius: 20px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   z-index: 10;
 }
 
-/* Content Area */
 .v-card-content {
-  padding: 24px;
+  padding: 20px;
   flex-grow: 1;
   display: flex;
   flex-direction: column;
 }
 
 .v-card-title {
-  font-size: 1.25rem;
+  font-size: 1.4rem;
   font-weight: 700;
   color: var(--vp-text-main);
-  margin: 0 0 10px 0;
-  line-height: 1.3;
+  margin: 0 0 6px 0;
 }
 
 .v-card-desc {
   font-size: 0.95rem;
   color: var(--vp-text-sub);
   margin-bottom: 20px;
-  line-height: 1.6;
+  line-height: 1.5;
   flex-grow: 1;
 }
 
-/* Details Row */
-.v-card-details {
-  padding-top: 16px;
-  border-top: 1px solid var(--vp-border);
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+.v-contact-btn {
+  width: 100%;
+  padding: 14px;
+  background-color: var(--vp-btn-dark);
+  color: white;
+  border: none;
+  border-radius: var(--vp-radius);
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: var(--vp-transition);
   margin-top: auto;
 }
 
-.v-detail-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: var(--vp-text-main);
-}
-
-.v-icon-gold {
-  color: var(--vp-gold-text);
-  min-width: 18px;
-}
-
-/* --- 6. SKELETON --- */
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-.v-skeleton {
-  height: 420px;
-  background: #f6f7f8;
-  background-image: linear-gradient(to right, #f6f7f8 0%, #edeef1 20%, #f6f7f8 40%, #f6f7f8 100%);
-  background-repeat: no-repeat;
-  background-size: 200% 100%; 
-  animation: shimmer 1.5s infinite linear;
-  border: none;
-}
-
-/* --- 7. RESPONSIVE --- */
-@media (max-width: 768px) {
-  .v-premium-container {
-    padding: 0 16px;
-    margin-top: 80px;
-  }
-  
-  .v-premium-header h1 {
-    margin-top:15px;
-    font-size: 1.2rem;
-  }
-
-  .v-premium-grid {
-    grid-template-columns: 1fr; 
-  }
-  .v-premium-header p {
-  font-size: 0.7rem;
-  color: var(--vp-text-sub);
-  max-width: 600px;
-  margin: 0 auto;           /* Center the paragraph itself */
-  line-height: 1.6;
-}
-}
-/* --- New Contact Button --- */
-.v-contact-btn {
-  width: 100%;
-  padding: 12px;
-  margin-top: 15px;
-  background-color: #1a1a1a; /* Corporate dark */
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
 .v-contact-btn:hover {
-  background-color: #333;
+  background-color: #000;
 }
 
-/* --- Minimal Modal Overlay --- */
+/* --- 6. MODALS --- */
 .v-modal-overlay {
   position: fixed;
   top: 0;
@@ -275,81 +210,127 @@
   justify-content: center;
   align-items: center;
   z-index: 1000;
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(3px);
+  padding: 20px;
+  box-sizing: border-box;
 }
 
-/* --- Modal Content Box --- */
 .v-modal-content {
   background-color: white;
-  width: 90%;
-  max-width: 450px;
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
   padding: 30px;
-  border-radius: 8px;
+  border-radius: 12px;
   position: relative;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
-.v-modal-content h2 {
-  margin: 0 0 5px 0;
-  font-size: 20px;
-  color: #1a1a1a;
+.v-modal-content::-webkit-scrollbar {
+  width: 6px;
 }
-
-.v-modal-content p {
-  margin: 0 0 20px 0;
-  font-size: 14px;
-  color: #666;
+.v-modal-content::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 4px;
 }
 
 .v-modal-close {
   position: absolute;
-  top: 20px;
-  right: 20px;
+  top: 15px;
+  right: 15px;
   background: none;
   border: none;
   cursor: pointer;
   color: #666;
   padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.v-modal-close:hover {
-  color: #000;
+.v-modal-content h2 {
+  margin: 0 0 8px 0;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--vp-text-main);
 }
 
-/* --- Form Elements --- */
-.v-lead-form {
+.v-modal-content p {
+  margin: 0 0 24px 0;
+  font-size: 0.9rem;
+  color: var(--vp-text-sub);
+  line-height: 1.4;
+}
+
+/* --- 7. FORMS --- */
+.v-form-grid {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 16px;
 }
 
-.v-lead-form input,
-.v-lead-form textarea {
+.v-form-row {
+  display: flex;
+  gap: 12px;
+}
+
+.v-form-row input {
+  flex: 1;
   width: 100%;
-  padding: 12px;
-  border: 1px solid #e0e0e0;
-  border-radius: 6px;
-  font-family: inherit;
-  font-size: 14px;
-  box-sizing: border-box;
 }
 
-.v-lead-form input:focus,
-.v-lead-form textarea:focus {
+.v-form-grid input,
+.v-form-grid select,
+.v-form-grid textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--vp-border);
+  border-radius: var(--vp-radius);
+  font-family: inherit;
+  font-size: 0.9rem;
+  box-sizing: border-box;
+  color: var(--vp-text-main);
+  background-color: #fafafa;
+  transition: var(--vp-transition);
+}
+
+.v-form-grid input:focus,
+.v-form-grid select:focus,
+.v-form-grid textarea:focus {
   outline: none;
-  border-color: #1a1a1a;
+  border-color: var(--vp-text-main);
+  background-color: #fff;
+}
+
+.v-file-upload-box {
+  border: 1px dashed #c0c4cc;
+  border-radius: var(--vp-radius);
+  padding: 10px;
+  background-color: #fafafa;
+  display: flex;
+  align-items: center;
+}
+
+.v-file-upload-box input[type="file"] {
+  padding: 0;
+  border: none;
+  background: transparent;
+  font-size: 0.85rem;
 }
 
 .v-submit-btn {
   padding: 14px;
-  background-color: #1a1a1a;
+  background-color: var(--vp-btn-dark);
   color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: var(--vp-radius);
   font-weight: 600;
-  font-size: 15px;
+  font-size: 1rem;
   cursor: pointer;
-  transition: opacity 0.2s ease;
+  width: 100%;
+  margin-top: 10px;
+  transition: var(--vp-transition);
 }
 
 .v-submit-btn:disabled {
@@ -357,19 +338,30 @@
   cursor: not-allowed;
 }
 
-/* --- Status Messages --- */
+/* Messages */
 .v-success-message {
   padding: 20px;
   background-color: #f0fdf4;
   color: #166534;
   border: 1px solid #bbf7d0;
-  border-radius: 6px;
+  border-radius: var(--vp-radius);
   text-align: center;
   font-weight: 500;
 }
 
 .v-error-message {
   color: #dc2626;
-  font-size: 13px;
-  margin-top: -5px;
+  font-size: 0.85rem;
+  margin-top: -8px;
+}
+
+/* --- 8. RESPONSIVE --- */
+@media (max-width: 600px) {
+  .v-premium-container {
+    padding: 16px;
+  }
+  
+  .v-premium-header h1 {
+    font-size: 1.4rem;
+  }
 }
