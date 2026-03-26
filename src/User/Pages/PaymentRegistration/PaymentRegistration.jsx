@@ -16,7 +16,7 @@ const PaymentRegistration = () => {
   const [isMobile, setIsMobile] = useState(false); 
 
   const [amount, setAmount] = useState(0); 
-  const [upiId, setUpiId] = useState(''); // <-- NEW STATE FOR DYNAMIC UPI ID
+  const [upiId, setUpiId] = useState(''); // Completely empty by default
   const [isFetchingFee, setIsFetchingFee] = useState(true);
   
   const [existingStatus, setExistingStatus] = useState(null);
@@ -55,7 +55,8 @@ const PaymentRegistration = () => {
         
         if (feeData.success) {
           setAmount(feeData.fee);
-          setUpiId(feeData.upiId || '8897714968@axl'); // <-- STORE THE FETCHED UPI ID (with fallback)
+          // Removed the hardcoded fallback. It now strictly uses what the backend provides.
+          setUpiId(feeData.upiId); 
         }
 
         const statusRes = await fetch("https://kalyanashobha-back.vercel.app/api/payment/registration/status", {
@@ -79,10 +80,14 @@ const PaymentRegistration = () => {
     fetchData();
   }, [navigate]);
 
-  // <-- UPDATED UPILINK TO USE DYNAMIC STATE -->
+  // Uses the strictly dynamic UPI ID
   const upiLink = `upi://pay?pa=${upiId}&pn=Kalyana%20Shobha&am=${amount}&cu=INR`; 
 
   const handlePayClick = () => {
+    if (!upiId || upiId === "Not Set") {
+      toast.error("Payment system is currently unavailable. Please contact support.");
+      return;
+    }
     toast.success("Opening UPI App...", { duration: 3000 });
     window.location.href = upiLink;
   };
@@ -281,11 +286,17 @@ const PaymentRegistration = () => {
                       <>
                         <div className="ks-qr-container">
                           <div className="ks-qr-box">
-                             <QRCode value={upiLink} size={180} fgColor="var(--ks-text-main)" />
+                             {/* Only render QR code if a valid UPI ID exists */}
+                             {upiId && upiId !== "Not Set" ? (
+                               <QRCode value={upiLink} size={180} fgColor="var(--ks-text-main)" />
+                             ) : (
+                               <div style={{ padding: '20px', textAlign: 'center', color: '#999' }}>
+                                  QR Code Unavailable
+                               </div>
+                             )}
                           </div>
                           <p className="ks-qr-text">Scan with GPay, PhonePe, or Paytm</p>
                           <div className="ks-divider"><span>OR</span></div>
-                          {/* <-- UPDATED MANUAL TEXT TO SHOW DYNAMIC UPI ID --> */}
                           <p className="ks-manual-upi">UPI ID: <strong>{upiId}</strong></p>
                         </div>
                         
