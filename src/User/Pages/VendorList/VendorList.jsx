@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Tag, Image as ImageIcon, X, Plus } from "lucide-react"; 
+import { Tag, Image as ImageIcon, X, Plus, Loader } from "lucide-react"; 
+import imageCompression from 'browser-image-compression'; // <-- Imported compression
 import "./VendorList.css";
 import Navbar from "../../Components/Navbar";
 
@@ -33,6 +34,7 @@ export default function VendorList() {
     description: "",
   });
   const [joinFiles, setJoinFiles] = useState([]);
+  const [isCompressing, setIsCompressing] = useState(false); // New state for compression loader
   const [joinSubmitStatus, setJoinSubmitStatus] = useState({
     loading: false,
     success: false,
@@ -61,7 +63,7 @@ export default function VendorList() {
     } catch (err) {
       console.error("Error fetching vendors", err);
     } finally {
-      setLoading(false); // Set to false to see real data
+      setLoading(false); 
     }
   };
 
@@ -121,14 +123,40 @@ export default function VendorList() {
       businessName: "", email: "", category: "", contactNumber: "", priceRange: "", description: ""
     });
     setJoinFiles([]);
+    setIsCompressing(false);
   };
 
   const handleJoinInputChange = (e) => {
     setJoinFormData({ ...joinFormData, [e.target.name]: e.target.value });
   };
 
-  const handleJoinFileChange = (e) => {
-    setJoinFiles(Array.from(e.target.files));
+  // NEW: Compression Logic + Max 2 Files restriction
+  const handleJoinFileChange = async (e) => {
+    const selectedFiles = Array.from(e.target.files).slice(0, 2); // Enforce max 2
+    if (selectedFiles.length === 0) return;
+
+    setIsCompressing(true);
+    const compressedImages = [];
+
+    for (let file of selectedFiles) {
+      try {
+        const options = {
+          maxSizeMB: 1,
+          maxWidthOrHeight: 1920,
+          useWebWorker: true,
+          alwaysKeepResolution: true
+        };
+        const compressedFile = await imageCompression(file, options);
+        compressedImages.push(compressedFile);
+      } catch (error) {
+        console.error("Image Compression Error:", error);
+        // Fallback to uncompressed if it fails, or you could reject it.
+        compressedImages.push(file); 
+      }
+    }
+    
+    setJoinFiles(compressedImages);
+    setIsCompressing(false);
   };
 
   const handleJoinSubmit = async (e) => {
@@ -172,16 +200,13 @@ export default function VendorList() {
       <Navbar />
       <div className="v-premium-container">
         
-        {/* HEADER SECTION */}
         <div className="v-premium-header">
           <h1>Premium Wedding Vendors</h1>
           <p>Curated services to make your special day perfect.</p>
         </div>
 
-        {/* VENDOR GRID */}
         <div className="v-premium-grid">
           {loading ? (
-             // PREMIUM STRUCTURAL SKELETON
              [1, 2, 3, 4].map(n => (
                <div key={n} className="v-premium-card v-skeleton-wrapper">
                  <div className="v-skeleton-img shimmer"></div>
@@ -201,8 +226,6 @@ export default function VendorList() {
           ) : (
             vendors.map((vendor) => (
               <div key={vendor._id} className="v-premium-card">
-                
-                {/* Image Section */}
                 <div className="v-card-image">
                   {vendor.images && vendor.images.length > 0 ? (
                     <img src={vendor.images[0]} alt={vendor.businessName} />
@@ -212,18 +235,12 @@ export default function VendorList() {
                   <span className="v-badge-category">{vendor.category}</span>
                 </div>
 
-                {/* Content Section */}
                 <div className="v-card-content">
                   <h3 className="v-card-title">{vendor.businessName}</h3>
                   <p className="v-card-desc">
                     {vendor.description ? vendor.description.substring(0, 80) + "..." : "No description available."}
                   </p>
-                  
-                  {/* Contact Button */}
-                  <button 
-                    className="v-contact-btn" 
-                    onClick={() => handleOpenModal(vendor)}
-                  >
+                  <button className="v-contact-btn" onClick={() => handleOpenModal(vendor)}>
                     Contact Now
                   </button>
                 </div>
@@ -232,15 +249,11 @@ export default function VendorList() {
           )}
         </div>
 
-        {/* --- FIXED FLOATING BUTTON --- */}
-        <button 
-          className="v-fixed-join-btn" 
-          onClick={handleOpenJoinModal}
-        >
-          <Plus size={20} /> Join as Vendor
+        <button className="v-fixed-join-btn" onClick={handleOpenJoinModal}>
+          <Plus size={18} /> Join as Vendor
         </button>
 
-        {/* --- EXISTING: Contact Vendor Modal --- */}
+        {/* --- Contact Vendor Modal --- */}
         {selectedVendor && (
           <div className="v-modal-overlay">
             <div className="v-modal-content">
@@ -257,22 +270,10 @@ export default function VendorList() {
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="v-lead-form">
-                  <input 
-                    type="text" name="name" placeholder="Full Name" 
-                    value={formData.name} onChange={handleInputChange} required 
-                  />
-                  <input 
-                    type="tel" name="phone" placeholder="Phone Number" 
-                    value={formData.phone} onChange={handleInputChange} required 
-                  />
-                  <input 
-                    type="email" name="email" placeholder="Email Address" 
-                    value={formData.email} onChange={handleInputChange} 
-                  />
-                  <textarea 
-                    name="message" placeholder="What are your requirements? (e.g., Dates, Venue)" 
-                    value={formData.message} onChange={handleInputChange} required rows="3"
-                  ></textarea>
+                  <input type="text" name="name" placeholder="Full Name" value={formData.name} onChange={handleInputChange} required />
+                  <input type="tel" name="phone" placeholder="Phone Number" value={formData.phone} onChange={handleInputChange} required />
+                  <input type="email" name="email" placeholder="Email Address" value={formData.email} onChange={handleInputChange} />
+                  <textarea name="message" placeholder="What are your requirements? (e.g., Dates, Venue)" value={formData.message} onChange={handleInputChange} required rows="3"></textarea>
 
                   {submitStatus.error && <div className="v-error-message">{submitStatus.error}</div>}
 
@@ -285,10 +286,10 @@ export default function VendorList() {
           </div>
         )}
 
-        {/* --- NEW: Join as Vendor Modal --- */}
+        {/* --- Join as Vendor Modal --- */}
         {showJoinModal && (
           <div className="v-modal-overlay">
-            <div className="v-modal-content" style={{ maxWidth: '600px' }}>
+            <div className="v-modal-content v-modal-large">
               <button className="v-modal-close" onClick={handleCloseJoinModal}>
                 <X size={20} />
               </button>
@@ -304,61 +305,44 @@ export default function VendorList() {
               ) : (
                 <form onSubmit={handleJoinSubmit} className="v-lead-form">
                   
-                  {/* Clean Grid Layout replacing inline styles */}
                   <div className="v-form-grid">
-                    <input 
-                      type="text" name="businessName" placeholder="Business Name *" 
-                      value={joinFormData.businessName} onChange={handleJoinInputChange} required 
-                    />
-                    <input 
-                      type="email" name="email" placeholder="Business Email *" 
-                      value={joinFormData.email} onChange={handleJoinInputChange} required 
-                    />
+                    <input type="text" name="businessName" placeholder="Business Name *" value={joinFormData.businessName} onChange={handleJoinInputChange} required />
+                    <input type="email" name="email" placeholder="Business Email *" value={joinFormData.email} onChange={handleJoinInputChange} required />
                     
-                    <input 
-                      type="text" name="category" list="vendor-categories" placeholder="Select Category *" 
-                      value={joinFormData.category} onChange={handleJoinInputChange} required 
-                    />
+                    <input type="text" name="category" list="vendor-categories" placeholder="Select Category *" value={joinFormData.category} onChange={handleJoinInputChange} required />
                     <datalist id="vendor-categories">
                       {categories.map(cat => <option key={cat} value={cat} />)}
                     </datalist>
 
-                    <input 
-                      type="tel" name="contactNumber" placeholder="Contact Number *" 
-                      value={joinFormData.contactNumber} onChange={handleJoinInputChange} required 
-                    />
+                    <input type="tel" name="contactNumber" placeholder="Contact Number *" value={joinFormData.contactNumber} onChange={handleJoinInputChange} required />
                   </div>
 
-                  <input 
-                    type="text" name="priceRange" placeholder="Price Range (e.g. ₹50,000 - ₹1 Lakh)" 
-                    value={joinFormData.priceRange} onChange={handleJoinInputChange} 
-                  />
+                  <input type="text" name="priceRange" placeholder="Price Range (e.g. ₹50,000 - ₹1 Lakh)" value={joinFormData.priceRange} onChange={handleJoinInputChange} />
                   
-                  <textarea 
-                    name="description" placeholder="Describe your services..." 
-                    value={joinFormData.description} onChange={handleJoinInputChange} rows="3"
-                  ></textarea>
+                  <textarea name="description" placeholder="Describe your services..." value={joinFormData.description} onChange={handleJoinInputChange} rows="3"></textarea>
 
                   <div>
-                    <label style={{ fontSize: '13px', fontWeight: '600', color: '#4b5563', marginBottom: '8px', display: 'block' }}>
-                      Upload Portfolio Images (Max 5)
+                    <label style={{ fontSize: '13px', fontWeight: '600', color: '#4b5563', marginBottom: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      Upload Portfolio Images (Max 2)
+                      {isCompressing && <span style={{ color: '#F59E0B', display: 'flex', alignItems: 'center', gap: '4px' }}><Loader size={12} className="v-spin" /> Compressing...</span>}
                     </label>
                     <input 
                       type="file" multiple accept="image/*" 
                       onChange={handleJoinFileChange} 
                       className="v-file-upload"
+                      disabled={isCompressing || joinSubmitStatus.loading}
                     />
-                    {joinFiles.length > 0 && (
+                    {joinFiles.length > 0 && !isCompressing && (
                       <small style={{ color: '#10b981', display: 'block', marginTop: '6px', fontWeight: '500' }}>
-                        ✓ {joinFiles.length} file(s) selected
+                        ✓ {joinFiles.length} file(s) ready
                       </small>
                     )}
                   </div>
 
                   {joinSubmitStatus.error && <div className="v-error-message">{joinSubmitStatus.error}</div>}
 
-                  <button type="submit" className="v-submit-btn" disabled={joinSubmitStatus.loading}>
-                    {joinSubmitStatus.loading ? "Submitting Application..." : "Submit Registration"}
+                  <button type="submit" className="v-submit-btn" disabled={joinSubmitStatus.loading || isCompressing || joinFiles.length === 0}>
+                    {joinSubmitStatus.loading ? "Submitting..." : isCompressing ? "Processing Images..." : "Submit Registration"}
                   </button>
                 </form>
               )}
