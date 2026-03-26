@@ -5,7 +5,7 @@ import QRCode from "react-qr-code";
 import toast, { Toaster } from 'react-hot-toast'; 
 import { CheckCircle, ShieldCheck, AlertTriangle, ArrowRight } from 'lucide-react';
 import { BsPatchCheck } from "react-icons/bs"; 
-import { MdPendingActions } from "react-icons/md"; // Added professional pending verification icon
+import { MdPendingActions } from "react-icons/md"; 
 import './Payment.css'; 
 
 const PaymentRegistration = () => {
@@ -16,6 +16,7 @@ const PaymentRegistration = () => {
   const [isMobile, setIsMobile] = useState(false); 
 
   const [amount, setAmount] = useState(0); 
+  const [upiId, setUpiId] = useState(''); // <-- NEW STATE FOR DYNAMIC UPI ID
   const [isFetchingFee, setIsFetchingFee] = useState(true);
   
   const [existingStatus, setExistingStatus] = useState(null);
@@ -54,6 +55,7 @@ const PaymentRegistration = () => {
         
         if (feeData.success) {
           setAmount(feeData.fee);
+          setUpiId(feeData.upiId || '8897714968@axl'); // <-- STORE THE FETCHED UPI ID (with fallback)
         }
 
         const statusRes = await fetch("https://kalyanashobha-back.vercel.app/api/payment/registration/status", {
@@ -77,17 +79,12 @@ const PaymentRegistration = () => {
     fetchData();
   }, [navigate]);
 
-  const upiLink = `upi://pay?pa=8897714968@axl&pn=Kalyana%20Shobha&am=${amount}&cu=INR`; 
+  // <-- UPDATED UPILINK TO USE DYNAMIC STATE -->
+  const upiLink = `upi://pay?pa=${upiId}&pn=Kalyana%20Shobha&am=${amount}&cu=INR`; 
 
   const handlePayClick = () => {
     toast.success("Opening UPI App...", { duration: 3000 });
-    
-    // Using standard location assignment. Deep links directly attached to a user 
-    // click event are generally allowed by browsers without popup warnings.
     window.location.href = upiLink;
-
-    // REMOVED the setTimeout state change. 
-    // By keeping the browser state completely quiet, the OS won't pull focus back to the browser.
   };
 
   const handleFileChange = (e) => {
@@ -234,7 +231,6 @@ const PaymentRegistration = () => {
             {existingStatus ? (
               <div className="ks-action-content ks-fade-in ks-status-view">
                 <div className="ks-status-icon">
-                   {/* UPDATED ICON HERE */}
                    {existingStatus === 'Success' 
                      ? <BsPatchCheck size={72} color="var(--ks-success)" /> 
                      : <MdPendingActions size={72} color="var(--ks-warning)" />}
@@ -289,7 +285,8 @@ const PaymentRegistration = () => {
                           </div>
                           <p className="ks-qr-text">Scan with GPay, PhonePe, or Paytm</p>
                           <div className="ks-divider"><span>OR</span></div>
-                          <p className="ks-manual-upi">UPI ID: <strong>8897714968@axl</strong></p>
+                          {/* <-- UPDATED MANUAL TEXT TO SHOW DYNAMIC UPI ID --> */}
+                          <p className="ks-manual-upi">UPI ID: <strong>{upiId}</strong></p>
                         </div>
                         
                         <div className="ks-manual-link-area">
