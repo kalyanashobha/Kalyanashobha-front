@@ -61,7 +61,7 @@ export default function VendorList() {
     } catch (err) {
       console.error("Error fetching vendors", err);
     } finally {
-      setLoading(false);
+      setLoading(false); // Set to false to see real data
     }
   };
 
@@ -181,7 +181,18 @@ export default function VendorList() {
         {/* VENDOR GRID */}
         <div className="v-premium-grid">
           {loading ? (
-             [1,2,3,4].map(n => <div key={n} className="v-premium-card v-skeleton"></div>)
+             // PREMIUM STRUCTURAL SKELETON
+             [1, 2, 3, 4].map(n => (
+               <div key={n} className="v-premium-card v-skeleton-wrapper">
+                 <div className="v-skeleton-img shimmer"></div>
+                 <div className="v-card-content">
+                   <div className="v-skeleton-title shimmer"></div>
+                   <div className="v-skeleton-text shimmer"></div>
+                   <div className="v-skeleton-text short shimmer"></div>
+                   <div className="v-skeleton-btn shimmer"></div>
+                 </div>
+               </div>
+             ))
           ) : vendors.length === 0 ? (
             <div className="v-no-data">
               <h3>No Vendors Found</h3>
