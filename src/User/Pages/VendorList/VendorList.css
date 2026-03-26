@@ -8,17 +8,17 @@
   --vp-gold-text: #B7791F;  
   
   /* UI Colors */
-  --vp-bg: #F8F9FA; /* Softer premium off-white */
+  --vp-bg: #F8F9FA; 
   --vp-card-bg: #FFFFFF;
   --vp-text-main: #111827;
   --vp-text-sub: #6B7280;
-  --vp-border: rgba(17, 24, 39, 0.08); /* More subtle border */
+  --vp-border: rgba(17, 24, 39, 0.08); 
   
   /* Effects */
   --vp-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.04);
   --vp-hover-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
-  --vp-radius: 16px; /* Slightly softer corners for a modern feel */
-  --vp-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* Smoother premium easing */
+  --vp-radius: 16px; 
+  --vp-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
 }
 
 /* Utilities */
@@ -249,6 +249,7 @@
   left: 0;
   width: 100vw;
   height: 100vh;
+  height: 100dvh; /* FIX: Dynamic viewport height handles mobile address bars perfectly */
   background-color: rgba(17, 24, 39, 0.6);
   display: flex;
   justify-content: center;
@@ -267,7 +268,7 @@
   border-radius: 20px;
   position: relative;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-  max-height: 90vh;
+  max-height: 90vh; /* Desktop max height */
   overflow-y: auto;
 }
 
@@ -409,10 +410,9 @@
 
 .v-skeleton-wrapper {
   cursor: default;
-  pointer-events: none; /* Prevents hovering state on skeletons */
+  pointer-events: none; 
 }
 
-/* The sweeping gradient class */
 .shimmer {
   animation: shimmer-sweep 2s infinite linear;
   background: #f6f7f8;
@@ -420,7 +420,6 @@
   background-size: 1000px 100%;
 }
 
-/* Structural elements mimicking the actual card */
 .v-skeleton-img {
   height: 240px;
   width: 100%;
@@ -460,7 +459,6 @@
     margin-top: 80px;
   }
   
-  /* REDUCED FONTS FOR MOBILE */
   .v-premium-header h1 {
     font-size: 1.4rem; 
   }
@@ -493,21 +491,27 @@
     padding: 12px;
   }
 
-  /* --- MODAL MOBILE REFINEMENTS --- */
+  /* --- MODAL MOBILE REFINEMENTS FIX --- */
   .v-modal-overlay {
-    padding: 16px; /* Reduced outer padding to allow modal to be wider */
+    padding: 16px; 
+    /* Ensures we use dynamic viewport so it doesn't get pushed under address bars */
+    height: 100dvh; 
   }
 
   .v-modal-content {
     padding: 24px 20px; 
     width: 100%;
-    max-height: 85vh; /* Keep it from going under the browser URL bar/notches */
-    border-radius: 16px; /* Slightly tighter radius for mobile */
+    /* Strict calculation: 100% of the screen minus the 16px padding on top and bottom (32px) */
+    max-height: calc(100dvh - 32px); 
+    border-radius: 16px; 
+    overflow-y: auto;
+    /* Extra padding at bottom to ensure scroll clears the button safely */
+    padding-bottom: 32px; 
   }
 
   .v-modal-content h2 {
     font-size: 1.25rem;
-    margin-right: 24px; /* Stop text overlapping the X close button */
+    margin-right: 24px; 
   }
   
   .v-modal-content p {
@@ -518,11 +522,11 @@
   .v-modal-close {
     top: 16px;
     right: 16px;
-    padding: 6px; /* Smaller touch target but visually less bulky */
+    padding: 6px; 
   }
 
   .v-form-grid {
-    grid-template-columns: 1fr; /* Stack inputs vertically */
+    grid-template-columns: 1fr; 
     gap: 12px;
   }
 
@@ -538,7 +542,7 @@
   }
 
   .v-file-upload {
-    padding: 14px; /* Slim down the upload box */
+    padding: 14px; 
   }
 
   .v-submit-btn {
@@ -549,7 +553,7 @@
 
   /* --- FLOATING BUTTON (MOVED UP) --- */
   .v-fixed-join-btn {
-    bottom: 80px; /* Moved up safely above mobile OS navigation bars */
+    bottom: 80px; 
     right: 16px;
     padding: 12px 20px;
     font-size: 0.9rem; 
