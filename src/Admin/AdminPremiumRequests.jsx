@@ -315,7 +315,7 @@ const AdminPremiumRequests = () => {
                 .apr-info-stack { display: flex; flex-direction: column; gap: 4px; }
                 .apr-info-stack strong { font-size: 14px; font-weight: 600; color: var(--apr-text-main); }
                 .apr-text-muted { font-size: 13px; color: var(--apr-text-sub); font-family: 'Monaco', monospace;}
-                .apr-text-small { font-size: 14px; color: var(--apr-text-main); font-weight: 500;}
+                .apr-text-small { font-size: 14px; color: var(--apr-text-main); font-weight: 500; display: block;}
 
                 /* Badges */
                 .apr-status-badge {
@@ -449,15 +449,25 @@ const AdminPremiumRequests = () => {
                         margin-right: 12px;
                         flex-shrink: 0;
                         margin-top: 2px;
-                        max-width: 90px;
+                        max-width: 100px;
                         text-align: left;
                     }
 
-                    /* Cell Alignment Adjustments */
-                    .apr-info-stack { align-items: flex-end; text-align: right; }
-                    .apr-info-stack strong { font-size: 13px; }
+                    /* FIX: Cell Alignment Adjustments */
+                    .apr-info-stack { 
+                        align-items: flex-end; 
+                        text-align: right; 
+                        width: calc(100% - 110px); /* Forces it to fill space next to label */
+                    }
+                    .apr-info-stack strong { font-size: 13px; line-height: 1.4;}
                     .apr-text-muted { font-size: 11px; }
-                    .apr-text-small { font-size: 13px; }
+                    
+                    .apr-text-small { 
+                        font-size: 13px; 
+                        text-align: right; 
+                        width: calc(100% - 110px); /* Prevents overflow issues */
+                        line-height: 1.4; 
+                    }
 
                     .apr-status-badge { font-size: 10px; padding: 4px 10px; }
                     
