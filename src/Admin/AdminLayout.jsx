@@ -9,10 +9,9 @@ const AdminLayout = () => {
   return (
     <div className="admin-root-layout">
       
-      {/* MOBILE HEADER (Visible only on mobile) */}
+      {/* MOBILE HEADER */}
       <div className="admin-mobile-header">
         <div className="mobile-brand">
-            {/* Replaced text with Logo Image */}
             <img 
               src="/Kalyanashobha.png" 
               alt="KalyanaShobha Logo" 
@@ -25,7 +24,7 @@ const AdminLayout = () => {
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
           aria-label="Toggle menu"
         >
-          {/* Animated Hamburger Icon */}
+          {/* Smaller Animated Hamburger Icon */}
           <div className={`animated-hamburger ${isSidebarOpen ? 'open' : ''}`}>
             <span></span>
             <span></span>
@@ -34,14 +33,15 @@ const AdminLayout = () => {
         </button>
       </div>
 
-      {/* SIDEBAR (Pass open state for mobile) */}
+      {/* OVERLAY (Moved outside so it doesn't slide with the sidebar) */}
+      <div 
+        className={`sidebar-overlay ${isSidebarOpen ? 'visible' : ''}`} 
+        onClick={() => setIsSidebarOpen(false)}
+      ></div>
+
+      {/* SIDEBAR */}
       <div className={`sidebar-wrapper ${isSidebarOpen ? 'mobile-open' : ''}`}>
         <AdminSidebar closeMobileMenu={() => setIsSidebarOpen(false)} />
-        {/* Overlay to close sidebar on click outside */}
-        <div 
-            className="sidebar-overlay" 
-            onClick={() => setIsSidebarOpen(false)}
-        ></div>
       </div>
 
       {/* MAIN CONTENT AREA */}
