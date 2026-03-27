@@ -277,7 +277,7 @@ export default function VendorList() {
           <div className="v-modal-overlay">
             <div className="v-modal-content">
               <button className="v-modal-close" onClick={handleCloseModal}>
-                <X size={18} />
+                <X size={16} />
               </button>
               
               <h2>Contact {selectedVendor.businessName}</h2>
@@ -310,7 +310,7 @@ export default function VendorList() {
           <div className="v-modal-overlay">
             <div className="v-modal-content v-modal-large">
               <button className="v-modal-close" onClick={handleCloseJoinModal}>
-                <X size={18} />
+                <X size={16} />
               </button>
               
               <h2>Register Your Business</h2>
@@ -318,8 +318,8 @@ export default function VendorList() {
 
               {joinSubmitStatus.success ? (
                 <div className="v-success-message">
-                  <h3 style={{ margin: '0 0 10px 0', fontSize: '1rem' }}>Registration Submitted!</h3>
-                  <p style={{ margin: 0, fontSize: '0.8rem' }}>Our admin team will review your application. You will receive an email once your profile is approved and live.</p>
+                  <h3 style={{ margin: '0 0 10px 0', fontSize: '0.95rem' }}>Registration Submitted!</h3>
+                  <p style={{ margin: 0, fontSize: '0.75rem' }}>Our admin team will review your application. You will receive an email once your profile is approved and live.</p>
                 </div>
               ) : (
                 <form onSubmit={handleJoinSubmit} className="v-lead-form">
@@ -341,9 +341,9 @@ export default function VendorList() {
                   <textarea name="description" placeholder="Describe your services..." value={joinFormData.description} onChange={handleJoinInputChange} rows="2"></textarea>
 
                   <div>
-                    <label style={{ fontSize: '12px', fontWeight: '600', color: '#4b5563', marginBottom: '6px', display: 'flex', justify-content: 'space-between', alignItems: 'center' }}>
+                    <label style={{ fontSize: '11px', fontWeight: '600', color: '#4b5563', marginBottom: '4px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       Upload Portfolio Images (Max 2)
-                      {isCompressing && <span style={{ color: '#F59E0B', display: 'flex', alignItems: 'center', gap: '4px' }}><Loader size={12} className="v-spin" /> Compressing...</span>}
+                      {isCompressing && <span style={{ color: '#F59E0B', display: 'flex', alignItems: 'center', gap: '4px' }}><Loader size={10} className="v-spin" /> Compressing...</span>}
                     </label>
                     <input 
                       type="file" multiple accept="image/*" 
@@ -352,7 +352,7 @@ export default function VendorList() {
                       disabled={isCompressing || joinSubmitStatus.loading}
                     />
                     {joinFiles.length > 0 && !isCompressing && (
-                      <small style={{ color: '#10b981', display: 'block', marginTop: '4px', fontWeight: '500', fontSize: '0.75rem' }}>
+                      <small style={{ color: '#10b981', display: 'block', marginTop: '4px', fontWeight: '500', fontSize: '0.7rem' }}>
                         ✓ {joinFiles.length} file(s) ready
                       </small>
                     )}
