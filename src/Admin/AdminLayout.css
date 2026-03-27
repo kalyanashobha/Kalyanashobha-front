@@ -37,6 +37,68 @@
   justify-content: center;
 }
 
+.mobile-logo {
+  height: 32px; 
+  width: auto;
+  object-fit: contain;
+  display: block;
+}
+
+/* --- SMALLER ANIMATED HAMBURGER MENU --- */
+.animated-hamburger {
+  width: 24px; /* Reduced width */
+  height: 16px; /* Reduced height */
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 101; /* Keep above sidebar if needed */
+}
+
+.animated-hamburger span {
+  display: block;
+  position: absolute;
+  height: 2px;
+  background: #111827; 
+  border-radius: 2px;
+  right: 0;
+  transform: rotate(0deg);
+  transition: .3s ease-in-out;
+}
+
+/* Default State (Hamburger) */
+.animated-hamburger span:nth-child(1) {
+  top: 0px;
+  width: 100%; 
+}
+
+.animated-hamburger span:nth-child(2) {
+  top: 7px; /* Adjusted spacing */
+  width: 65%; 
+}
+
+.animated-hamburger span:nth-child(3) {
+  top: 14px; /* Adjusted spacing */
+  width: 100%; 
+}
+
+/* Open State (Converted to X) */
+.animated-hamburger.open span:nth-child(1) {
+  top: 7px;
+  transform: rotate(45deg);
+}
+
+.animated-hamburger.open span:nth-child(2) {
+  opacity: 0;
+  width: 0;
+}
+
+.animated-hamburger.open span:nth-child(3) {
+  top: 7px;
+  transform: rotate(-45deg);
+}
+
 /* --- SIDEBAR WRAPPER --- */
 .sidebar-wrapper {
   width: var(--admin-sidebar-width);
@@ -50,6 +112,7 @@
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* --- OVERLAY (Desktop default hidden) --- */
 .sidebar-overlay {
   display: none;
 }
@@ -75,88 +138,43 @@
     padding-top: var(--admin-header-height);
   }
 
-  /* Full Screen Overlay for Mobile Menu */
+  /* Professional Overlay */
+  .sidebar-overlay {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(2px); /* Adds a premium blur effect */
+    z-index: 90; /* Below sidebar, above content */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+  }
+
+  .sidebar-overlay.visible {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  /* Sliding Sidebar from the Left */
   .sidebar-wrapper {
-    width: 100%; /* Take up full width for premium centered look */
-    top: var(--admin-header-height); /* Start below the mobile header */
-    transform: translateY(-150%); /* Slide down instead of from the side */
-    box-shadow: none;
+    width: var(--admin-sidebar-width); 
+    top: 0; /* Cover the whole screen height */
+    transform: translateX(-100%); /* Start completely off-screen to the left */
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15); /* Adds a professional shadow */
+    z-index: 100;
   }
 
   /* Show Sidebar when Open */
   .sidebar-wrapper.mobile-open {
-    transform: translateY(0);
+    transform: translateX(0); /* Slide into view */
   }
 
   .admin-main-content {
     margin-left: 0;
     padding: 20px;
   }
-
-  /* No overlay needed since the menu is full-width */
-  .sidebar-wrapper.mobile-open .sidebar-overlay {
-    display: none; 
-  }
-}
-
-/* --- NEW LOGO STYLES --- */
-.mobile-logo {
-  height: 32px; 
-  width: auto;
-  object-fit: contain;
-  display: block;
-}
-
-/* --- ANIMATED HAMBURGER MENU --- */
-.animated-hamburger {
-  width: 28px;
-  height: 20px;
-  position: relative;
-  cursor: pointer;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.animated-hamburger span {
-  display: block;
-  position: absolute;
-  height: 2px;
-  background: #111827; /* Dark color matching your design */
-  border-radius: 2px;
-  right: 0;
-  transform: rotate(0deg);
-  transition: .3s ease-in-out;
-}
-
-/* Default State (Hamburger) */
-.animated-hamburger span:nth-child(1) {
-  top: 0px;
-  width: 100%; /* Long top line */
-}
-
-.animated-hamburger span:nth-child(2) {
-  top: 9px;
-  width: 65%; /* Shorter middle line */
-}
-
-.animated-hamburger span:nth-child(3) {
-  top: 18px;
-  width: 100%; /* Long bottom line */
-}
-
-/* Open State (Converted to X) */
-.animated-hamburger.open span:nth-child(1) {
-  top: 9px;
-  transform: rotate(45deg);
-}
-
-.animated-hamburger.open span:nth-child(2) {
-  opacity: 0;
-  width: 0;
-}
-
-.animated-hamburger.open span:nth-child(3) {
-  top: 9px;
-  transform: rotate(-45deg);
 }
