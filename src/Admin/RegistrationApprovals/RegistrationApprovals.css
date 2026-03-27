@@ -469,7 +469,7 @@
   .ra-actions { width: 100%; justify-content: flex-end; }
   .ra-btn-approve, .ra-btn-reject { width: 32px; height: 32px; border-radius: 6px; }
   
-  /* --- REBUILT MOBILE PAGINATION --- */
+  /* --- REBUILT MOBILE PAGINATION (Inline format) --- */
   .ra-pagination-container {
       flex-direction: column;
       border-radius: 16px;
@@ -481,18 +481,21 @@
   }
   .ra-pagination-controls { 
       width: 100%; 
-      justify-content: space-between; 
-      flex-wrap: wrap; /* Allows the numbers to stack above buttons */
+      justify-content: center; /* Center the buttons */
+      flex-wrap: wrap; 
+      gap: 8px; /* Adds space between Prev, numbers, and Next */
   }
   .ra-page-numbers { 
-      display: flex; /* Override display: none */
-      width: 100%;
+      display: flex; /* Keep numbers visible inline */
+      gap: 4px;
+      width: auto; /* Stop it taking full width */
       justify-content: center;
-      order: -1; /* Forces page numbers ABOVE prev/next buttons */
-      margin-bottom: 12px;
-      flex-wrap: wrap;
+      margin-bottom: 0; 
   } 
-  .ra-page-btn { flex: 1; }
+  .ra-page-btn { 
+      flex: unset; /* Remove full-width stretch */
+      width: auto;
+  }
 
   /* Skeleton Mobile */
   .ra-skeleton-stack { padding: 0; }
