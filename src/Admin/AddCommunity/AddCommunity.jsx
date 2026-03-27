@@ -3,7 +3,7 @@ import toast, { Toaster } from 'react-hot-toast';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { 
   FiPlus, FiX, FiLayers, FiList, FiRefreshCw, 
-  FiDatabase, FiTrash2, FiCornerDownRight, FiChevronLeft, FiChevronRight, FiMenu 
+  FiDatabase, FiTrash2, FiCornerDownRight, FiChevronLeft, FiChevronRight, FiMenu, FiChevronDown 
 } from 'react-icons/fi';
 import './AddCommunity.css';
 
@@ -44,14 +44,15 @@ const AdminMasterDataManager = () => {
   const [subInput, setSubInput] = useState('');
   const [subItemsList, setSubItemsList] = useState([]);
 
-  // --- NEW STATE FOR HIERARCHY ---
   const [parentOptions, setParentOptions] = useState([]);
   const [selectedParent, setSelectedParent] = useState('');
+
+  // Mobile Scroll Indicator State
+  const [showMainScroll, setShowMainScroll] = useState(false);
 
   const getAuthToken = () => localStorage.getItem('adminToken'); 
   const API_BASE = 'https://kalyanashobha-back.vercel.app';
 
-  // --- NEW HELPER: Determine Parent Category ---
   const getParentCategory = (cat) => {
     if (cat === 'State') return 'Country';
     if (cat === 'City') return 'State';
@@ -86,13 +87,12 @@ const AdminMasterDataManager = () => {
     setSubItemsList([]);
     setSubInput('');
     setCurrentPage(1); 
-    setSelectedParent(''); // Reset parent selection
+    setSelectedParent('');
 
     if (selectedCategory !== 'Community') {
       setActiveTab('create');
     }
 
-    // --- NEW LOGIC: Fetch Parent Options if Category is State or City ---
     const parentCat = getParentCategory(selectedCategory);
     if (parentCat) {
       fetch(`${API_BASE}/api/public/master-data/${parentCat}`)
@@ -102,7 +102,7 @@ const AdminMasterDataManager = () => {
         })
         .catch(() => setParentOptions([]));
     } else {
-      setParentOptions([]); // Clear if no parent is required
+      setParentOptions([]); 
     }
   }, [selectedCategory]);
 
@@ -112,6 +112,27 @@ const AdminMasterDataManager = () => {
       setCurrentPage(maxPage);
     }
   }, [existingItems.length, currentPage]);
+
+  // Scroll Indicator Logic
+  useEffect(() => {
+    const checkMainScroll = () => {
+        const scrollY = window.scrollY || document.documentElement.scrollTop;
+        const windowHeight = window.innerHeight;
+        const documentHeight = document.documentElement.scrollHeight;
+        
+        setShowMainScroll(documentHeight > windowHeight + 10 && scrollY + windowHeight < documentHeight - 60);
+    };
+
+    const timer = setTimeout(checkMainScroll, 500); 
+    window.addEventListener('scroll', checkMainScroll);
+    window.addEventListener('resize', checkMainScroll);
+
+    return () => {
+        clearTimeout(timer);
+        window.removeEventListener('scroll', checkMainScroll);
+        window.removeEventListener('resize', checkMainScroll);
+    };
+  }, [existingItems, activeTab, currentPage]);
 
   const handleSubKeyDown = (e) => {
     if (e.key === 'Enter' || e.key === ',') {
@@ -175,7 +196,6 @@ const AdminMasterDataManager = () => {
       return;
     }
 
-    // --- NEW LOGIC: Validate Parent Selection ---
     const parentCat = getParentCategory(selectedCategory);
     if (parentCat && !selectedParent) {
       toast.error(`Please select a parent ${parentCat}`);
@@ -205,7 +225,7 @@ const AdminMasterDataManager = () => {
         category: selectedCategory, 
         name: mainInput.includes(',') ? mainInput.split(',').map(s => s.trim()).filter(s => s) : mainInput.trim(), 
         subItems: [],
-        parentValue: selectedParent || null // <-- Passing the selected parent to the backend
+        parentValue: selectedParent || null
       };
     }
 
@@ -330,7 +350,7 @@ const AdminMasterDataManager = () => {
 
   return (
     <div className="sys-cfg-layout">
-      <Toaster position="top-right" toastOptions={{ style: { background: '#000', color: '#fff', borderRadius: '4px' } }} />
+      <Toaster position="top-right" toastOptions={{ style: { background: '#0f172a', color: '#fff', borderRadius: '8px' } }} />
       
       <div className="sys-cfg-surface">
         <div className="sys-cfg-controls">
@@ -362,10 +382,8 @@ const AdminMasterDataManager = () => {
         <div className="sys-cfg-form-wrapper">
           <form onSubmit={handleSubmit} className="sys-cfg-form">
             
-            {/* MAIN CREATION TAB (Includes State/City logic) */}
             {activeTab === 'create' && (
               <>
-                {/* --- NEW UI: Render Parent Dropdown if needed --- */}
                 {parentOptions.length > 0 && (
                   <div className="sys-cfg-field">
                     <label className="sys-cfg-label">Select Parent {getParentCategory(selectedCategory)}</label>
@@ -389,7 +407,6 @@ const AdminMasterDataManager = () => {
               </>
             )}
 
-            {/* COMMUNITY SUB-TAB */}
             {activeTab === 'append' && isCommunity && (
               <>
                 <div className="sys-cfg-field">
@@ -419,7 +436,7 @@ const AdminMasterDataManager = () => {
 
         <div className="sys-cfg-data-section">
           <div className="sys-cfg-data-header-row">
-            <h3 className="sys-cfg-data-title" style={{ marginBottom: 0, borderBottom: 'none', paddingBottom: 0 }}>
+            <h3 className="sys-cfg-data-title">
               <FiDatabase /> Active Records ({existingItems.length})
             </h3>
             {existingItems.length > ITEMS_PER_PAGE && (
@@ -466,9 +483,8 @@ const AdminMasterDataManager = () => {
                                          </div>
                                          <span className="sys-cfg-record-name">
                                             {item.name}
-                                            {/* --- NEW UI: Display Parent Information --- */}
                                             {item.parentValue && (
-                                              <span style={{ fontSize: '12px', color: '#888', marginLeft: '8px', fontWeight: 'normal' }}>
+                                              <span className="sys-cfg-parent-badge">
                                                 (in {item.parentValue})
                                               </span>
                                             )}
@@ -529,8 +545,6 @@ const AdminMasterDataManager = () => {
               {/* --- SINGLE PAGE PAGINATION --- */}
               {!fetching && totalPages > 1 && (
                 <div className="sys-cfg-pro-pagination">
-                  
-                  {/* PREV BUTTON */}
                   <Droppable droppableId="page-prev" type="MAIN">
                     {(provided, snapshot) => (
                       <div ref={provided.innerRef} {...provided.droppableProps} className="sys-cfg-page-drop-wrapper">
@@ -546,7 +560,6 @@ const AdminMasterDataManager = () => {
                     )}
                   </Droppable>
                   
-                  {/* SINGLE VISIBLE PAGE NUMBER */}
                   <div className="sys-cfg-page-numbers-strict">
                     {visiblePages.map(pageNum => (
                       <Droppable key={`page-${pageNum}`} droppableId={`page-${pageNum}`} type="MAIN">
@@ -566,7 +579,6 @@ const AdminMasterDataManager = () => {
                     ))}
                   </div>
 
-                  {/* NEXT BUTTON */}
                   <Droppable droppableId="page-next" type="MAIN">
                     {(provided, snapshot) => (
                       <div ref={provided.innerRef} {...provided.droppableProps} className="sys-cfg-page-drop-wrapper">
@@ -581,14 +593,20 @@ const AdminMasterDataManager = () => {
                       </div>
                     )}
                   </Droppable>
-
                 </div>
               )}
             </DragDropContext>
           )}
-
         </div>
       </div>
+      
+      {/* MOBILE SCROLL INDICATOR */}
+      {showMainScroll && (
+          <div className="sys-cfg-scroll-indicator">
+              <FiChevronDown size={18} />
+              <span>Scroll for more</span>
+          </div>
+      )}
     </div>
   );
 };
