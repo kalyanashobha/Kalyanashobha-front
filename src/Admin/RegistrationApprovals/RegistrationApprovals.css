@@ -68,6 +68,8 @@
   padding: 4px;
   border-radius: 10px;
   border: 1px solid var(--ra-border);
+  max-width: 100%;
+  overflow-x: auto; /* Allows scrolling on tiny screens if tabs get too wide */
 }
 
 .ra-tab {
@@ -81,6 +83,7 @@
   cursor: pointer;
   position: relative;
   transition: 0.2s ease;
+  white-space: nowrap;
 }
 
 .ra-tab:hover { color: var(--ra-text-main); }
@@ -105,7 +108,7 @@
   border-radius: var(--ra-radius);
   border: 1px solid var(--ra-border);
   box-shadow: var(--ra-shadow);
-  overflow: hidden; /* Rounds corners of table */
+  overflow: hidden;
 }
 
 .ra-table-container {
@@ -116,7 +119,7 @@
 .ra-table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 800px; /* Forces scroll on medium screens */
+  min-width: 800px; 
 }
 
 .ra-table th {
@@ -147,7 +150,7 @@
 
 /* Date Cell */
 .ra-date-cell { display: flex; gap: 8px; align-items: flex-start; }
-.ra-icon-sub { color: var(--ra-text-sub); margin-top: 2px; }
+.ra-icon-sub { color: var(--ra-text-sub); margin-top: 2px; flex-shrink: 0; }
 .ra-date-text { display: flex; flex-direction: column; font-size: 14px; font-weight: 500; }
 .ra-date-text small { color: var(--ra-text-sub); font-size: 12px; font-weight: 400; margin-top: 2px; }
 
@@ -161,6 +164,7 @@
   display: flex; align-items: center; justify-content: center;
   font-weight: 700;
   font-size: 16px;
+  flex-shrink: 0;
 }
 .ra-user-info { display: flex; flex-direction: column; }
 .ra-user-info strong { font-size: 14px; color: var(--ra-text-main); }
@@ -283,14 +287,27 @@
 .ra-modal-body { padding: 20px; text-align: center; background: #000; }
 .ra-modal-body img { max-width: 100%; max-height: 70vh; object-fit: contain; }
 
-/* --- RESPONSIVE (MOBILE CARDS) --- */
+
+/* =========================================
+   RESPONSIVE (MOBILE CARDS)
+   ========================================= */
 @media (max-width: 768px) {
+  /* Reduce outer padding */
   .ra-layout { padding: 12px; }
+  
+  /* Scale down header typography */
+  .ra-title-group h2 { font-size: 20px; }
+  .ra-title-group p { font-size: 12px; }
+  .ra-refresh-btn { padding: 6px 12px; font-size: 12px; }
+
+  /* Scale down tabs */
+  .ra-tabs { padding: 3px; }
+  .ra-tab { padding: 6px 14px; font-size: 12px; }
   
   /* Hide standard table headers */
   .ra-table thead { display: none; }
   
-  /* Make rows behave like cards */
+  /* Make rows behave like floating cards */
   .ra-table, .ra-table tbody, .ra-table tr, .ra-table td {
     display: block;
     width: 100%;
@@ -303,41 +320,65 @@
     background: white;
     border: 1px solid var(--ra-border);
     border-radius: 12px;
-    padding: 16px;
+    padding: 12px; /* Tighter padding for mobile cards */
     box-shadow: 0 1px 3px rgba(0,0,0,0.05);
   }
 
-  /* Style Cells to look like labeled rows */
+  /* Structural fix for mobile row alignment */
   .ra-table td {
-    padding: 10px 0;
-    text-align: right;
+    padding: 8px 0;
     border-bottom: 1px solid #f1f5f9;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    justify-content: space-between; /* Pushes label left, content right */
+    align-items: flex-start; /* Aligns to top so multiline text doesn't look weird */
+    text-align: right;
   }
   
-  .ra-table td:last-child { border-bottom: none; }
+  .ra-table td:last-child { border-bottom: none; padding-bottom: 0; }
+  .ra-table td:first-child { padding-top: 0; }
 
-  /* Inject labels via CSS using data-label attribute */
+  /* Mobile Labels */
   .ra-table td::before {
     content: attr(data-label);
-    float: left;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 600;
     color: var(--ra-text-sub);
     text-transform: uppercase;
+    margin-right: 16px;
+    flex-shrink: 0; /* Prevents the label from wrapping/squishing */
+    margin-top: 2px; /* Visually aligns with the first line of text */
   }
 
-  /* Specific styling tweaks for mobile */
-  .ra-user-cell { text-align: right; flex-direction: row-reverse; }
+  /* --- Scale down inner card elements --- */
+  
+  /* Date */
+  .ra-date-cell { flex-direction: row-reverse; gap: 6px; }
+  .ra-date-text { font-size: 13px; align-items: flex-end; }
+  .ra-date-text small { font-size: 11px; }
+
+  /* User */
+  .ra-user-cell { flex-direction: row-reverse; gap: 10px; }
+  .ra-avatar-initial { width: 32px; height: 32px; font-size: 13px; }
   .ra-user-info { align-items: flex-end; }
+  .ra-user-info strong { font-size: 13px; }
+  .ra-sub-id { font-size: 10px; margin: 2px 0; }
+  .ra-sub-phone { font-size: 11px; }
+
+  /* Amount & Proof */
+  .ra-amount-badge { font-size: 12px; padding: 4px 8px; }
+  .ra-proof-group { align-items: flex-end; gap: 4px; }
+  .ra-utr { font-size: 11px; }
+  .ra-view-screenshot-btn { font-size: 11px; padding: 4px 8px; }
+
+  /* Status */
+  .ra-status-badge { font-size: 11px; padding: 4px 8px; }
+
+  /* Actions */
+  .ra-actions { width: 100%; justify-content: flex-end; gap: 12px; }
+  .ra-btn-approve, .ra-btn-reject { width: 32px; height: 32px; }
+  .ra-btn-approve svg, .ra-btn-reject svg { width: 16px; height: 16px; }
   
-  .ra-proof-group { align-items: flex-end; }
-  
-  .ra-actions { width: 100%; justify-content: flex-end; }
-  
-  /* Skeleton Mobile */
+  /* Skeleton Mobile Adjustments */
   .ra-skeleton-row { flex-direction: column; align-items: stretch; gap: 8px; border-bottom: 1px solid #eee; padding-bottom: 12px; }
   .sk-date, .sk-user, .sk-amount { width: 100%; height: 16px; }
 }
