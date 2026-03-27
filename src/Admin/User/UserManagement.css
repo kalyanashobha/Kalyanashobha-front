@@ -5,7 +5,7 @@
   /* Core Colors */
   --primary: #D32F2F;        
   --primary-hover: #B71C1C;
-  --secondary: #4F46E5;      
+  --secondary: #b92b24;      
   --secondary-light: #EEF2FF;
   
   /* Semantic Colors */
@@ -15,7 +15,7 @@
   --info-light: #F0F9FF;
   --success: #10B981;
   --success-light: #D1FAE5;
-  --purple: #8B5CF6;
+  --purple: #b92b24;
   --purple-light: #F5F3FF;
   --danger: #EF4444;
   --danger-light: #FEE2E2;
