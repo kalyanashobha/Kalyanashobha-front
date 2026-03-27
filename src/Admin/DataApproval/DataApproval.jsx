@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Check, X, Database, ChevronLeft, ChevronRight, RefreshCw } from 'lucide-react';
+import { Check, X, Database, ChevronLeft, ChevronRight, RefreshCw, Search, ChevronDown } from 'lucide-react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './DataApproval.css';
@@ -10,15 +10,62 @@ const DataApproval = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [actionLoading, setActionLoading] = useState(null); 
     
+    // Search State
+    const [searchTerm, setSearchTerm] = useState("");
+
     // Pagination State
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 8;
+    // Dynamic items per page: 3 for mobile, 5 for laptops
+    const [itemsPerPage, setItemsPerPage] = useState(window.innerWidth < 768 ? 3 : 5);
+
+    // Mobile Scroll Indicator State
+    const [showMainScroll, setShowMainScroll] = useState(false);
 
     const API_BASE = "https://kalyanashobha-back.vercel.app/api/admin/pending-data";
+
+    // Resize listener to adjust items per page dynamically
+    useEffect(() => {
+        const handleResize = () => {
+            setItemsPerPage(window.innerWidth < 768 ? 3 : 5);
+            setCurrentPage(1); // Reset page on resize
+        };
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     useEffect(() => {
         fetchPendingData();
     }, []);
+
+    // Reset pagination when search changes
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchTerm]);
+
+    // Scroll Indicator Logic
+    useEffect(() => {
+        const checkMainScroll = () => {
+            if (pendingItems.length === 0) {
+                setShowMainScroll(false);
+                return;
+            }
+            const scrollY = window.scrollY || document.documentElement.scrollTop;
+            const windowHeight = window.innerHeight;
+            const documentHeight = document.documentElement.scrollHeight;
+            
+            setShowMainScroll(documentHeight > windowHeight + 20 && scrollY + windowHeight < documentHeight - 30);
+        };
+
+        const timer = setTimeout(checkMainScroll, 500); 
+        window.addEventListener('scroll', checkMainScroll);
+        window.addEventListener('resize', checkMainScroll);
+
+        return () => {
+            clearTimeout(timer);
+            window.removeEventListener('scroll', checkMainScroll);
+            window.removeEventListener('resize', checkMainScroll);
+        };
+    }, [pendingItems, currentPage]);
 
     const fetchPendingData = async () => {
         setIsLoading(true);
@@ -85,11 +132,24 @@ const DataApproval = () => {
         }
     };
 
+    // Filter Logic
+    const filteredItems = pendingItems.filter(item => {
+        const searchStr = searchTerm.toLowerCase();
+        const val = (item.value || '').toLowerCase();
+        const cat = (item.category || '').toLowerCase();
+        const parent = (item.parentValue || '').toLowerCase();
+        const fName = (item.submittedBy?.firstName || '').toLowerCase();
+        const lName = (item.submittedBy?.lastName || '').toLowerCase();
+        const uId = (item.submittedBy?.uniqueId || '').toLowerCase();
+
+        return val.includes(searchStr) || cat.includes(searchStr) || parent.includes(searchStr) || fName.includes(searchStr) || lName.includes(searchStr) || uId.includes(searchStr);
+    });
+
     // Pagination Calculations
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = pendingItems.slice(indexOfFirstItem, indexOfLastItem);
-    const totalPages = Math.ceil(pendingItems.length / itemsPerPage);
+    const currentItems = filteredItems.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(filteredItems.length / itemsPerPage) || 1;
 
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
@@ -102,15 +162,27 @@ const DataApproval = () => {
                     <h2>Master Data Approvals</h2>
                     <p>Review new dropdown entries submitted by users.</p>
                 </div>
-                <button className="kda-refresh-btn" onClick={fetchPendingData}>
-                    <RefreshCw size={14} /> Refresh
-                </button>
+                <div className="kda-controls-wrapper">
+                    <div className="kda-search-group">
+                        <Search size={16} className="kda-search-icon" />
+                        <input 
+                            type="text"
+                            placeholder="Search category, value, or user..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="kda-search-input"
+                        />
+                    </div>
+                    <button className="kda-refresh-btn" onClick={fetchPendingData}>
+                        <RefreshCw size={14} /> Refresh
+                    </button>
+                </div>
             </div>
 
             <div className="kda-content">
                 {isLoading ? (
                     <div className="kda-skeleton-stack">
-                        {[1, 2, 3, 4, 5, 6].map(i => (
+                        {[1, 2, 3, 4, 5].map(i => (
                             <div key={i} className="kda-skeleton-row">
                                 <div className="kda-sk-box kda-sk-cat"></div>
                                 <div className="kda-sk-box kda-sk-val"></div>
@@ -119,11 +191,11 @@ const DataApproval = () => {
                             </div>
                         ))}
                     </div>
-                ) : pendingItems.length === 0 ? (
+                ) : filteredItems.length === 0 ? (
                     <div className="kda-empty-state">
                         <div className="kda-empty-icon"><Database size={40} /></div>
                         <h3>No pending data</h3>
-                        <p>There are no new dropdown entries to review right now.</p>
+                        <p>{searchTerm ? `No results match "${searchTerm}".` : "There are no new dropdown entries to review right now."}</p>
                     </div>
                 ) : (
                     <>
@@ -167,7 +239,7 @@ const DataApproval = () => {
                                             </td>
                                             <td data-label="Date">
                                                 <span className="kda-date-text">
-                                                    {new Date(item.createdAt).toLocaleDateString()}
+                                                    {new Date(item.createdAt).toLocaleDateString('en-IN', {day: '2-digit', month: 'short', year: 'numeric'})}
                                                 </span>
                                             </td>
                                             <td data-label="Actions" className="kda-text-right">
@@ -196,11 +268,11 @@ const DataApproval = () => {
                             </table>
                         </div>
 
-                        {/* Pagination Controls */}
-                        {totalPages > 1 && (
+                        {/* Pagination Controls - Visible even if 1 page to show bounds */}
+                        {filteredItems.length > 0 && (
                             <div className="kda-pagination-container">
                                 <span className="kda-page-info">
-                                    Showing <span style={{fontWeight: 700}}>{indexOfFirstItem + 1}</span> to <span style={{fontWeight: 700}}>{Math.min(indexOfLastItem, pendingItems.length)}</span> of <span style={{fontWeight: 700}}>{pendingItems.length}</span> entries
+                                    Showing <span style={{fontWeight: 700}}>{indexOfFirstItem + 1}</span> to <span style={{fontWeight: 700}}>{Math.min(indexOfLastItem, filteredItems.length)}</span> of <span style={{fontWeight: 700}}>{filteredItems.length}</span> entries
                                 </span>
                                 <div className="kda-pagination">
                                     <button 
@@ -213,7 +285,6 @@ const DataApproval = () => {
                                     
                                     <div className="kda-page-numbers">
                                         {[...Array(totalPages)].map((_, index) => {
-                                            // Simple logic to show limited page numbers (optional polish)
                                             if (totalPages > 5 && (index + 1 < currentPage - 1 || index + 1 > currentPage + 1) && index !== 0 && index !== totalPages - 1) {
                                                 if (index + 1 === currentPage - 2 || index + 1 === currentPage + 2) return <span key={index} className="kda-page-dots">...</span>;
                                                 return null;
@@ -243,6 +314,14 @@ const DataApproval = () => {
                     </>
                 )}
             </div>
+
+            {/* SCROLL INDICATOR */}
+            {showMainScroll && (
+                <div className="kda-scroll-indicator">
+                    <ChevronDown size={18} />
+                    <span>Scroll for more</span>
+                </div>
+            )}
         </div>
     );
 };
