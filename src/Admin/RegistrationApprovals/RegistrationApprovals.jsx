@@ -4,7 +4,6 @@ import axios from "axios";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-// Import the CSS file
 import "./RegistrationApprovals.css"; 
 
 export default function RegistrationApprovals() {
@@ -14,7 +13,6 @@ export default function RegistrationApprovals() {
   const [selectedImage, setSelectedImage] = useState(null);
   const [processingId, setProcessingId] = useState(null);
 
-  // Fetch Data
   const fetchPayments = async () => {
     setLoading(true);
     try {
@@ -38,7 +36,6 @@ export default function RegistrationApprovals() {
     fetchPayments();
   }, [activeTab]);
 
-  // Handle Approve/Reject
   const handleAction = async (paymentId, action) => {
     setProcessingId(paymentId);
     const toastId = toast.loading(`Processing ${action}...`);
@@ -51,23 +48,12 @@ export default function RegistrationApprovals() {
         { headers: { Authorization: token } }
       );
 
-      toast.update(toastId, { 
-        render: `Payment ${action}ed successfully`, 
-        type: "success", 
-        isLoading: false, 
-        autoClose: 3000 
-      });
-
+      toast.update(toastId, { render: `Payment ${action}ed successfully`, type: "success", isLoading: false, autoClose: 3000 });
       fetchPayments();
       window.dispatchEvent(new Event("paymentUpdated"));
 
     } catch (error) {
-      toast.update(toastId, { 
-        render: "Action failed. Please try again.", 
-        type: "error", 
-        isLoading: false, 
-        autoClose: 3000 
-      });
+      toast.update(toastId, { render: "Action failed. Please try again.", type: "error", isLoading: false, autoClose: 3000 });
     } finally {
       setProcessingId(null);
     }
@@ -92,24 +78,23 @@ export default function RegistrationApprovals() {
       <div className="ra-tabs-container">
         <div className="ra-tabs">
             <button 
-            className={`ra-tab ${activeTab === "PendingVerification" ? "active" : ""}`} 
-            onClick={() => setActiveTab("PendingVerification")}
+              className={`ra-tab ${activeTab === "PendingVerification" ? "active" : ""}`} 
+              onClick={() => setActiveTab("PendingVerification")}
             >
-            Pending Review
-            {/* Optional Badge if you have count data */}
-            {activeTab === "PendingVerification" && <span className="ra-tab-dot"></span>}
+              Pending Review
+              {activeTab === "PendingVerification" && <span className="ra-tab-dot"></span>}
             </button>
             <button 
-            className={`ra-tab ${activeTab === "Success" ? "active" : ""}`} 
-            onClick={() => setActiveTab("Success")}
+              className={`ra-tab ${activeTab === "Success" ? "active" : ""}`} 
+              onClick={() => setActiveTab("Success")}
             >
-            Approved History
+              Approved History
             </button>
             <button 
-            className={`ra-tab ${activeTab === "Rejected" ? "active" : ""}`} 
-            onClick={() => setActiveTab("Rejected")}
+              className={`ra-tab ${activeTab === "Rejected" ? "active" : ""}`} 
+              onClick={() => setActiveTab("Rejected")}
             >
-            Rejected
+              Rejected
             </button>
         </div>
       </div>
@@ -117,7 +102,6 @@ export default function RegistrationApprovals() {
       {/* CONTENT AREA */}
       <div className="ra-content">
         {loading ? (
-           /* SKELETON LOADER */
            <div className="ra-skeleton-stack">
               {[1, 2, 3, 4].map(i => (
                   <div key={i} className="ra-skeleton-row">
@@ -130,7 +114,7 @@ export default function RegistrationApprovals() {
            </div>
         ) : payments.length === 0 ? (
           <div className="ra-empty-state">
-             <div className="ra-empty-icon"><Filter size={32}/></div>
+             <div className="ra-empty-icon"><Filter size={36}/></div>
              <h3>No records found</h3>
              <p>There are no {activeTab.toLowerCase()} requests at the moment.</p>
           </div>
@@ -144,8 +128,7 @@ export default function RegistrationApprovals() {
                     <th>Payment Info</th>
                     <th>Proof Of Payment</th>
                     <th>Status</th>
-                    {/* Allow Actions header on both Pending and Rejected tabs */}
-                    {(activeTab === "PendingVerification" || activeTab === "Rejected") && <th align="right">Actions</th>}
+                    {(activeTab === "PendingVerification" || activeTab === "Rejected") && <th className="ra-text-right">Actions</th>}
                 </tr>
                 </thead>
                 <tbody>
@@ -154,10 +137,10 @@ export default function RegistrationApprovals() {
                     <td data-label="Date">
                         <div className="ra-date-cell">
                             <Clock size={14} className="ra-icon-sub"/>
-                            <span className="ra-date-text">
-                                {new Date(pay.date).toLocaleDateString()}
+                            <div className="ra-date-text">
+                                <span>{new Date(pay.date).toLocaleDateString()}</span>
                                 <small>{new Date(pay.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</small>
-                            </span>
+                            </div>
                         </div>
                     </td>
                     <td data-label="User">
@@ -167,14 +150,14 @@ export default function RegistrationApprovals() {
                            </div>
                            <div className="ra-user-info">
                                 <strong>{pay.userId?.firstName} {pay.userId?.lastName}</strong>
-                                <span className="ra-sub-id">ID: {pay.userId?.uniqueId || "N/A"}</span>
+                                <span className="ra-sub-id">{pay.userId?.uniqueId || "N/A"}</span>
                                 <span className="ra-sub-phone">{pay.userId?.mobileNumber}</span>
                            </div>
                         </div>
                     </td>
                     <td data-label="Amount">
                         <div className="ra-amount-badge">
-                           Rs. {pay.amount?.toLocaleString()}
+                           ₹{pay.amount?.toLocaleString()}
                         </div>
                     </td>
                     <td data-label="Proof">
@@ -187,7 +170,7 @@ export default function RegistrationApprovals() {
                                 className="ra-view-screenshot-btn" 
                                 onClick={() => setSelectedImage(pay.screenshotUrl)}
                             >
-                                <Eye size={12} /> View Screenshot
+                                <Eye size={14} /> View
                             </button>
                         </div>
                     </td>
@@ -197,12 +180,9 @@ export default function RegistrationApprovals() {
                         </span>
                     </td>
                     
-                    {/* Show Actions block on both Pending and Rejected tabs */}
                     {(activeTab === "PendingVerification" || activeTab === "Rejected") && (
-                        <td data-label="Actions" align="right">
+                        <td data-label="Actions" className="ra-text-right">
                         <div className="ra-actions">
-                            
-                            {/* Approve button is visible for both Pending and Rejected */}
                             <button 
                                 className="ra-btn-approve" 
                                 onClick={() => handleAction(pay._id, "approve")}
@@ -212,7 +192,6 @@ export default function RegistrationApprovals() {
                                 {processingId === pay._id ? <div className="spinner-sm"></div> : <Check size={18} />}
                             </button>
                             
-                            {/* Reject button is ONLY visible on the Pending tab */}
                             {activeTab === "PendingVerification" && (
                                 <button 
                                     className="ra-btn-reject" 
