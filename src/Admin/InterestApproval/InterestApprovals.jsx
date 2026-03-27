@@ -14,7 +14,7 @@ export default function InterestApprovals() {
   const [activeTab, setActiveTab] = useState("PendingAdminPhase1"); 
   const [processingId, setProcessingId] = useState(null);
   
-  // NEW: State to track actual pending counts for the notification dots
+  // State to track actual pending counts for the notification dots
   const [tabCounts, setTabCounts] = useState({ phase1: 0, phase2: 0 });
 
   // Fetch Data for the active tab
@@ -37,7 +37,7 @@ export default function InterestApprovals() {
     }
   };
 
-  // NEW: Fetch counts for the notification dots in the background
+  // Fetch counts for the notification dots in the background
   const fetchCounts = async () => {
     try {
       const token = localStorage.getItem("adminToken");
@@ -57,7 +57,7 @@ export default function InterestApprovals() {
 
   useEffect(() => {
     fetchRequests();
-    fetchCounts(); // Always update counts when swapping tabs
+    fetchCounts();
   }, [activeTab]);
 
   // Handle Actions
@@ -73,22 +73,11 @@ export default function InterestApprovals() {
         { headers: { Authorization: token } }
       );
 
-      toast.update(toastId, { 
-        render: "Action completed successfully", 
-        type: "success", 
-        isLoading: false, 
-        autoClose: 3000 
-      });
-
+      toast.update(toastId, { render: "Action completed successfully", type: "success", isLoading: false, autoClose: 3000 });
       fetchRequests(); 
-      fetchCounts(); // Update the notification dots after an action is taken
+      fetchCounts(); 
     } catch (error) {
-      toast.update(toastId, { 
-        render: "Action failed. Please try again.", 
-        type: "error", 
-        isLoading: false, 
-        autoClose: 3000 
-      });
+      toast.update(toastId, { render: "Action failed. Please try again.", type: "error", isLoading: false, autoClose: 3000 });
     } finally {
       setProcessingId(null);
     }
@@ -116,23 +105,21 @@ export default function InterestApprovals() {
                 className={`ksa-tab ${activeTab === "PendingAdminPhase1" ? "active" : ""}`} 
                 onClick={() => setActiveTab("PendingAdminPhase1")}
             >
-            New Requests
-            {/* Show red dot ONLY if phase1 count is greater than 0 */}
-            {tabCounts.phase1 > 0 && <span className="ksa-tab-dot"></span>}
+              New Requests
+              {tabCounts.phase1 > 0 && <span className="ksa-tab-dot"></span>}
             </button>
             <button 
                 className={`ksa-tab ${activeTab === "PendingAdminPhase2" ? "active" : ""}`} 
                 onClick={() => setActiveTab("PendingAdminPhase2")}
             >
-            Accepted Matches
-            {/* Show green dot ONLY if phase2 count is greater than 0 */}
-            {tabCounts.phase2 > 0 && <span className="ksa-tab-dot" style={{background: '#10B981'}}></span>}
+              Accepted Matches
+              {tabCounts.phase2 > 0 && <span className="ksa-tab-dot ksa-dot-green"></span>}
             </button>
             <button 
                 className={`ksa-tab ${activeTab === "Finalized" ? "active" : ""}`} 
                 onClick={() => setActiveTab("Finalized")}
             >
-            Completed Matches
+              Completed Matches
             </button>
         </div>
       </div>
@@ -145,13 +132,14 @@ export default function InterestApprovals() {
                   <div key={i} className="ksa-skeleton-row">
                       <div className="ksa-sk-box ksa-sk-date"></div>
                       <div className="ksa-sk-box ksa-sk-flow"></div>
+                      <div className="ksa-sk-box ksa-sk-details"></div>
                       <div className="ksa-sk-box ksa-sk-action"></div>
                   </div>
               ))}
            </div>
         ) : requests.length === 0 ? (
           <div className="ksa-empty-state">
-             <div className="ksa-empty-icon"><Filter size={32}/></div>
+             <div className="ksa-empty-icon"><Filter size={36}/></div>
              <h3>No requests found</h3>
              <p>There are no requests in this stage right now.</p>
           </div>
@@ -164,7 +152,7 @@ export default function InterestApprovals() {
                     <th>Match Flow</th>
                     <th>Connection Details</th>
                     <th>Status</th>
-                    {activeTab !== "Finalized" && <th align="right">Actions</th>}
+                    {activeTab !== "Finalized" && <th className="ksa-text-right">Actions</th>}
                 </tr>
                 </thead>
                 <tbody>
@@ -175,17 +163,15 @@ export default function InterestApprovals() {
                     <td data-label="Date">
                         <div className="ksa-date-cell">
                             <Clock size={14} className="ksa-icon-sub"/>
-                            <span className="ksa-date-text">
-                                {new Date(req.date).toLocaleDateString()}
-                                <small style={{display: "block", color: "#64748b", marginTop: "2px"}}>
-                                    {new Date(req.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                                </small>
-                            </span>
+                            <div className="ksa-date-text">
+                                <span>{new Date(req.date).toLocaleDateString()}</span>
+                                <small>{new Date(req.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</small>
+                            </div>
                         </div>
                     </td>
                     
                     {/* FLOW */}
-                    <td data-label="Flow">
+                    <td data-label="Match Flow">
                         <div className="ksa-flow-cell">
                              <div className="ksa-user-mini">
                                 <div className="ksa-avatar-xs">{req.senderId?.firstName?.[0] || "S"}</div>
@@ -205,34 +191,29 @@ export default function InterestApprovals() {
 
                     {/* CONNECTION DETAILS */}
                     <td data-label="Connection Details">
-                        <div className="ksa-contact-box" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                        <div className="ksa-contact-box">
                             {/* SENDER BLOCK */}
                             <div className="ksa-contact-person">
-                                <span className="contact-label" style={{color: '#64748b', fontSize: '11px', textTransform: 'uppercase', fontWeight: 'bold'}}>
-                                    Sent By (Initiator)
+                                <span className="ksa-contact-label">Sent By (Initiator)</span>
+                                <span className="ksa-contact-name">
+                                    {req.senderId?.firstName} {req.senderId?.lastName} 
+                                    <span className="ksa-contact-id">({req.senderId?.uniqueId})</span>
                                 </span>
-                                <span className="contact-name" style={{fontWeight: 600, fontSize: '13.5px', display: 'block', marginTop: '3px', color: '#0f172a'}}>
-                                    {req.senderId?.firstName} {req.senderId?.lastName} <span style={{color: '#3b82f6'}}>({req.senderId?.uniqueId})</span>
-                                </span>
-                                <span className="contact-number" style={{display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: '#475569', marginTop: '3px'}}>
+                                <span className="ksa-contact-number">
                                     <Phone size={12}/> {req.senderId?.mobileNumber || "N/A"}
                                 </span>
                             </div>
 
                             {/* RECEIVER BLOCK */}
-                            <div className="ksa-contact-person" style={{paddingTop: "10px", borderTop: "1px dashed #cbd5e1"}}>
-                                <span className="contact-label" style={{
-                                    color: activeTab === 'PendingAdminPhase2' ? '#10b981' : '#f59e0b', 
-                                    fontSize: '11px', 
-                                    textTransform: 'uppercase', 
-                                    fontWeight: 'bold'
-                                }}>
+                            <div className="ksa-contact-person receiver-block">
+                                <span className={`ksa-contact-label ${activeTab === 'PendingAdminPhase2' ? 'accepted' : 'pending'}`}>
                                     {activeTab === 'PendingAdminPhase2' ? "✓ Accepted By (Receiver)" : "To Receiver"}
                                 </span>
-                                <span className="contact-name" style={{fontWeight: 600, fontSize: '13.5px', display: 'block', marginTop: '3px', color: '#0f172a'}}>
-                                    {req.receiverId?.firstName} {req.receiverId?.lastName} <span style={{color: '#3b82f6'}}>({req.receiverId?.uniqueId})</span>
+                                <span className="ksa-contact-name">
+                                    {req.receiverId?.firstName} {req.receiverId?.lastName} 
+                                    <span className="ksa-contact-id">({req.receiverId?.uniqueId})</span>
                                 </span>
-                                <span className="contact-number" style={{display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: '#475569', marginTop: '3px'}}>
+                                <span className="ksa-contact-number">
                                     <Phone size={12}/> {req.receiverId?.mobileNumber || "N/A"}
                                 </span>
                             </div>
@@ -251,18 +232,17 @@ export default function InterestApprovals() {
 
                     {/* ACTIONS - NEW REQUESTS (Phase 1) */}
                     {activeTab === "PendingAdminPhase1" && (
-                        <td data-label="Actions" align="right">
+                        <td data-label="Actions" className="ksa-text-right">
                         <div className="ksa-actions">
                             <button 
                                 className="ksa-btn-outline-primary" 
                                 onClick={() => handleAction(req._id, 'approve', 1)} 
                                 disabled={processingId === req._id}
-                                style={{ whiteSpace: 'nowrap' }} 
                             >
                                 Forward Request
                             </button>
                             <button className="ksa-btn-reject" onClick={() => handleAction(req._id, 'reject', 1)} disabled={processingId === req._id} title="Reject Request">
-                                <X size={18} />
+                                {processingId === req._id ? <div className="spinner-sm"></div> : <X size={18} />}
                             </button>
                         </div>
                         </td>
@@ -270,30 +250,14 @@ export default function InterestApprovals() {
 
                     {/* ACTIONS - ACCEPTED MATCHES (Phase 2) */}
                     {activeTab === "PendingAdminPhase2" && (
-                        <td data-label="Actions" align="right">
-                        <div className="ksa-actions" style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                        <td data-label="Actions" className="ksa-text-right">
+                        <div className="ksa-actions">
                             <button 
+                                className="ksa-btn-success"
                                 onClick={() => handleAction(req._id, 'finalize', 2)} 
                                 disabled={processingId === req._id}
-                                style={{
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    backgroundColor: '#059669', 
-                                    color: '#ffffff', 
-                                    border: 'none',
-                                    padding: '8px 14px',
-                                    borderRadius: '6px',
-                                    fontSize: '13px',
-                                    fontWeight: '600',
-                                    cursor: 'pointer',
-                                    whiteSpace: 'nowrap', 
-                                    boxShadow: '0 2px 4px rgba(5, 150, 105, 0.2)',
-                                    opacity: processingId === req._id ? 0.7 : 1,
-                                    transition: 'all 0.2s ease'
-                                }}
                             >
-                                <Check size={16} strokeWidth={3} style={{marginRight: '6px'}}/> Finalize Match
+                                {processingId === req._id ? <div className="spinner-sm"></div> : <><Check size={16} strokeWidth={3}/> Finalize Match</>}
                             </button>
                         </div>
                         </td>
