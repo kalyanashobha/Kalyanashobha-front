@@ -341,7 +341,7 @@ export default function VendorList() {
                   <textarea name="description" placeholder="Describe your services..." value={joinFormData.description} onChange={handleJoinInputChange} rows="2"></textarea>
 
                   <div>
-                    <label style={{ fontSize: '12px', fontWeight: '600', color: '#4b5563', marginBottom: '6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <label style={{ fontSize: '12px', fontWeight: '600', color: '#4b5563', marginBottom: '6px', display: 'flex', justify-content: 'space-between', alignItems: 'center' }}>
                       Upload Portfolio Images (Max 2)
                       {isCompressing && <span style={{ color: '#F59E0B', display: 'flex', alignItems: 'center', gap: '4px' }}><Loader size={12} className="v-spin" /> Compressing...</span>}
                     </label>
