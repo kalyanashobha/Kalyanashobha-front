@@ -596,7 +596,7 @@ export default function CreateModerator() {
         }
 
         /* =========================================================
-           MOBILE RESPONSIVENESS (NO HORIZONTAL SCROLLING)
+           MOBILE RESPONSIVENESS (NO HORIZONTAL SCROLLING FIX)
            ========================================================= */
         @media (max-width: 767px) {
           .ks-mod-admin-wrapper { padding: 16px; }
@@ -616,16 +616,17 @@ export default function CreateModerator() {
           }
           
           .ks-mod-table tr {
-              margin-bottom: 16px; background: var(--ks-mod-card-bg);
+              margin-bottom: 16px; background: #ffffff;
               border: 1px solid var(--ks-mod-border); border-radius: 12px;
-              padding: 16px; box-shadow: var(--ks-mod-shadow-sm);
+              padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
           }
           
           /* Flex alignment for Mobile Cells */
           .ks-mod-table td {
               display: flex; justify-content: space-between; align-items: flex-start;
               padding: 12px 0; border-bottom: 1px dashed var(--ks-mod-border);
-              text-align: right; word-break: break-word; 
+              text-align: right; 
+              gap: 12px; /* Prevent label and data from touching */
           }
           
           .ks-mod-table td:last-child { border-bottom: none; padding-bottom: 0; }
@@ -636,13 +637,20 @@ export default function CreateModerator() {
               content: attr(data-label);
               font-size: 11px; font-weight: 700; color: var(--ks-mod-text-sub);
               text-transform: uppercase; letter-spacing: 0.5px;
-              margin-right: 12px; flex-shrink: 0; margin-top: 2px;
-              max-width: 90px; text-align: left;
+              flex-shrink: 0; margin-top: 2px;
+              width: 90px; /* Force rigid width so data side scales correctly */
+              text-align: left;
           }
 
-          /* Overrides for specific cells to align correctly */
-          .ks-mod-td-bold { max-width: calc(100% - 100px); }
-          .ks-mod-td-muted { font-size: 13px; max-width: calc(100% - 100px); }
+          /* OVERRIDE FOR SQUISHED TEXT ISSUE */
+          /* Using flex: 1 ensures the content dynamically fills the space, and word-break forces it to drop down gracefully instead of squishing */
+          .ks-mod-td-bold, .ks-mod-td-muted, .ks-mod-badge {
+              flex: 1;
+              word-break: break-all; /* Forces extremely long text (like emails) to break cleanly */
+              overflow-wrap: anywhere;
+              text-align: right;
+              font-size: 13px;
+          }
           
           .ks-mod-actions-cell { width: 100%; justify-content: flex-end; }
           .ks-mod-action-btn { font-size: 12px; padding: 6px 12px; }
@@ -688,7 +696,6 @@ export default function CreateModerator() {
                 value={formData.email} 
                 onChange={handleInputChange} 
                 required 
-                placeholder="Enter email..."
               />
             </div>
           </div>
