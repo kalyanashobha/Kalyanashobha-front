@@ -98,3 +98,11 @@
     display: none; 
   }
 }
+/* --- NEW LOGO STYLES --- */
+.mobile-logo {
+  height: 32px; /* Adjust this slightly up or down depending on your logo's native padding */
+  width: auto;
+  object-fit: contain;
+  display: block;
+}
+
