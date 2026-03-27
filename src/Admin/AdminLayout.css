@@ -21,7 +21,7 @@
   height: var(--admin-header-height);
   background: white;
   border-bottom: 1px solid #E5E7EB;
-  z-index: 50;
+  z-index: 110; /* Increased to stay on top of the full-width sidebar */
   align-items: center;
   justify-content: space-between;
   padding: 0 20px;
@@ -38,7 +38,7 @@
 }
 
 .mobile-logo {
-  height: 32px; 
+  height: 40px; /* Increased logo size slightly (was 32px) */
   width: auto;
   object-fit: contain;
   display: block;
@@ -46,14 +46,13 @@
 
 /* --- SMALLER ANIMATED HAMBURGER MENU --- */
 .animated-hamburger {
-  width: 24px; /* Reduced width */
-  height: 16px; /* Reduced height */
+  width: 24px; 
+  height: 16px; 
   position: relative;
   cursor: pointer;
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 101; /* Keep above sidebar if needed */
 }
 
 .animated-hamburger span {
@@ -74,12 +73,12 @@
 }
 
 .animated-hamburger span:nth-child(2) {
-  top: 7px; /* Adjusted spacing */
+  top: 7px; 
   width: 65%; 
 }
 
 .animated-hamburger span:nth-child(3) {
-  top: 14px; /* Adjusted spacing */
+  top: 14px; 
   width: 100%; 
 }
 
@@ -138,39 +137,19 @@
     padding-top: var(--admin-header-height);
   }
 
-  /* Professional Overlay */
-  .sidebar-overlay {
-    display: block;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background-color: rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(2px); /* Adds a premium blur effect */
-    z-index: 90; /* Below sidebar, above content */
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
-  }
-
-  .sidebar-overlay.visible {
-    opacity: 1;
-    visibility: visible;
-  }
-
-  /* Sliding Sidebar from the Left */
+  /* Full-width Sliding Sidebar */
   .sidebar-wrapper {
-    width: var(--admin-sidebar-width); 
-    top: 0; /* Cover the whole screen height */
-    transform: translateX(-100%); /* Start completely off-screen to the left */
-    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15); /* Adds a professional shadow */
+    width: 100%; /* Now takes up the full width of the screen */
+    top: var(--admin-header-height); /* Starts directly below the header */
+    height: calc(100vh - var(--admin-header-height)); /* Prevents scrolling issues */
+    transform: translateX(-100%); /* Starts completely off-screen to the left */
+    box-shadow: none; /* Shadow removed since it spans the whole screen */
     z-index: 100;
   }
 
   /* Show Sidebar when Open */
   .sidebar-wrapper.mobile-open {
-    transform: translateX(0); /* Slide into view */
+    transform: translateX(0); /* Slides smoothly into view */
   }
 
   .admin-main-content {
