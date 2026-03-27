@@ -200,6 +200,8 @@ const AdminPremiumRequests = () => {
                     font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
                     color: var(--pr-text-main) !important;
                     box-sizing: border-box !important;
+                    max-width: 100vw !important;
+                    overflow-x: hidden !important;
                 }
 
                 /* Header Styles */
@@ -208,6 +210,7 @@ const AdminPremiumRequests = () => {
                     flex-direction: column !important;
                     gap: 20px !important;
                     margin-bottom: 24px !important;
+                    box-sizing: border-box !important;
                 }
                 .admin-header-title-group {
                     display: flex !important;
@@ -234,6 +237,8 @@ const AdminPremiumRequests = () => {
                     gap: 16px !important;
                     justify-content: space-between !important;
                     align-items: center !important;
+                    box-sizing: border-box !important;
+                    width: 100% !important;
                 }
                 .admin-search-group {
                     position: relative !important;
@@ -242,6 +247,7 @@ const AdminPremiumRequests = () => {
                     flex: 1 !important;
                     min-width: 250px !important;
                     max-width: 400px !important;
+                    box-sizing: border-box !important;
                 }
                 .admin-search-group svg {
                     position: absolute !important;
@@ -276,6 +282,7 @@ const AdminPremiumRequests = () => {
                     max-width: 100% !important;
                     box-sizing: border-box !important;
                     -webkit-overflow-scrolling: touch !important;
+                    scrollbar-width: none !important;
                 }
                 .admin-tabs-wrapper::-webkit-scrollbar { display: none !important; }
                 
@@ -319,16 +326,19 @@ const AdminPremiumRequests = () => {
                     border-radius: var(--pr-radius) !important;
                     box-shadow: var(--pr-shadow-md) !important;
                     overflow: hidden !important;
+                    box-sizing: border-box !important;
+                    width: 100% !important;
                 }
                 .admin-table-wrapper {
                     width: 100% !important;
                     overflow-x: auto !important;
+                    box-sizing: border-box !important;
                 }
                 .admin-data-table {
                     width: 100% !important;
                     border-collapse: collapse !important;
                     text-align: left !important;
-                    min-width: 850px !important; /* <--- This was breaking mobile */
+                    min-width: 850px !important;
                 }
                 .admin-data-table th {
                     background: #f8fafc !important;
@@ -470,42 +480,83 @@ const AdminPremiumRequests = () => {
                 }
 
                 /* =========================================================
-                   MOBILE RESPONSIVENESS (FULLY FIXED)
+                   MOBILE RESPONSIVENESS (FULLY FIXED TABS & SEARCH)
                    ========================================================= */
                 @media (max-width: 768px) {
-                    .admin-layout-container { padding: 16px !important; }
+                    .admin-layout-container { 
+                        padding: 16px !important; 
+                        width: 100% !important;
+                        max-width: 100vw !important; /* Stop page from being pulled wide */
+                        overflow-x: hidden !important; 
+                        box-sizing: border-box !important;
+                    }
                     
-                    /* Show scroll indicator on mobile */
                     .admin-scroll-indicator { display: flex !important; }
 
-                    /* Header & Controls */
+                    .admin-header {
+                        width: 100% !important;
+                        box-sizing: border-box !important;
+                    }
+
                     .admin-header-text h2 { font-size: 22px !important; }
                     .admin-header-text p { font-size: 14px !important; }
-                    .admin-controls-group { flex-direction: column !important; align-items: stretch !important; gap: 12px !important; }
-                    .admin-search-group { max-width: 100% !important; width: 100% !important; }
+                    
+                    /* Force controls to fit exactly 100% */
+                    .admin-controls-group { 
+                        flex-direction: column !important; 
+                        align-items: flex-start !important; 
+                        gap: 12px !important; 
+                        width: 100% !important;
+                        box-sizing: border-box !important;
+                    }
+                    
+                    /* Search bar shrink to fit container */
+                    .admin-search-group { 
+                        width: 100% !important; 
+                        max-width: 100% !important; 
+                        min-width: 100% !important;
+                        box-sizing: border-box !important;
+                    }
+
+                    /* Tabs become a swipeable row, no wrap */
+                    .admin-tabs-wrapper { 
+                        width: 100% !important;
+                        max-width: 100% !important;
+                        flex-wrap: nowrap !important; /* Do not break to new lines */
+                        overflow-x: auto !important; /* Allow swipe left/right */
+                        justify-content: flex-start !important;
+                        padding: 6px !important; 
+                        box-sizing: border-box !important;
+                    }
+                    
                     .admin-tab-button { padding: 8px 16px !important; font-size: 13px !important; }
 
-                    /* --- CRITICAL FIX: Stop horizontal scrolling --- */
                     .admin-table-wrapper {
                         overflow-x: hidden !important; 
                         width: 100% !important;
+                        box-sizing: border-box !important;
                     }
 
-                    /* --- CRITICAL FIX: Override Desktop min-width --- */
                     .admin-data-table {
                         min-width: 100% !important; 
+                        width: 100% !important;
+                        box-sizing: border-box !important;
                     }
 
                     .admin-data-table thead { display: none !important; }
                     
-                    /* Remove background from table container so cards stand out */
-                    .admin-data-card { background: transparent !important; border: none !important; box-shadow: none !important; }
+                    .admin-data-card { 
+                        background: transparent !important; 
+                        border: none !important; 
+                        box-shadow: none !important; 
+                        width: 100% !important;
+                        box-sizing: border-box !important;
+                    }
                     
                     .admin-data-table, .admin-data-table tbody, .admin-data-table tr, .admin-data-table td {
                         display: block !important; width: 100% !important; box-sizing: border-box !important;
                     }
                     
-                    /* Individual Card Wrapper Styling */
                     .admin-data-table tr {
                         margin-bottom: 16px !important;
                         background: var(--pr-card-bg) !important;
@@ -515,24 +566,21 @@ const AdminPremiumRequests = () => {
                         overflow: hidden !important; 
                     }
                     
-                    /* Cell Layout - Flexbox fixes overlap and squishing */
                     .admin-data-table td {
                         display: flex !important;
                         justify-content: space-between !important;
-                        align-items: flex-start !important; /* Top alignment so multi-line text looks good */
+                        align-items: flex-start !important; 
                         padding: 14px 16px !important;
                         border-bottom: 1px solid var(--pr-border) !important;
                         gap: 12px !important;
                     }
                     
-                    /* Distinct area for action buttons */
                     .admin-data-table td:last-child { 
                         border-bottom: none !important; 
                         background-color: #f8fafc !important; 
                         align-items: center !important;
                     }
                     
-                    /* Mobile Labels */
                     .admin-data-table td::before {
                         content: attr(data-label) !important;
                         font-size: 12px !important;
@@ -541,16 +589,15 @@ const AdminPremiumRequests = () => {
                         text-transform: uppercase !important;
                         letter-spacing: 0.5px !important;
                         flex-shrink: 0 !important;
-                        max-width: 35% !important; /* Keep label from pushing text off screen */
+                        max-width: 35% !important; 
                         margin-top: 2px !important;
                     }
 
-                    /* Content Alignment - Force wrap so text never overlaps the label */
                     .admin-info-stack { 
                         align-items: flex-end !important; 
                         text-align: right !important; 
                         margin: 0 !important;
-                        width: 60% !important; /* Gives the text a safe boundary */
+                        width: 60% !important; 
                         word-wrap: break-word !important;
                         overflow-wrap: break-word !important;
                     }
@@ -564,7 +611,6 @@ const AdminPremiumRequests = () => {
                     .admin-action-group { width: 100% !important; justify-content: flex-end !important; }
                     .admin-btn { font-size: 13px !important; padding: 8px 16px !important; }
                     
-                    /* Pagination Stack */
                     .admin-pagination-bar {
                         flex-direction: column !important;
                         border-radius: var(--pr-radius) !important;
@@ -573,6 +619,8 @@ const AdminPremiumRequests = () => {
                         box-shadow: var(--pr-shadow-sm) !important;
                         gap: 16px !important;
                         background: var(--pr-card-bg) !important;
+                        width: 100% !important;
+                        box-sizing: border-box !important;
                     }
                 }
             `}</style>
