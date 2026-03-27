@@ -1,8 +1,9 @@
 :root {
   --admin-sidebar-width: 260px;
   --admin-header-height: 60px;
-  --admin-bg: #FDFBF7;
+  --admin-bg: #FFFFFF; /* Changed to pure white */
 }
+
 
 .admin-root-layout {
   display: flex;
