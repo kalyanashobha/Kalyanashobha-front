@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Tag, Image as ImageIcon, X, Plus, Loader } from "lucide-react"; 
-import imageCompression from 'browser-image-compression'; // <-- Imported compression
+import { Tag, Image as ImageIcon, X, Plus, Loader, ChevronRight } from "lucide-react"; 
+import imageCompression from 'browser-image-compression';
 import "./VendorList.css";
 import Navbar from "../../Components/Navbar";
 
@@ -34,7 +34,7 @@ export default function VendorList() {
     description: "",
   });
   const [joinFiles, setJoinFiles] = useState([]);
-  const [isCompressing, setIsCompressing] = useState(false); // New state for compression loader
+  const [isCompressing, setIsCompressing] = useState(false);
   const [joinSubmitStatus, setJoinSubmitStatus] = useState({
     loading: false,
     success: false,
@@ -63,7 +63,7 @@ export default function VendorList() {
     } catch (err) {
       console.error("Error fetching vendors", err);
     } finally {
-      setLoading(false); 
+      setLoading(false);
     }
   };
 
@@ -130,7 +130,6 @@ export default function VendorList() {
     setJoinFormData({ ...joinFormData, [e.target.name]: e.target.value });
   };
 
-  // NEW: Compression Logic + Max 2 Files restriction
   const handleJoinFileChange = async (e) => {
     const selectedFiles = Array.from(e.target.files).slice(0, 2); // Enforce max 2
     if (selectedFiles.length === 0) return;
@@ -150,7 +149,6 @@ export default function VendorList() {
         compressedImages.push(compressedFile);
       } catch (error) {
         console.error("Image Compression Error:", error);
-        // Fallback to uncompressed if it fails, or you could reject it.
         compressedImages.push(file); 
       }
     }
@@ -200,6 +198,17 @@ export default function VendorList() {
       <Navbar />
       <div className="v-premium-container">
         
+        {/* --- NEW: TOP STICKY BANNER --- */}
+        <div className="v-sticky-banner">
+          <div className="v-banner-text">
+            <h3 className="v-banner-title">Are you a Wedding Vendor?</h3>
+            <p className="v-banner-subtitle">Grow your business & connect with thousands of couples.</p>
+          </div>
+          <button className="v-banner-btn" onClick={handleOpenJoinModal}>
+            Join Now <ChevronRight size={18} />
+          </button>
+        </div>
+
         <div className="v-premium-header">
           <h1>Premium Wedding Vendors</h1>
           <p>Curated services to make your special day perfect.</p>
@@ -248,10 +257,6 @@ export default function VendorList() {
             ))
           )}
         </div>
-
-        <button className="v-fixed-join-btn" onClick={handleOpenJoinModal}>
-          <Plus size={18} /> Join as Vendor
-        </button>
 
         {/* --- Contact Vendor Modal --- */}
         {selectedVendor && (
@@ -319,7 +324,7 @@ export default function VendorList() {
 
                   <input type="text" name="priceRange" placeholder="Price Range (e.g. ₹50,000 - ₹1 Lakh)" value={joinFormData.priceRange} onChange={handleJoinInputChange} />
                   
-                  <textarea name="description" placeholder="Describe your services..." value={joinFormData.description} onChange={handleJoinInputChange} rows="3"></textarea>
+                  <textarea name="description" placeholder="Describe your services..." value={joinFormData.description} onChange={handleJoinInputChange} rows="2"></textarea>
 
                   <div>
                     <label style={{ fontSize: '13px', fontWeight: '600', color: '#4b5563', marginBottom: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
