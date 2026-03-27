@@ -4,7 +4,8 @@ import './Dashboard.css';
 
 import { 
   Users, UserCheck, UserX, 
-  CheckCircle, Heart, Briefcase, Share2, Activity
+  CheckCircle, Heart, Briefcase, Share2, Activity,
+  ShieldAlert, Star
 } from 'lucide-react';
 
 const AdminDashboard = () => {
@@ -27,9 +28,6 @@ const AdminDashboard = () => {
     }
 
     try {
-      // Simulate slight delay to show off skeleton (optional, remove in production)
-      // await new Promise(r => setTimeout(r, 1000)); 
-      
       const res = await fetch(`${API_BASE}/stats`, {
         headers: { 
           'Content-Type': 'application/json',
@@ -49,29 +47,39 @@ const AdminDashboard = () => {
     }
   };
 
-  // Reusable Card Component with Navigation
-  const StatCard = ({ label, value, icon: Icon, path, colorType = "amber" }) => {
-    // Define color styles based on type
+  // Reusable Card Component with Navigation and Unique Colors
+  const StatCard = ({ label, value, icon: Icon, path, colorType }) => {
+    // Unique color definitions for a vibrant, premium dashboard
     const styles = {
-      amber: { color: '#D97706', bg: '#FFFBEB', border: 'hover:border-amber-400' }, // Amber-600
-      red:   { color: '#DC2626', bg: '#FEF2F2', border: 'hover:border-red-400' },   // Red-600
+      blue:   { color: '#2563EB', bg: '#EFF6FF', border: '#BFDBFE', shadow: 'rgba(37, 99, 235, 0.15)' },
+      emerald:{ color: '#059669', bg: '#F0FDF4', border: '#A7F3D0', shadow: 'rgba(5, 150, 105, 0.15)' },
+      rose:   { color: '#E11D48', bg: '#FFF1F2', border: '#FECDD3', shadow: 'rgba(225, 29, 72, 0.15)' },
+      amber:  { color: '#D97706', bg: '#FFFBEB', border: '#FDE68A', shadow: 'rgba(217, 119, 6, 0.15)' },
+      purple: { color: '#7C3AED', bg: '#F5F3FF', border: '#DDD6FE', shadow: 'rgba(124, 58, 237, 0.15)' },
+      indigo: { color: '#4F46E5', bg: '#EEF2FF', border: '#C7D2FE', shadow: 'rgba(79, 70, 229, 0.15)' },
+      teal:   { color: '#0D9488', bg: '#F0FDFA', border: '#99F6E4', shadow: 'rgba(13, 148, 136, 0.15)' },
+      cyan:   { color: '#0891B2', bg: '#ECFEFF', border: '#A5F3FC', shadow: 'rgba(8, 145, 178, 0.15)' }
     };
 
-    const currentStyle = styles[colorType] || styles.amber;
+    const currentStyle = styles[colorType] || styles.blue;
 
     return (
       <div 
         className={`ks-stat-card ${path ? 'clickable' : ''}`} 
         onClick={() => path && navigate(path)}
+        style={{
+           '--card-hover-border': currentStyle.border,
+           '--card-hover-shadow': currentStyle.shadow
+        }}
       >
         <div className="ks-card-header">
           <div 
             className="ks-icon-box" 
             style={{ color: currentStyle.color, backgroundColor: currentStyle.bg }}
           >
-            {Icon && <Icon size={22} strokeWidth={2} />}
+            {Icon && <Icon size={24} strokeWidth={2} />}
           </div>
-          <span className="ks-trend-indicator">●</span>
+          <Activity size={18} className="ks-trend-indicator" style={{color: currentStyle.color, opacity: 0.5}} />
         </div>
 
         <div className="ks-card-body">
@@ -84,7 +92,6 @@ const AdminDashboard = () => {
     );
   };
 
-  // Skeleton Loading Component
   const SkeletonCard = () => (
     <div className="ks-stat-card skeleton-wrapper">
       <div className="ks-card-header">
@@ -107,7 +114,7 @@ const AdminDashboard = () => {
           <p className="ks-subtitle">Welcome back, Admin</p>
         </div>
         <div className="ks-date-pill">
-          {new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+          {new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
         </div>
       </header>
 
@@ -130,28 +137,28 @@ const AdminDashboard = () => {
                   value={stats?.users?.total} 
                   icon={Users} 
                   path="/admin/users"
-                  colorType="amber"
+                  colorType="blue"
                 />
                 <StatCard 
                   label="Male Profiles" 
                   value={stats?.users?.males} 
                   icon={UserCheck} 
                   path="/admin/users" 
-                  colorType="amber"
+                  colorType="cyan"
                 />
                 <StatCard 
                   label="Female Profiles" 
                   value={stats?.users?.females} 
-                  icon={UserCheck} 
+                  icon={Star} 
                   path="/admin/users" 
-                  colorType="red"
+                  colorType="rose"
                 />
                 <StatCard 
                   label="Restricted / Blocked" 
                   value={stats?.users?.blocked} 
-                  icon={UserX} 
+                  icon={ShieldAlert} 
                   path="/admin/users" 
-                  colorType="red"
+                  colorType="amber"
                 />
               </>
             )}
@@ -173,28 +180,28 @@ const AdminDashboard = () => {
                   value={stats?.referrals?.totalAgents} 
                   icon={Briefcase} 
                   path="/admin/agents" 
-                  colorType="amber"
+                  colorType="purple"
                 />
                 <StatCard 
                   label="Interests Sent" 
                   value={stats?.platformHealth?.totalInterestsSent} 
                   icon={Heart} 
                   path="/admin/interest-approvals" 
-                  colorType="red"
+                  colorType="emerald"
                 />
                 <StatCard 
                   label="Successful Matches" 
                   value={stats?.platformHealth?.successfulMatches} 
                   icon={CheckCircle} 
                   path="/admin/registration-approvals" 
-                  colorType="amber"
+                  colorType="teal"
                 />
                 <StatCard 
                   label="Referrals Made" 
                   value={stats?.referrals?.totalReferredUsers} 
                   icon={Share2} 
                   path="/admin/agents" 
-                  colorType="red"
+                  colorType="indigo"
                 />
               </>
             )}
