@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import toast from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 import html2pdf from "html2pdf.js"; 
+import { Search, ChevronLeft, ChevronRight, ChevronDown, Download, FileText } from "lucide-react";
 import './AdminCertificates.css'; 
 
 const AdminCertificates = () => {
@@ -13,6 +14,9 @@ const AdminCertificates = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const usersPerPage = 10; 
 
+  // Mobile Scroll Indicator State
+  const [showMainScroll, setShowMainScroll] = useState(false);
+
   useEffect(() => {
     fetchUsers();
   }, []);
@@ -20,6 +24,27 @@ const AdminCertificates = () => {
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm]);
+
+  // Scroll Indicator Logic
+  useEffect(() => {
+    const checkMainScroll = () => {
+        const scrollY = window.scrollY || document.documentElement.scrollTop;
+        const windowHeight = window.innerHeight;
+        const documentHeight = document.documentElement.scrollHeight;
+        
+        setShowMainScroll(documentHeight > windowHeight + 10 && scrollY + windowHeight < documentHeight - 60);
+    };
+
+    const timer = setTimeout(checkMainScroll, 500); 
+    window.addEventListener('scroll', checkMainScroll);
+    window.addEventListener('resize', checkMainScroll);
+
+    return () => {
+        clearTimeout(timer);
+        window.removeEventListener('scroll', checkMainScroll);
+        window.removeEventListener('resize', checkMainScroll);
+    };
+  }, [users, currentPage]);
 
   const fetchUsers = async () => {
     try {
@@ -99,14 +124,20 @@ const AdminCertificates = () => {
   };
 
   return (
-    <div className="admin-container">
-      <div className="admin-header">
-        <h2 className="admin-title">User Certificates</h2>
+    <div className="ac-layout">
+      <Toaster position="top-right" />
+      
+      <div className="ac-header">
+        <div className="ac-title-group">
+          <h2>User Certificates</h2>
+          <p>Generate and manage digital signature certificates for users.</p>
+        </div>
         
-        <div className="search-box">
+        <div className="ac-search-group">
+          <Search size={16} className="ac-search-icon" />
           <input
             type="text"
-            className="search-input"
+            className="ac-search-input"
             placeholder="Search by Name or Profile ID..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -114,72 +145,79 @@ const AdminCertificates = () => {
         </div>
       </div>
 
-      <div className="table-card">
+      <div className="ac-data-card">
         {loading ? (
-          <div className="loading-state">
-            <div className="spinner"></div> Loading user data...
+          <div className="ac-state-view">
+            <span className="ac-spinner"></span>
+            Loading user data...
           </div>
         ) : (
           <>
-            <div className="table-responsive">
-              <table className="custom-table">
+            <div className="ac-table-wrapper">
+              <table className="ac-data-table">
                 <thead>
                   <tr>
                     <th>Profile ID</th>
                     <th>User Name</th>
                     <th>Email Address</th>
                     <th>Legal Status</th>
-                    <th style={{ textAlign: "center" }}>Action</th>
+                    <th className="ac-text-right">Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   {currentUsers.length > 0 ? (
                     currentUsers.map((user) => (
                       <tr key={user._id}>
-                        <td style={{ fontWeight: "600" }}>{user.uniqueId || "N/A"}</td>
-                        <td>{user.firstName} {user.lastName}</td>
-                        <td className="text-muted">{user.email}</td>
+                        <td data-label="Profile ID">
+                          <span className="ac-id-badge">{user.uniqueId || "N/A"}</span>
+                        </td>
+                        <td data-label="User Name">
+                          <strong>{user.firstName} {user.lastName}</strong>
+                        </td>
+                        <td data-label="Email Address">
+                          <span className="ac-text-muted">{user.email}</span>
+                        </td>
                         
-                        <td>
+                        <td data-label="Legal Status">
                           {user.digitalSignature ? (
-                            <span className="badge badge-signed">✓ Signed</span>
+                            <span className="ac-status-badge ac-signed">✓ Signed</span>
                           ) : (
-                            <span className="badge badge-pending">Pending</span>
+                            <span className="ac-status-badge ac-pending">Pending</span>
                           )}
                         </td>
 
-                        <td style={{ textAlign: "center" }}>
-                          {user.digitalSignature ? (
-                            <button
-                              className="btn-download"
-                              onClick={() => downloadCertificate(user._id, user.firstName)}
-                              disabled={processingId === user._id}
-                            >
-                              {processingId === user._id ? (
-                                <span>Generating...</span>
-                              ) : (
-                                <>
-                                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                    <polyline points="7 10 12 15 17 10"></polyline>
-                                    <line x1="12" y1="15" x2="12" y2="3"></line>
-                                  </svg>
-                                  Download PDF
-                                </>
-                              )}
-                            </button>
-                          ) : (
-                            <button className="btn-disabled" disabled>
-                              Not Available
-                            </button>
-                          )}
+                        <td data-label="Action" className="ac-text-right">
+                          <div className="ac-action-group">
+                            {user.digitalSignature ? (
+                              <button
+                                className="ac-btn-download"
+                                onClick={() => downloadCertificate(user._id, user.firstName)}
+                                disabled={processingId === user._id}
+                              >
+                                {processingId === user._id ? (
+                                  <span className="ac-spinner-small"></span>
+                                ) : (
+                                  <Download size={14} />
+                                )}
+                                {processingId === user._id ? "Generating..." : "Download PDF"}
+                              </button>
+                            ) : (
+                              <button className="ac-btn-disabled" disabled>
+                                Not Available
+                              </button>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="5" style={{ textAlign: "center", padding: "30px 20px", color: "#64748b" }}>
-                        No users found matching "{searchTerm}"
+                      <td colSpan="5" className="ac-empty-cell">
+                        <div className="ac-state-view empty">
+                          <FileText size={48} />
+                          <h3>No users found</h3>
+                          <p>No users match "{searchTerm}".</p>
+                        </div>
                       </td>
                     </tr>
                   )}
@@ -188,30 +226,30 @@ const AdminCertificates = () => {
             </div>
 
             {totalPages > 1 && (
-              <div className="pagination-container">
-                <span className="pagination-info">
-                  Showing {indexOfFirstUser + 1} to {Math.min(indexOfLastUser, filteredUsers.length)} of {filteredUsers.length} entries
+              <div className="ac-pagination-bar">
+                <span className="ac-pagination-text">
+                  Showing <strong>{indexOfFirstUser + 1}</strong> to <strong>{Math.min(indexOfLastUser, filteredUsers.length)}</strong> of <strong>{filteredUsers.length}</strong>
                 </span>
                 
-                <div className="pagination-controls">
+                <div className="ac-pagination-controls">
                   <button 
-                    className="pagination-btn"
+                    className="ac-page-btn"
                     onClick={handlePrevPage} 
                     disabled={currentPage === 1}
                   >
-                    Previous
+                    <ChevronLeft size={16} /> Prev
                   </button>
                   
-                  <span className="pagination-page">
-                    Page {currentPage} of {totalPages}
+                  <span className="ac-page-number active">
+                    {currentPage}
                   </span>
                   
                   <button 
-                    className="pagination-btn"
+                    className="ac-page-btn"
                     onClick={handleNextPage} 
                     disabled={currentPage === totalPages}
                   >
-                    Next
+                    Next <ChevronRight size={16} />
                   </button>
                 </div>
               </div>
@@ -219,6 +257,14 @@ const AdminCertificates = () => {
           </>
         )}
       </div>
+
+      {/* MOBILE SCROLL INDICATOR */}
+      {showMainScroll && (
+          <div className="ac-scroll-indicator">
+              <ChevronDown size={18} />
+              <span>Scroll for more</span>
+          </div>
+      )}
     </div>
   );
 };
