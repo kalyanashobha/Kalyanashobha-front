@@ -8,27 +8,38 @@ const Icons = {
   Phone: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>,
   Clock: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>,
   Search: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>,
-  ChevronLeft: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>,
-  ChevronRight: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>,
+  ChevronLeft: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>,
+  ChevronRight: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>,
   ChevronDown: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
 };
 
 const AdminPremiumRequests = () => {
     const [requests, setRequests] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState('All');
+    // Removed 'All' tab, default is now 'Pending'
+    const [activeTab, setActiveTab] = useState('Pending');
     const [searchTerm, setSearchTerm] = useState('');
     const [processingId, setProcessingId] = useState(null);
 
-    // Pagination States
+    // Dynamic Pagination States
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 10; 
+    const [itemsPerPage, setItemsPerPage] = useState(window.innerWidth < 768 ? 3 : 5);
 
-    // Mobile Scroll Indicator State
+    // Global Scroll Indicator State
     const [showMainScroll, setShowMainScroll] = useState(false);
 
     const API_URL = "https://kalyanashobha-back.vercel.app/api/admin";
     const token = localStorage.getItem('adminToken'); 
+
+    // Handle screen resize for dynamic pagination
+    useEffect(() => {
+        const handleResize = () => {
+            setItemsPerPage(window.innerWidth < 768 ? 3 : 5);
+            setCurrentPage(1);
+        };
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     useEffect(() => {
         fetchRequests();
@@ -89,7 +100,8 @@ const AdminPremiumRequests = () => {
     };
 
     const filteredRequests = requests.filter(req => {
-        if (activeTab !== 'All' && req.status !== activeTab) return false;
+        // Strictly match the active tab status
+        if (req.status !== activeTab) return false;
         
         if (searchTerm) {
             const term = searchTerm.toLowerCase();
@@ -106,7 +118,7 @@ const AdminPremiumRequests = () => {
     });
 
     // Pagination Logic
-    const totalPages = Math.ceil(filteredRequests.length / itemsPerPage);
+    const totalPages = Math.ceil(filteredRequests.length / itemsPerPage) || 1;
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentItems = filteredRequests.slice(indexOfFirstItem, indexOfLastItem);
@@ -117,14 +129,18 @@ const AdminPremiumRequests = () => {
         }
     };
 
-    // Scroll Indicator Logic
+    // Universal Scroll Indicator Logic
     useEffect(() => {
         const checkMainScroll = () => {
+            if (filteredRequests.length === 0) {
+                setShowMainScroll(false);
+                return;
+            }
             const scrollY = window.scrollY || document.documentElement.scrollTop;
             const windowHeight = window.innerHeight;
             const documentHeight = document.documentElement.scrollHeight;
             
-            setShowMainScroll(documentHeight > windowHeight + 10 && scrollY + windowHeight < documentHeight - 60);
+            setShowMainScroll(documentHeight > windowHeight + 20 && scrollY + windowHeight < documentHeight - 30);
         };
 
         const timer = setTimeout(checkMainScroll, 500); 
@@ -136,7 +152,7 @@ const AdminPremiumRequests = () => {
             window.removeEventListener('scroll', checkMainScroll);
             window.removeEventListener('resize', checkMainScroll);
         };
-    }, [currentItems, activeTab]);
+    }, [filteredRequests, currentPage]);
 
     const formatDate = (dateString) => {
         const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
@@ -278,7 +294,7 @@ const AdminPremiumRequests = () => {
                     border-radius: 10px !important;
                     gap: 4px !important;
                     overflow-x: auto !important;
-                    width: 100% !important;
+                    width: auto !important;
                     max-width: 100% !important;
                     box-sizing: border-box !important;
                     -webkit-overflow-scrolling: touch !important;
@@ -331,14 +347,14 @@ const AdminPremiumRequests = () => {
                 }
                 .admin-table-wrapper {
                     width: 100% !important;
-                    overflow-x: auto !important;
+                    overflow-x: hidden !important;
                     box-sizing: border-box !important;
                 }
                 .admin-data-table {
                     width: 100% !important;
                     border-collapse: collapse !important;
                     text-align: left !important;
-                    min-width: 850px !important;
+                    min-width: 100% !important;
                 }
                 .admin-data-table th {
                     background: #f8fafc !important;
@@ -388,6 +404,7 @@ const AdminPremiumRequests = () => {
                     gap: 10px !important;
                 }
                 .admin-btn {
+                    display: inline-flex !important; align-items: center !important; justify-content: center !important;
                     padding: 8px 16px !important;
                     border-radius: var(--pr-radius-sm) !important;
                     font-size: 13px !important;
@@ -407,7 +424,7 @@ const AdminPremiumRequests = () => {
                 
                 .admin-status-done { color: #94a3b8 !important; font-size: 13px !important; font-weight: 600 !important; padding-right: 8px !important; text-transform: uppercase !important;}
 
-                /* Pagination */
+                /* Pagination UI */
                 .admin-pagination-bar {
                     display: flex !important;
                     justify-content: space-between !important;
@@ -419,21 +436,33 @@ const AdminPremiumRequests = () => {
                     gap: 16px !important;
                 }
                 .admin-pagination-text { font-size: 13px !important; color: var(--pr-text-sub) !important; }
-                .admin-pagination-controls { display: flex !important; gap: 8px !important; }
+                .admin-pagination-controls { display: flex !important; gap: 8px !important; align-items: center !important; }
+                
                 .admin-page-btn {
-                    display: flex !important; align-items: center !important; justify-content: center !important;
-                    min-width: 36px !important; height: 36px !important;
-                    border: 1px solid transparent !important;
+                    display: flex !important; align-items: center !important; justify-content: center !important; gap: 4px !important;
+                    padding: 6px 16px !important;
+                    border: 1px solid var(--pr-border) !important;
                     background: white !important;
                     border-radius: 6px !important;
-                    color: var(--pr-text-sub) !important;
+                    color: var(--pr-text-main) !important;
                     font-size: 13px !important; font-weight: 600 !important;
                     cursor: pointer !important;
                     transition: var(--pr-anim) !important;
                 }
-                .admin-page-btn:hover:not(:disabled) { background: #f1f5f9 !important; color: var(--pr-text-main) !important; }
-                .admin-page-btn.active { background: var(--pr-primary) !important; color: white !important; box-shadow: 0 2px 4px rgba(79, 70, 229, 0.2) !important; }
-                .admin-page-btn:disabled { opacity: 0.5 !important; cursor: not-allowed !important; background: transparent !important; }
+                .admin-page-btn:hover:not(:disabled) { background: #f1f5f9 !important; border-color: var(--pr-border-hover) !important; }
+                .admin-page-btn:disabled { opacity: 0.5 !important; cursor: not-allowed !important; background: #f8fafc !important; border-color: var(--pr-border) !important;}
+
+                .admin-page-numbers { display: flex !important; gap: 4px !important; }
+                .admin-page-number {
+                    width: 32px !important; height: 32px !important;
+                    display: flex !important; align-items: center !important; justify-content: center !important;
+                    background: white !important; border: 1px solid transparent !important;
+                    border-radius: 6px !important; font-size: 13px !important; font-weight: 600 !important;
+                    color: var(--pr-text-sub) !important; cursor: pointer !important; transition: var(--pr-anim) !important;
+                }
+                .admin-page-number:hover { background: #f1f5f9 !important; color: var(--pr-text-main) !important; }
+                .admin-page-number.active { background: var(--pr-primary) !important; color: white !important; box-shadow: 0 2px 4px rgba(79, 70, 229, 0.2) !important; }
+                .admin-page-dots { padding: 0 4px !important; color: var(--pr-text-sub) !important; font-weight: 700 !important; align-self: flex-end !important; }
 
                 /* Loading & Empty States */
                 .admin-state-view {
@@ -455,78 +484,58 @@ const AdminPremiumRequests = () => {
 
                 /* --- SCROLL INDICATOR UI --- */
                 .admin-scroll-indicator {
-                    display: none; 
-                    position: fixed;
-                    bottom: 24px;
-                    left: 50%;
-                    transform: translateX(-50%);
-                    background: rgba(15, 23, 42, 0.9);
-                    color: white;
-                    padding: 8px 16px;
-                    border-radius: 30px;
-                    align-items: center;
-                    gap: 6px;
-                    font-size: 13px;
-                    font-weight: 600;
-                    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-                    pointer-events: none; 
-                    z-index: 50;
-                    animation: bounceSubtle 2s infinite ease-in-out;
-                    backdrop-filter: blur(4px);
+                    position: fixed !important;
+                    bottom: 24px !important;
+                    left: 50% !important;
+                    transform: translateX(-50%) !important;
+                    background: rgba(15, 23, 42, 0.9) !important;
+                    color: white !important;
+                    padding: 8px 16px !important;
+                    border-radius: 30px !important;
+                    align-items: center !important;
+                    gap: 6px !important;
+                    font-size: 13px !important;
+                    font-weight: 600 !important;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.2) !important;
+                    pointer-events: none !important; 
+                    z-index: 50 !important;
+                    animation: bounceSubtle 2s infinite ease-in-out !important;
+                    backdrop-filter: blur(4px) !important;
+                    display: flex !important;
                 }
                 @keyframes bounceSubtle {
-                    0%, 100% { transform: translate(-50%, 0); }
-                    50% { transform: translate(-50%, 6px); }
+                    0%, 100% { transform: translate(-50%, 0) !important; }
+                    50% { transform: translate(-50%, 6px) !important; }
                 }
 
                 /* =========================================================
-                   MOBILE RESPONSIVENESS (FULLY FIXED TABS & SEARCH)
+                   MOBILE RESPONSIVENESS (PERFECT FLEX CARDS)
                    ========================================================= */
                 @media (max-width: 768px) {
                     .admin-layout-container { 
                         padding: 16px !important; 
                         width: 100% !important;
-                        max-width: 100vw !important; /* Stop page from being pulled wide */
                         overflow-x: hidden !important; 
-                        box-sizing: border-box !important;
                     }
                     
-                    .admin-scroll-indicator { display: flex !important; }
-
-                    .admin-header {
-                        width: 100% !important;
-                        box-sizing: border-box !important;
-                    }
-
                     .admin-header-text h2 { font-size: 22px !important; }
                     .admin-header-text p { font-size: 14px !important; }
                     
-                    /* Force controls to fit exactly 100% */
                     .admin-controls-group { 
                         flex-direction: column !important; 
                         align-items: flex-start !important; 
                         gap: 12px !important; 
                         width: 100% !important;
-                        box-sizing: border-box !important;
                     }
                     
-                    /* Search bar shrink to fit container */
                     .admin-search-group { 
                         width: 100% !important; 
                         max-width: 100% !important; 
-                        min-width: 100% !important;
-                        box-sizing: border-box !important;
                     }
 
-                    /* Tabs become a swipeable row, no wrap */
                     .admin-tabs-wrapper { 
                         width: 100% !important;
                         max-width: 100% !important;
-                        flex-wrap: nowrap !important; /* Do not break to new lines */
-                        overflow-x: auto !important; /* Allow swipe left/right */
-                        justify-content: flex-start !important;
-                        padding: 6px !important; 
-                        box-sizing: border-box !important;
                     }
                     
                     .admin-tab-button { padding: 8px 16px !important; font-size: 13px !important; }
@@ -534,13 +543,6 @@ const AdminPremiumRequests = () => {
                     .admin-table-wrapper {
                         overflow-x: hidden !important; 
                         width: 100% !important;
-                        box-sizing: border-box !important;
-                    }
-
-                    .admin-data-table {
-                        min-width: 100% !important; 
-                        width: 100% !important;
-                        box-sizing: border-box !important;
                     }
 
                     .admin-data-table thead { display: none !important; }
@@ -550,11 +552,10 @@ const AdminPremiumRequests = () => {
                         border: none !important; 
                         box-shadow: none !important; 
                         width: 100% !important;
-                        box-sizing: border-box !important;
                     }
                     
                     .admin-data-table, .admin-data-table tbody, .admin-data-table tr, .admin-data-table td {
-                        display: block !important; width: 100% !important; box-sizing: border-box !important;
+                        display: block !important; width: 100% !important; box-sizing: border-box !important; min-width: unset !important;
                     }
                     
                     .admin-data-table tr {
@@ -563,7 +564,6 @@ const AdminPremiumRequests = () => {
                         border: 1px solid var(--pr-border) !important;
                         border-radius: var(--pr-radius) !important;
                         box-shadow: var(--pr-shadow-sm) !important;
-                        overflow: hidden !important; 
                     }
                     
                     .admin-data-table td {
@@ -571,39 +571,38 @@ const AdminPremiumRequests = () => {
                         justify-content: space-between !important;
                         align-items: flex-start !important; 
                         padding: 14px 16px !important;
-                        border-bottom: 1px solid var(--pr-border) !important;
+                        border-bottom: 1px dashed var(--pr-border) !important;
                         gap: 12px !important;
+                        text-align: right !important;
+                        word-break: break-word !important;
                     }
                     
                     .admin-data-table td:last-child { 
                         border-bottom: none !important; 
-                        background-color: #f8fafc !important; 
                         align-items: center !important;
                     }
                     
                     .admin-data-table td::before {
                         content: attr(data-label) !important;
                         font-size: 12px !important;
-                        font-weight: 600 !important;
+                        font-weight: 700 !important;
                         color: var(--pr-text-sub) !important;
                         text-transform: uppercase !important;
                         letter-spacing: 0.5px !important;
                         flex-shrink: 0 !important;
-                        max-width: 35% !important; 
+                        max-width: 100px !important; 
                         margin-top: 2px !important;
+                        text-align: left !important;
                     }
 
                     .admin-info-stack { 
                         align-items: flex-end !important; 
                         text-align: right !important; 
-                        margin: 0 !important;
-                        width: 60% !important; 
-                        word-wrap: break-word !important;
-                        overflow-wrap: break-word !important;
+                        width: calc(100% - 110px) !important; 
                     }
                     
                     .admin-info-stack strong { font-size: 14px !important; }
-                    .admin-text-muted { font-size: 12px !important; word-wrap: break-word !important; }
+                    .admin-text-muted { font-size: 12px !important; }
                     .admin-text-small { font-size: 14px !important; text-align: right !important;}
 
                     .admin-status-badge { font-size: 11px !important; padding: 4px 10px !important; }
@@ -611,6 +610,7 @@ const AdminPremiumRequests = () => {
                     .admin-action-group { width: 100% !important; justify-content: flex-end !important; }
                     .admin-btn { font-size: 13px !important; padding: 8px 16px !important; }
                     
+                    /* --- INLINE MOBILE PAGINATION --- */
                     .admin-pagination-bar {
                         flex-direction: column !important;
                         border-radius: var(--pr-radius) !important;
@@ -619,9 +619,22 @@ const AdminPremiumRequests = () => {
                         box-shadow: var(--pr-shadow-sm) !important;
                         gap: 16px !important;
                         background: var(--pr-card-bg) !important;
-                        width: 100% !important;
-                        box-sizing: border-box !important;
                     }
+                    .admin-pagination-controls { 
+                        width: 100% !important; 
+                        justify-content: center !important; 
+                        flex-wrap: wrap !important; 
+                        gap: 8px !important; 
+                    }
+                    .admin-page-numbers { 
+                        display: flex !important; 
+                        gap: 4px !important;
+                        width: auto !important; 
+                        justify-content: center !important;
+                        order: -1 !important; /* Forces numbers ABOVE prev/next buttons */
+                        margin-bottom: 0 !important; 
+                    } 
+                    .admin-page-btn { flex: unset !important; width: auto !important; }
                 }
             `}</style>
 
@@ -647,7 +660,7 @@ const AdminPremiumRequests = () => {
                     </div>
 
                     <div className="admin-tabs-wrapper">
-                        {['All', 'Pending', 'Contacted', 'Resolved'].map(tab => (
+                        {['Pending', 'Contacted', 'Resolved'].map(tab => (
                             <button 
                                 key={tab}
                                 id={`filter-tab-${tab.toLowerCase()}`}
@@ -655,11 +668,9 @@ const AdminPremiumRequests = () => {
                                 onClick={() => setActiveTab(tab)}
                             >
                                 {tab}
-                                {tab !== 'All' && (
-                                    <span className="admin-tab-count">
-                                        {requests.filter(r => r.status === tab).length}
-                                    </span>
-                                )}
+                                <span className="admin-tab-count">
+                                    {requests.filter(r => r.status === tab).length}
+                                </span>
                             </button>
                         ))}
                     </div>
@@ -675,11 +686,11 @@ const AdminPremiumRequests = () => {
                 ) : filteredRequests.length === 0 ? (
                     <div className="admin-state-view empty">
                         <Icons.Crown />
-                        <h3>No requests found</h3>
+                        <h3>No {activeTab.toLowerCase()} requests</h3>
                         <p>
                             {searchTerm 
-                                ? `No results match "${searchTerm}" in the ${activeTab} tab.` 
-                                : `There are currently no ${activeTab !== 'All' ? activeTab.toLowerCase() : ''} premium requests.`
+                                ? `No results match "${searchTerm}" in this tab.` 
+                                : `There are currently no requests awaiting action here.`
                             }
                         </p>
                     </div>
@@ -713,7 +724,7 @@ const AdminPremiumRequests = () => {
                                                 </div>
                                             </td>
                                             <td data-label="Location">
-                                                <span className="admin-text-small">{req.userId?.city}, {req.userId?.state}</span>
+                                                <span className="admin-text-small">{req.userId?.city || "N/A"}, {req.userId?.state || "N/A"}</span>
                                             </td>
                                             <td data-label="Request Date">
                                                 <span className="admin-text-small">{formatDate(req.requestDate)}</span>
@@ -752,8 +763,8 @@ const AdminPremiumRequests = () => {
                             </table>
                         </div>
 
-                        {/* Pagination Controls */}
-                        {totalPages > 1 && (
+                        {/* Pagination Controls - Always Visible if Data Exists */}
+                        {filteredRequests.length > 0 && (
                             <div className="admin-pagination-bar">
                                 <span className="admin-pagination-text">
                                     Showing <strong>{indexOfFirstItem + 1}</strong> to <strong>{Math.min(indexOfLastItem, filteredRequests.length)}</strong> of <strong>{filteredRequests.length}</strong>
@@ -764,25 +775,33 @@ const AdminPremiumRequests = () => {
                                         onClick={() => handlePageChange(currentPage - 1)}
                                         disabled={currentPage === 1}
                                     >
-                                        <Icons.ChevronLeft />
+                                        <Icons.ChevronLeft /> Prev
                                     </button>
                                     
-                                    {[...Array(totalPages)].map((_, index) => (
-                                        <button 
-                                            key={index + 1}
-                                            className={`admin-page-btn ${currentPage === index + 1 ? 'active' : ''}`}
-                                            onClick={() => handlePageChange(index + 1)}
-                                        >
-                                            {index + 1}
-                                        </button>
-                                    ))}
+                                    <div className="admin-page-numbers">
+                                        {[...Array(totalPages)].map((_, index) => {
+                                            if (totalPages > 5 && (index + 1 < currentPage - 1 || index + 1 > currentPage + 1) && index !== 0 && index !== totalPages - 1) {
+                                                if (index + 1 === currentPage - 2 || index + 1 === currentPage + 2) return <span key={index} className="admin-page-dots">...</span>;
+                                                return null;
+                                            }
+                                            return (
+                                                <button 
+                                                    key={index + 1}
+                                                    className={`admin-page-number ${currentPage === index + 1 ? 'active' : ''}`}
+                                                    onClick={() => handlePageChange(index + 1)}
+                                                >
+                                                    {index + 1}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
 
                                     <button 
                                         className="admin-page-btn" 
                                         onClick={() => handlePageChange(currentPage + 1)}
                                         disabled={currentPage === totalPages}
                                     >
-                                        <Icons.ChevronRight />
+                                        Next <Icons.ChevronRight />
                                     </button>
                                 </div>
                             </div>
@@ -791,7 +810,7 @@ const AdminPremiumRequests = () => {
                 )}
             </div>
             
-            {/* NEW MOBILE SCROLL INDICATOR */}
+            {/* NEW SCROLL INDICATOR */}
             {showMainScroll && (
                 <div className="admin-scroll-indicator">
                     <Icons.ChevronDown />
