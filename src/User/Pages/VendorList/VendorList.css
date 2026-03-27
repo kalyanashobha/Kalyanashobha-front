@@ -29,14 +29,70 @@
 .v-premium-container {
   max-width: 1200px;        
   width: 100%;
-  margin: 100px auto 60px;  
-  padding: 25px 24px !important;
+  margin: 90px auto 60px;  
+  padding: 20px 24px !important;
   box-sizing: border-box;
   font-family: 'Poppins', sans-serif;
   color: var(--vp-text-main);
   background-color: var(--vp-bg);
   display: block;           
   min-height: 80vh;
+}
+
+/* --- TOP STICKY BANNER --- */
+.v-sticky-banner {
+  position: sticky;
+  top: 70px; /* Safely sticks just under navbar when scrolling */
+  z-index: 90;
+  background: var(--vp-text-main);
+  color: white;
+  border-radius: 12px;
+  padding: 16px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+  box-shadow: 0 10px 25px -5px rgba(0,0,0,0.25);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.v-banner-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.v-banner-title {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--vp-amber);
+}
+
+.v-banner-subtitle {
+  margin: 4px 0 0 0;
+  font-size: 0.95rem;
+  color: #e5e7eb;
+}
+
+.v-banner-btn {
+  background: var(--vp-amber);
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 20px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: var(--vp-transition);
+  white-space: nowrap;
+}
+
+.v-banner-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(255, 202, 40, 0.3);
 }
 
 /* --- 3. HEADER --- */
@@ -119,7 +175,6 @@
   border-color: rgba(17, 24, 39, 0.12); 
 }
 
-/* Image Area */
 .v-card-image {
   height: 240px; 
   width: 100%;
@@ -151,7 +206,6 @@
   color: #9ca3af;
 }
 
-/* Category Badge */
 .v-badge-category {
   position: absolute;
   top: 16px;
@@ -168,7 +222,6 @@
   z-index: 10;
 }
 
-/* Content Area */
 .v-card-content {
   padding: 24px;
   flex-grow: 1;
@@ -213,35 +266,6 @@
   box-shadow: 0 6px 16px rgba(17, 24, 39, 0.2);
 }
 
-/* Fixed Join Button */
-.v-fixed-join-btn {
-  position: fixed;
-  bottom: 30px;
-  right: 30px;
-  background-color: var(--vp-text-main);
-  color: #fff;
-  border: 2px solid transparent;
-  border-radius: 50px;
-  padding: 14px 24px;
-  font-weight: 600;
-  font-size: 1rem;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  cursor: pointer;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-  z-index: 999;
-  transition: var(--vp-transition);
-  font-family: 'Poppins', sans-serif;
-}
-
-.v-fixed-join-btn:hover {
-  background-color: var(--vp-amber);
-  color: var(--vp-text-main);
-  transform: translateY(-4px);
-  box-shadow: 0 14px 30px rgba(0,0,0,0.25);
-}
-
 /* --- 7. MODALS --- */
 .v-modal-overlay {
   position: fixed;
@@ -249,7 +273,6 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  height: 100dvh; /* FIX: Dynamic viewport height handles mobile address bars perfectly */
   background-color: rgba(17, 24, 39, 0.6);
   display: flex;
   justify-content: center;
@@ -268,7 +291,7 @@
   border-radius: 20px;
   position: relative;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-  max-height: 90vh; /* Desktop max height */
+  max-height: 90vh; 
   overflow-y: auto;
 }
 
@@ -311,7 +334,6 @@
   transform: rotate(90deg);
 }
 
-/* Form Elements */
 .v-lead-form {
   display: flex;
   flex-direction: column;
@@ -386,7 +408,6 @@
   cursor: not-allowed;
 }
 
-/* --- Status Messages --- */
 .v-success-message {
   padding: 24px;
   background-color: #f0fdf4;
@@ -456,9 +477,31 @@
 @media (max-width: 768px) {
   .v-premium-container {
     padding: 20px 16px !important;
-    margin-top: 80px;
+    margin-top: 75px;
   }
   
+  /* Top Banner Mobile Tweaks */
+  .v-sticky-banner {
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+    padding: 16px;
+    top: 60px; /* Adjust if your navbar height is smaller on mobile */
+  }
+
+  .v-banner-title {
+    font-size: 1.1rem;
+  }
+
+  .v-banner-subtitle {
+    font-size: 0.85rem;
+  }
+
+  .v-banner-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
   .v-premium-header h1 {
     font-size: 1.4rem; 
   }
@@ -493,20 +536,17 @@
 
   /* --- MODAL MOBILE REFINEMENTS FIX --- */
   .v-modal-overlay {
-    padding: 16px; 
-    /* Ensures we use dynamic viewport so it doesn't get pushed under address bars */
-    height: 100dvh; 
+    padding: 12px; 
+    align-items: flex-start; /* Pushes the modal to the top instead of centering, avoiding keyboard/nav bar hiding it */
   }
 
   .v-modal-content {
-    padding: 24px 20px; 
+    padding: 24px 16px; 
     width: 100%;
-    /* Strict calculation: 100% of the screen minus the 16px padding on top and bottom (32px) */
-    max-height: calc(100dvh - 32px); 
+    margin-top: 5vh; /* Gives a tiny bit of breathing room at the top */
+    max-height: 85vh; /* Strictly caps the height so it must scroll */
     border-radius: 16px; 
     overflow-y: auto;
-    /* Extra padding at bottom to ensure scroll clears the button safely */
-    padding-bottom: 32px; 
   }
 
   .v-modal-content h2 {
@@ -516,47 +556,38 @@
   
   .v-modal-content p {
     font-size: 0.85rem;
-    margin-bottom: 16px;
+    margin-bottom: 12px;
   }
 
   .v-modal-close {
-    top: 16px;
-    right: 16px;
+    top: 12px;
+    right: 12px;
     padding: 6px; 
   }
 
   .v-form-grid {
     grid-template-columns: 1fr; 
-    gap: 12px;
+    gap: 10px; /* Tighter gaps to save vertical space */
   }
 
   .v-lead-form {
-    gap: 12px;
+    gap: 10px;
   }
 
   .v-lead-form input,
   .v-lead-form textarea,
   .v-lead-form select {
     font-size: 0.85rem; 
-    padding: 12px 14px; 
+    padding: 10px 12px; /* Slimmer inputs */
   }
 
   .v-file-upload {
-    padding: 14px; 
+    padding: 12px; 
   }
 
   .v-submit-btn {
     font-size: 0.9rem;
-    padding: 14px;
+    padding: 12px;
     margin-top: 4px;
-  }
-
-  /* --- FLOATING BUTTON (MOVED UP) --- */
-  .v-fixed-join-btn {
-    bottom: 80px; 
-    right: 16px;
-    padding: 12px 20px;
-    font-size: 0.9rem; 
-    box-shadow: 0 8px 20px rgba(0,0,0,0.25);
   }
 }
