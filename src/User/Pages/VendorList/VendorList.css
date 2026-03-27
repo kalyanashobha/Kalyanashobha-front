@@ -271,13 +271,13 @@
   flex-grow: 1;
 }
 
-/* --- 6. BUTTONS --- */
+/* --- 6. PREMIUM BUTTON --- */
 .v-contact-btn {
   width: 100%;
   padding: 14px;
   margin-top: auto;
-  background-color: var(--vp-text-main); 
-  color: white;
+  background-color: var(--vp-amber); /* Changed to premium color */
+  color: var(--vp-text-main);        /* Changed to black text */
   border: none;
   border-radius: 10px;
   font-weight: 600;
@@ -288,8 +288,8 @@
 }
 
 .v-contact-btn:hover {
-  background-color: #374151;
-  box-shadow: 0 6px 16px rgba(17, 24, 39, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(255, 202, 40, 0.4);
 }
 
 /* --- 7. MODALS --- */
@@ -502,31 +502,31 @@
 /* --- 9. RESPONSIVE (MOBILE OPTIMIZED) --- */
 @media (max-width: 768px) {
   .v-premium-container {
-    padding: 16px 12px !important; /* Slightly tighter container padding */
+    padding: 16px 12px !important; 
     margin-top: 75px;
   }
   
-  /* --- HORIZONTAL INLINE BANNER (Matches Image 2 exactly) --- */
+  /* --- HORIZONTAL COMPACT BANNER --- */
   .v-dark-banner {
-    flex-direction: row; /* Forces horizontal layout */
-    padding: 12px; 
-    gap: 12px;
+    flex-direction: row; 
+    padding: 10px 12px; 
+    gap: 10px;
     top: 70px;
     align-items: center;
-    border-radius: 10px;
+    border-radius: 12px;
   }
 
   .v-banner-left {
-    flex-direction: row; /* Forces horizontal icon and text */
+    flex-direction: row; 
     text-align: left;
     gap: 10px;
-    flex: 1; /* Allows the left side to take up remaining space */
-    min-width: 0; /* Prevents flexbox text overflow issues */
+    flex: 1; 
+    min-width: 0; 
   }
 
   .v-banner-icon-box {
-    width: 36px;
-    height: 36px;
+    width: 34px;
+    height: 34px;
     padding: 6px;
     border-radius: 8px;
   }
@@ -539,28 +539,29 @@
   }
 
   .v-banner-text-col h3 {
-    font-size: 0.9rem; /* Very small */
+    font-size: 0.85rem; /* Shrunk down */
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
   .v-banner-text-col p {
-    font-size: 0.7rem; /* Very small */
+    font-size: 0.65rem; /* Shrunk down */
     line-height: 1.2;
     margin-top: 2px;
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis; /* Ensures it doesn't wrap and break layout */
+    text-overflow: ellipsis;
   }
 
   .v-banner-action-btn {
     width: auto;
     justify-content: center;
-    padding: 8px 12px; /* Very compact button */
+    padding: 6px 12px; 
     font-size: 0.75rem;
+    border-radius: 6px;
     gap: 4px;
-    flex-shrink: 0; /* Prevents button from getting crushed */
+    flex-shrink: 0; 
   }
 
   .v-btn-icon {
@@ -568,12 +569,13 @@
     height: 14px;
   }
 
+  /* --- HEADER & CARD FONT REDUCTIONS --- */
   .v-premium-header h1 {
-    font-size: 1.3rem; 
+    font-size: 1.2rem; 
   }
 
   .v-premium-header p {
-    font-size: 0.8rem; 
+    font-size: 0.75rem; 
     padding: 0 10px;
   }
 
@@ -585,50 +587,58 @@
   .v-card-content {
     padding: 16px; 
   }
+
+  .v-badge-category {
+    font-size: 0.65rem;
+    padding: 4px 10px;
+  }
   
   .v-card-title {
-    font-size: 1.05rem; 
+    font-size: 1rem; 
+    margin-bottom: 6px;
   }
 
   .v-card-desc {
-    font-size: 0.8rem; 
+    font-size: 0.75rem; 
     margin-bottom: 12px;
   }
 
   .v-contact-btn {
-    font-size: 0.85rem;
-    padding: 12px;
+    font-size: 0.8rem;
+    padding: 10px;
     border-radius: 8px;
   }
 
-  /* --- STRICT CENTERED MODAL MOBILE FIX --- */
+  /* --- PERFECTLY CENTERED MODAL FIX --- */
   .v-modal-overlay {
     padding: 16px; 
-    align-items: center; /* STRICTLY forces center alignment */
+    align-items: center; /* Locks to center vertically */
+    justify-content: center; /* Locks to center horizontally */
   }
 
   .v-modal-content {
-    padding: 20px 16px; /* Compact internal padding */
+    padding: 20px 16px; 
     width: 100%;
     max-height: 85dvh; 
     border-radius: 12px; 
     overflow-y: auto;
+    margin: auto; /* Fallback absolute center guarantee */
   }
 
   .v-modal-content h2 {
-    font-size: 1.1rem; /* Matched Image 1 title size */
+    font-size: 1.1rem; 
     margin-right: 20px; 
   }
   
   .v-modal-content p {
-    font-size: 0.75rem; /* Matched Image 1 subtitle size */
+    font-size: 0.75rem; 
     margin-bottom: 12px;
   }
 
   .v-modal-close {
     top: 14px;
     right: 14px;
-    padding: 4px; /* Tiny close button */
+    padding: 4px; 
   }
 
   .v-form-grid {
@@ -637,14 +647,14 @@
   }
 
   .v-lead-form {
-    gap: 10px; /* Reduced vertical gap between inputs */
+    gap: 10px; 
   }
 
   .v-lead-form input,
   .v-lead-form textarea,
   .v-lead-form select {
-    font-size: 0.8rem; /* Very small text inside inputs */
-    padding: 10px 12px; /* Slim inputs */
+    font-size: 0.8rem; 
+    padding: 10px 12px; 
     border-radius: 8px;
   }
 
