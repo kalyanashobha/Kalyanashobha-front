@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
 
 export default function CreateModerator() {
   const [formData, setFormData] = useState({
@@ -16,7 +16,11 @@ export default function CreateModerator() {
   const [moderators, setModerators] = useState([]);
   const [editingModId, setEditingModId] = useState(null);
 
-  // Mobile Scroll Indicator State
+  // Pagination States
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
+  // Global Scroll Indicator State (Desktop & Mobile)
   const [showMainScroll, setShowMainScroll] = useState(false);
 
   const availablePermissions = [
@@ -39,7 +43,7 @@ export default function CreateModerator() {
     fetchModerators();
   }, []);
 
-  // Scroll Indicator Logic
+  // Universal Scroll Indicator Logic (applies to all screen sizes)
   useEffect(() => {
     const checkMainScroll = () => {
         const scrollY = window.scrollY || document.documentElement.scrollTop;
@@ -49,6 +53,7 @@ export default function CreateModerator() {
         setShowMainScroll(documentHeight > windowHeight + 10 && scrollY + windowHeight < documentHeight - 60);
     };
 
+    // Run initial check
     const timer = setTimeout(checkMainScroll, 500); 
     window.addEventListener('scroll', checkMainScroll);
     window.addEventListener('resize', checkMainScroll);
@@ -58,7 +63,7 @@ export default function CreateModerator() {
         window.removeEventListener('scroll', checkMainScroll);
         window.removeEventListener('resize', checkMainScroll);
     };
-  }, [moderators]);
+  }, [moderators, currentPage]);
 
   const fetchModerators = async () => {
     try {
@@ -182,6 +187,18 @@ export default function CreateModerator() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Pagination Calculations
+  const totalPages = Math.ceil(moderators.length / itemsPerPage);
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentModerators = moderators.slice(indexOfFirstItem, indexOfLastItem);
+
+  const handlePageChange = (pageNumber) => {
+      if (pageNumber > 0 && pageNumber <= totalPages) {
+          setCurrentPage(pageNumber);
+      }
   };
 
   return (
@@ -538,9 +555,76 @@ export default function CreateModerator() {
           font-size: 15px;
         }
 
+        /* --- PAGINATION STYLES --- */
+        .ks-mod-pagination-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            border-top: 1px solid var(--ks-mod-border);
+            background: #f8fafc;
+            flex-wrap: wrap;
+            gap: 16px;
+            border-bottom-left-radius: var(--ks-mod-radius);
+            border-bottom-right-radius: var(--ks-mod-radius);
+            margin: 0 -32px -32px -32px; /* Pulls pagination flush against card edges */
+        }
+
+        .ks-mod-pagination-text { 
+            font-size: 13px; 
+            color: var(--ks-mod-text-sub); 
+        }
+
+        .ks-mod-pagination-controls { 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+        }
+
+        .ks-mod-page-btn {
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 4px;
+            padding: 6px 16px;
+            border: 1px solid var(--ks-mod-border);
+            background: white;
+            border-radius: var(--ks-mod-radius-sm);
+            color: var(--ks-mod-text-dark);
+            font-size: 13px; 
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--ks-mod-anim);
+        }
+
+        .ks-mod-page-btn:hover:not(:disabled) { 
+            background: #f1f5f9; 
+            border-color: var(--ks-mod-border-hover); 
+        }
+
+        .ks-mod-page-btn:disabled { 
+            opacity: 0.5; 
+            cursor: not-allowed; 
+            background: #f8fafc; 
+        }
+
+        .ks-mod-page-number {
+            min-width: 32px; 
+            height: 32px;
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            border-radius: 6px; 
+            font-size: 13px; 
+            font-weight: 600;
+            background: var(--ks-mod-primary); 
+            color: white;
+            box-shadow: 0 2px 4px rgba(142, 27, 27, 0.2);
+        }
+
         /* --- SCROLL INDICATOR UI --- */
+        /* Changed to display: flex by default, then controlled by state */
         .ks-mod-scroll-indicator {
-          display: none; 
           position: fixed;
           bottom: 24px;
           left: 50%;
@@ -558,6 +642,7 @@ export default function CreateModerator() {
           z-index: 50;
           animation: bounceSubtle 2s infinite ease-in-out;
           backdrop-filter: blur(4px);
+          display: flex; /* Shown dynamically via react state */
         }
         @keyframes bounceSubtle {
           0%, 100% { transform: translate(-50%, 0); }
@@ -600,9 +685,7 @@ export default function CreateModerator() {
            ========================================================= */
         @media (max-width: 767px) {
           .ks-mod-admin-wrapper { padding: 16px; }
-          .ks-mod-card { padding: 20px; border-radius: 16px; }
-          
-          .ks-mod-scroll-indicator { display: flex; }
+          .ks-mod-card { padding: 20px; border-radius: 16px; overflow: hidden; } /* Ensure overflow hidden for pagination bar */
 
           .ks-mod-header h2 { font-size: 20px; }
           .ks-mod-header p { font-size: 13px; }
@@ -643,10 +726,9 @@ export default function CreateModerator() {
           }
 
           /* OVERRIDE FOR SQUISHED TEXT ISSUE */
-          /* Using flex: 1 ensures the content dynamically fills the space, and word-break forces it to drop down gracefully instead of squishing */
           .ks-mod-td-bold, .ks-mod-td-muted, .ks-mod-badge {
               flex: 1;
-              word-break: break-all; /* Forces extremely long text (like emails) to break cleanly */
+              word-break: break-all; /* Forces extremely long text to break cleanly */
               overflow-wrap: anywhere;
               text-align: right;
               font-size: 13px;
@@ -654,6 +736,20 @@ export default function CreateModerator() {
           
           .ks-mod-actions-cell { width: 100%; justify-content: flex-end; }
           .ks-mod-action-btn { font-size: 12px; padding: 6px 12px; }
+
+          /* Mobile Pagination Styling */
+          .ks-mod-pagination-bar {
+              flex-direction: column;
+              margin: 0 -20px -20px -20px; /* Adapts to mobile card padding */
+              padding: 16px 20px;
+          }
+          
+          .ks-mod-pagination-controls { 
+              width: 100%; 
+              justify-content: space-between; 
+          }
+          
+          .ks-mod-page-btn { flex: 1; }
         }
       `}</style>
 
@@ -758,7 +854,7 @@ export default function CreateModerator() {
       </div>
 
       {/* TABLE SECTION */}
-      <div className="ks-mod-card" style={{ marginBottom: 0 }}>
+      <div className="ks-mod-card" style={{ paddingBottom: 0 }}>
         <div className="ks-mod-header">
           <h2>Active Moderators</h2>
           <p>Manage existing sub-admins and their permissions.</p>
@@ -775,8 +871,8 @@ export default function CreateModerator() {
               </tr>
             </thead>
             <tbody>
-              {moderators.length > 0 ? (
-                moderators.map(mod => (
+              {currentModerators.length > 0 ? (
+                currentModerators.map(mod => (
                   <tr key={mod._id}>
                     <td data-label="Username" className="ks-mod-td-bold">{mod.username}</td>
                     <td data-label="Email" className="ks-mod-td-muted">{mod.email}</td>
@@ -811,9 +907,40 @@ export default function CreateModerator() {
             </tbody>
           </table>
         </div>
+
+        {/* PAGINATION CONTROLS */}
+        {totalPages > 1 && (
+            <div className="ks-mod-pagination-bar">
+                <span className="ks-mod-pagination-text">
+                    Showing <strong>{indexOfFirstItem + 1}</strong> to <strong>{Math.min(indexOfLastItem, moderators.length)}</strong> of <strong>{moderators.length}</strong>
+                </span>
+                
+                <div className="ks-mod-pagination-controls">
+                    <button 
+                        className="ks-mod-page-btn"
+                        onClick={() => handlePageChange(currentPage - 1)} 
+                        disabled={currentPage === 1}
+                    >
+                        <ChevronLeft size={16} /> Prev
+                    </button>
+                    
+                    <span className="ks-mod-page-number">
+                        {currentPage}
+                    </span>
+                    
+                    <button 
+                        className="ks-mod-page-btn"
+                        onClick={() => handlePageChange(currentPage + 1)} 
+                        disabled={currentPage === totalPages}
+                    >
+                        Next <ChevronRight size={16} />
+                    </button>
+                </div>
+            </div>
+        )}
       </div>
 
-      {/* MOBILE SCROLL INDICATOR */}
+      {/* UNIVERSAL SCROLL INDICATOR */}
       {showMainScroll && (
           <div className="ks-mod-scroll-indicator">
               <ChevronDown size={18} />
