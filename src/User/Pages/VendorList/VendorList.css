@@ -51,7 +51,7 @@
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
   border: 1px solid rgba(255, 255, 255, 0.05);
   position: sticky;
-  top: 85px; /* Adjust based on your actual navbar height */
+  top: 85px; 
   z-index: 90;
 }
 
@@ -74,6 +74,11 @@
   flex-shrink: 0;
   padding: 10px;
   box-sizing: border-box;
+}
+
+.v-banner-text-col {
+  display: flex;
+  flex-direction: column;
 }
 
 .v-banner-text-col h3 {
@@ -103,6 +108,11 @@
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
+}
+
+.v-btn-icon {
+  width: 18px;
+  height: 18px;
 }
 
 .v-banner-action-btn:hover {
@@ -288,11 +298,11 @@
   top: 0;
   left: 0;
   width: 100vw;
-  height: 100dvh; /* Dynamic viewport height */
+  height: 100dvh; 
   background-color: rgba(17, 24, 39, 0.7);
   display: flex;
   justify-content: center;
-  align-items: center; /* PERFECTLY CENTERS THE MODAL ON DESKTOP AND MOBILE */
+  align-items: center; 
   z-index: 1000;
   backdrop-filter: blur(8px);
   padding: 20px;
@@ -492,129 +502,161 @@
 /* --- 9. RESPONSIVE (MOBILE OPTIMIZED) --- */
 @media (max-width: 768px) {
   .v-premium-container {
-    padding: 20px 16px !important;
-    margin-top: 80px;
+    padding: 16px 12px !important; /* Slightly tighter container padding */
+    margin-top: 75px;
   }
   
-  /* Top Dark Banner Mobile Adjustments */
+  /* --- HORIZONTAL INLINE BANNER (Matches Image 2 exactly) --- */
   .v-dark-banner {
-    flex-direction: column;
-    padding: 16px;
-    gap: 16px;
-    top: 70px; /* Adjust if your navbar height is different on mobile */
+    flex-direction: row; /* Forces horizontal layout */
+    padding: 12px; 
+    gap: 12px;
+    top: 70px;
+    align-items: center;
+    border-radius: 10px;
   }
 
   .v-banner-left {
-    flex-direction: column;
-    text-align: center;
-    gap: 12px;
+    flex-direction: row; /* Forces horizontal icon and text */
+    text-align: left;
+    gap: 10px;
+    flex: 1; /* Allows the left side to take up remaining space */
+    min-width: 0; /* Prevents flexbox text overflow issues */
   }
 
   .v-banner-icon-box {
-    width: 40px;
-    height: 40px;
-    padding: 8px;
+    width: 36px;
+    height: 36px;
+    padding: 6px;
+    border-radius: 8px;
+  }
+
+  .v-banner-text-col {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
   }
 
   .v-banner-text-col h3 {
-    font-size: 1.1rem;
+    font-size: 0.9rem; /* Very small */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .v-banner-text-col p {
-    font-size: 0.85rem;
+    font-size: 0.7rem; /* Very small */
+    line-height: 1.2;
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* Ensures it doesn't wrap and break layout */
   }
 
   .v-banner-action-btn {
-    width: 100%;
+    width: auto;
     justify-content: center;
-    padding: 14px;
+    padding: 8px 12px; /* Very compact button */
+    font-size: 0.75rem;
+    gap: 4px;
+    flex-shrink: 0; /* Prevents button from getting crushed */
+  }
+
+  .v-btn-icon {
+    width: 14px;
+    height: 14px;
   }
 
   .v-premium-header h1 {
-    font-size: 1.4rem; 
+    font-size: 1.3rem; 
   }
 
   .v-premium-header p {
-    font-size: 0.85rem; 
+    font-size: 0.8rem; 
     padding: 0 10px;
   }
 
   .v-premium-grid {
     grid-template-columns: 1fr; 
-    gap: 20px; 
+    gap: 16px; 
   }
 
   .v-card-content {
-    padding: 20px; 
+    padding: 16px; 
   }
   
   .v-card-title {
-    font-size: 1.1rem; 
+    font-size: 1.05rem; 
   }
 
   .v-card-desc {
-    font-size: 0.85rem; 
-    margin-bottom: 16px;
+    font-size: 0.8rem; 
+    margin-bottom: 12px;
   }
 
   .v-contact-btn {
     font-size: 0.85rem;
     padding: 12px;
+    border-radius: 8px;
   }
 
   /* --- STRICT CENTERED MODAL MOBILE FIX --- */
   .v-modal-overlay {
     padding: 16px; 
+    align-items: center; /* STRICTLY forces center alignment */
   }
 
   .v-modal-content {
-    padding: 24px 20px; 
+    padding: 20px 16px; /* Compact internal padding */
     width: 100%;
-    /* Keep it shorter than 100% so browser UI doesn't clip the bottom */
     max-height: 85dvh; 
-    border-radius: 16px; 
+    border-radius: 12px; 
     overflow-y: auto;
   }
 
   .v-modal-content h2 {
-    font-size: 1.25rem;
-    margin-right: 24px; 
+    font-size: 1.1rem; /* Matched Image 1 title size */
+    margin-right: 20px; 
   }
   
   .v-modal-content p {
-    font-size: 0.85rem;
+    font-size: 0.75rem; /* Matched Image 1 subtitle size */
     margin-bottom: 12px;
   }
 
   .v-modal-close {
-    top: 16px;
-    right: 16px;
-    padding: 6px; 
+    top: 14px;
+    right: 14px;
+    padding: 4px; /* Tiny close button */
   }
 
   .v-form-grid {
     grid-template-columns: 1fr; 
-    gap: 12px; 
+    gap: 10px; 
   }
 
   .v-lead-form {
-    gap: 12px;
+    gap: 10px; /* Reduced vertical gap between inputs */
   }
 
   .v-lead-form input,
   .v-lead-form textarea,
   .v-lead-form select {
-    font-size: 0.85rem; 
-    padding: 12px 14px; /* Slim inputs for more space */
+    font-size: 0.8rem; /* Very small text inside inputs */
+    padding: 10px 12px; /* Slim inputs */
+    border-radius: 8px;
   }
 
   .v-file-upload {
-    padding: 12px; 
+    padding: 10px; 
+    font-size: 0.8rem;
   }
 
   .v-submit-btn {
-    font-size: 0.9rem;
-    padding: 14px;
+    font-size: 0.85rem;
+    padding: 12px;
     margin-top: 4px;
+    border-radius: 8px;
   }
 }
