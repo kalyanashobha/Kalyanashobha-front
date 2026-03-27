@@ -1,9 +1,18 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Tag, Image as ImageIcon, X, Plus, Loader, ChevronRight } from "lucide-react"; 
+import { Tag, Image as ImageIcon, X, Loader, ArrowRight } from "lucide-react"; 
 import imageCompression from 'browser-image-compression';
 import "./VendorList.css";
 import Navbar from "../../Components/Navbar";
+
+// Custom Diamond Icon to match your screenshot
+const DiamondIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: '100%', height: '100%' }}>
+    <path d="M6 3h12l4 6-10 13L2 9Z"></path>
+    <path d="M11 3 8 9l4 13 4-13-3-6"></path>
+    <path d="M2 9h20"></path>
+  </svg>
+);
 
 export default function VendorList() {
   const [vendors, setVendors] = useState([]);
@@ -198,14 +207,19 @@ export default function VendorList() {
       <Navbar />
       <div className="v-premium-container">
         
-        {/* --- NEW: TOP STICKY BANNER --- */}
-        <div className="v-sticky-banner">
-          <div className="v-banner-text">
-            <h3 className="v-banner-title">Are you a Wedding Vendor?</h3>
-            <p className="v-banner-subtitle">Grow your business & connect with thousands of couples.</p>
+        {/* --- NEW: DARK PREMIUM BANNER --- */}
+        <div className="v-dark-banner">
+          <div className="v-banner-left">
+            <div className="v-banner-icon-box">
+              <DiamondIcon />
+            </div>
+            <div className="v-banner-text-col">
+              <h3>Join as a Vendor</h3>
+              <p>Grow your business & connect with thousands of couples.</p>
+            </div>
           </div>
-          <button className="v-banner-btn" onClick={handleOpenJoinModal}>
-            Join Now <ChevronRight size={18} />
+          <button className="v-banner-action-btn" onClick={handleOpenJoinModal}>
+            Register Now <ArrowRight size={16} />
           </button>
         </div>
 
