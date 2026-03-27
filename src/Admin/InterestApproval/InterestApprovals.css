@@ -274,7 +274,7 @@
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* --- PAGINATION --- */
+/* --- PAGINATION (Always Visible) --- */
 .ksa-pagination-container {
   display: flex;
   justify-content: space-between;
@@ -349,9 +349,8 @@
 .ksa-empty-icon { color: #cbd5e1; margin-bottom: 16px; }
 .ksa-empty-state h3 { color: var(--ksa-text-main); margin: 0 0 8px 0; font-size: 18px;}
 
-/* --- SCROLL INDICATOR UI --- */
+/* --- SCROLL INDICATOR UI (Global) --- */
 .ksa-scroll-indicator {
-  display: none; 
   position: fixed;
   bottom: 24px;
   left: 50%;
@@ -369,6 +368,7 @@
   z-index: 50;
   animation: bounceSubtle 2s infinite ease-in-out;
   backdrop-filter: blur(4px);
+  display: flex;
 }
 @keyframes bounceSubtle {
   0%, 100% { transform: translate(-50%, 0); }
@@ -376,12 +376,10 @@
 }
 
 /* =========================================================
-   MOBILE RESPONSIVENESS (PERFECT ALIGNMENT & SMALLER FONTS)
+   MOBILE RESPONSIVENESS (NO HORIZONTAL SCROLLING)
    ========================================================= */
 @media (max-width: 768px) {
   .ksa-layout { padding: 16px; }
-  
-  .ksa-scroll-indicator { display: flex; }
 
   /* Shrink Header elements */
   .ksa-title-group h2 { font-size: 20px; }
@@ -391,13 +389,11 @@
   /* Shrink Tabs */
   .ksa-tab { padding: 6px 14px; font-size: 12px; }
 
-  /* Hide standard table headers */
-  .ksa-table-wrapper { overflow-x: hidden; }
-  .ksa-table thead { display: none; }
-  
   /* Transparent Table Background */
   .ksa-content { background: transparent; border: none; box-shadow: none; }
+  .ksa-table-container { overflow-x: hidden; }
   .ksa-table { min-width: unset; display: flex; flex-direction: column; gap: 16px;}
+  .ksa-table thead { display: none; }
   .ksa-table tbody { display: flex; flex-direction: column; gap: 16px; }
 
   /* Turn TR into Premium Cards */
@@ -414,11 +410,10 @@
   .ksa-table td {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start; /* flex-start needed because content is multi-line */
+    align-items: flex-start; 
     padding: 12px 0;
     border-bottom: 1px dashed var(--ksa-border);
     text-align: right; 
-    word-break: break-word; /* Prevents long words from breaking layouts */
   }
   
   .ksa-table td:last-child { border-bottom: none; padding-bottom: 0; }
@@ -433,9 +428,9 @@
     text-transform: uppercase;
     letter-spacing: 0.5px;
     margin-right: 12px;
-    flex-shrink: 0; /* Prevents label from squishing */
-    margin-top: 2px; /* Aligns visually with the content next to it */
-    max-width: 90px; /* Force label width to give data side more room */
+    flex-shrink: 0; 
+    margin-top: 2px; 
+    max-width: 90px; 
     text-align: left;
   }
 
@@ -449,38 +444,17 @@
     background: none; border: none; padding: 0; box-shadow: none;
     flex-direction: row; justify-content: flex-end; width: 100%;
     gap: 8px;
-    flex-wrap: wrap; /* Allows flow to wrap if names are too long */
+    flex-wrap: wrap; 
   }
   .ksa-user-text .name { font-size: 13px; }
   .ksa-avatar-xs { width: 26px; height: 26px; font-size: 11px; }
 
-  /* --- FIX FOR THE CONNECTION DETAILS BLOCK --- */
-  .ksa-table td[data-label="Connection Details"] {
-      align-items: stretch; /* Stretch to fill space */
-  }
-  
-  .ksa-contact-box { 
-      align-items: flex-end; 
-      width: calc(100% - 100px); /* Fill remaining space after label */
-  }
-  
-  .ksa-contact-person { 
-      align-items: flex-end; 
-      text-align: right; 
-      width: 100%; /* Ensure it takes full width of the box */
-  }
+  .ksa-table td[data-label="Connection Details"] { align-items: stretch; }
+  .ksa-contact-box { align-items: flex-end; width: calc(100% - 100px); }
+  .ksa-contact-person { align-items: flex-end; text-align: right; width: 100%; }
   
   .ksa-contact-label { font-size: 10px; }
-  
-  .ksa-contact-name { 
-      font-size: 13px; 
-      display: flex; 
-      flex-wrap: wrap; 
-      justify-content: flex-end; 
-      gap: 4px;
-      line-height: 1.3;
-  }
-  
+  .ksa-contact-name { font-size: 13px; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 4px; line-height: 1.3;}
   .ksa-contact-id { font-size: 11px; margin-left: 0; }
   .ksa-contact-number { font-size: 12px; justify-content: flex-end; flex-direction: row-reverse;}
 
@@ -491,7 +465,7 @@
   .ksa-btn-reject { width: 32px; height: 32px; border-radius: 6px; }
   .ksa-btn-success { font-size: 12px; padding: 6px 12px; }
 
-  /* --- REBUILT MOBILE PAGINATION (Inline format) --- */
+  /* MOBILE PAGINATION - INLINE REBUILD */
   .ksa-pagination-container {
       flex-direction: column;
       border-radius: 16px;
@@ -503,22 +477,19 @@
   }
   .ksa-pagination-controls { 
       width: 100%; 
-      justify-content: center; /* Center the buttons */
+      justify-content: center; 
       flex-wrap: wrap; 
-      gap: 8px; /* Adds space between Prev, numbers, and Next */
+      gap: 8px; 
   }
   .ksa-page-numbers { 
       display: flex; 
       gap: 4px;
       width: auto; 
       justify-content: center;
-      order: -1; /* Forces page numbers ABOVE prev/next buttons */
+      order: -1; /* Pushes the numbers above the Next/Prev buttons */
       margin-bottom: 0; 
   } 
-  .ksa-page-btn { 
-      flex: unset; 
-      width: auto;
-  }
+  .ksa-page-btn { flex: unset; width: auto; }
 
   /* Skeleton Mobile */
   .ksa-skeleton-stack { padding: 0; }
