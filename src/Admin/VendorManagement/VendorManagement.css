@@ -113,7 +113,9 @@
 
 /* --- PREMIUM TABS --- */
 .vm-tabs-wrapper {
-  display: inline-flex;
+  display: flex; /* Changed from inline-flex */
+  width: fit-content;
+  max-width: 100%;
   background: #f1f5f9;
   padding: 4px;
   border-radius: 10px;
@@ -123,6 +125,7 @@
   -webkit-overflow-scrolling: touch;
 }
 .vm-tab-button {
+  flex-shrink: 0;
   background: transparent;
   border: none;
   padding: 8px 20px;
@@ -200,7 +203,8 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: top; /* <--- Fixes face cutoff */
+  /* THE FIX FOR CUTOFF FACES: Focuses on top of the image */
+  object-position: top; 
 }
 
 .placeholder-img {
@@ -394,8 +398,8 @@
   border-radius: var(--vm-radius-sm);
   font-family: inherit; font-size: 14px; color: var(--vm-text-main);
   transition: var(--vm-anim);
-  width: 100%; /* Ensures inputs respect boundaries */
-  box-sizing: border-box; /* Crucial for preventing overflow */
+  width: 100%; 
+  box-sizing: border-box; 
 }
 
 .vm-form-group input:focus, .vm-form-group select:focus, .vm-form-group textarea:focus {
@@ -403,7 +407,7 @@
 }
 
 .vm-form-row { display: flex; gap: 16px; width: 100%; }
-.vm-form-row .vm-form-group { flex: 1; min-width: 0; /* Prevents flex children from overflowing */ }
+.vm-form-row .vm-form-group { flex: 1; min-width: 0; }
 
 .vm-file-input-wrapper {
   position: relative;
@@ -461,7 +465,6 @@
   50% { transform: translate(-50%, 6px); }
 }
 
-
 /* =========================================
    RESPONSIVE MEDIA QUERIES
 ========================================= */
@@ -482,11 +485,21 @@
   .vm-search-box { width: 100%; }
   .vm-add-btn { width: 100%; padding: 10px; font-size: 13px;}
 
-  /* --- THE FIX FOR FORM OVERLAPPING --- */
-  .vm-form-row { 
-    flex-direction: column; /* Stacks inputs vertically */
-    gap: 0; /* Let margin-bottom of individual groups handle spacing */
+  /* --- FIX FOR TABS OVERLAPPING ON MOBILE --- */
+  .vm-tabs-wrapper { 
+      width: 100%; 
+      display: flex; 
   }
+  .vm-tab-button { 
+      flex: 1; /* Both tabs take exactly 50% of the space */
+      justify-content: center; /* Center the text */
+      padding: 8px 10px; 
+      font-size: 12px; 
+      white-space: normal; /* Let the text wrap to a new line if it needs to */
+      text-align: center;
+  }
+
+  .vm-form-row { flex-direction: column; gap: 0; }
 
   .vm-grid { grid-template-columns: 1fr; gap: 16px; }
   
@@ -496,4 +509,3 @@
   
   .vm-modal-content { padding: 24px 20px; margin: 10px; width: auto; }
 }
-h
