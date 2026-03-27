@@ -5,7 +5,7 @@ import imageCompression from 'browser-image-compression';
 import "./VendorList.css";
 import Navbar from "../../Components/Navbar";
 
-// Custom Diamond Icon to match your screenshot
+// Custom Diamond Icon 
 const DiamondIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: '100%', height: '100%' }}>
     <path d="M6 3h12l4 6-10 13L2 9Z"></path>
@@ -140,7 +140,7 @@ export default function VendorList() {
   };
 
   const handleJoinFileChange = async (e) => {
-    const selectedFiles = Array.from(e.target.files).slice(0, 2); // Enforce max 2
+    const selectedFiles = Array.from(e.target.files).slice(0, 2); 
     if (selectedFiles.length === 0) return;
 
     setIsCompressing(true);
@@ -207,7 +207,7 @@ export default function VendorList() {
       <Navbar />
       <div className="v-premium-container">
         
-        {/* --- NEW: DARK PREMIUM BANNER --- */}
+        {/* --- DARK PREMIUM BANNER --- */}
         <div className="v-dark-banner">
           <div className="v-banner-left">
             <div className="v-banner-icon-box">
@@ -219,7 +219,7 @@ export default function VendorList() {
             </div>
           </div>
           <button className="v-banner-action-btn" onClick={handleOpenJoinModal}>
-            Register Now <ArrowRight size={16} />
+            Register Now <ArrowRight className="v-btn-icon" />
           </button>
         </div>
 
@@ -277,7 +277,7 @@ export default function VendorList() {
           <div className="v-modal-overlay">
             <div className="v-modal-content">
               <button className="v-modal-close" onClick={handleCloseModal}>
-                <X size={20} />
+                <X size={18} />
               </button>
               
               <h2>Contact {selectedVendor.businessName}</h2>
@@ -310,7 +310,7 @@ export default function VendorList() {
           <div className="v-modal-overlay">
             <div className="v-modal-content v-modal-large">
               <button className="v-modal-close" onClick={handleCloseJoinModal}>
-                <X size={20} />
+                <X size={18} />
               </button>
               
               <h2>Register Your Business</h2>
@@ -318,8 +318,8 @@ export default function VendorList() {
 
               {joinSubmitStatus.success ? (
                 <div className="v-success-message">
-                  <h3 style={{ margin: '0 0 10px 0' }}>Registration Submitted!</h3>
-                  <p style={{ margin: 0 }}>Our admin team will review your application. You will receive an email once your profile is approved and live.</p>
+                  <h3 style={{ margin: '0 0 10px 0', fontSize: '1rem' }}>Registration Submitted!</h3>
+                  <p style={{ margin: 0, fontSize: '0.8rem' }}>Our admin team will review your application. You will receive an email once your profile is approved and live.</p>
                 </div>
               ) : (
                 <form onSubmit={handleJoinSubmit} className="v-lead-form">
@@ -341,7 +341,7 @@ export default function VendorList() {
                   <textarea name="description" placeholder="Describe your services..." value={joinFormData.description} onChange={handleJoinInputChange} rows="2"></textarea>
 
                   <div>
-                    <label style={{ fontSize: '13px', fontWeight: '600', color: '#4b5563', marginBottom: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <label style={{ fontSize: '12px', fontWeight: '600', color: '#4b5563', marginBottom: '6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       Upload Portfolio Images (Max 2)
                       {isCompressing && <span style={{ color: '#F59E0B', display: 'flex', alignItems: 'center', gap: '4px' }}><Loader size={12} className="v-spin" /> Compressing...</span>}
                     </label>
@@ -352,7 +352,7 @@ export default function VendorList() {
                       disabled={isCompressing || joinSubmitStatus.loading}
                     />
                     {joinFiles.length > 0 && !isCompressing && (
-                      <small style={{ color: '#10b981', display: 'block', marginTop: '6px', fontWeight: '500' }}>
+                      <small style={{ color: '#10b981', display: 'block', marginTop: '4px', fontWeight: '500', fontSize: '0.75rem' }}>
                         ✓ {joinFiles.length} file(s) ready
                       </small>
                     )}
