@@ -274,6 +274,60 @@
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
+/* --- PAGINATION --- */
+.ksa-pagination-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  border-top: 1px solid var(--ksa-border);
+  background: #f8fafc;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.ksa-page-info {
+  font-size: 13px;
+  color: var(--ksa-text-sub);
+}
+
+.ksa-pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ksa-page-btn {
+  display: flex; align-items: center; justify-content: center; gap: 4px;
+  padding: 6px 16px;
+  border: 1px solid var(--ksa-border);
+  background: white;
+  border-radius: var(--ksa-radius-sm);
+  color: var(--ksa-text-main);
+  font-size: 13px; font-weight: 600;
+  cursor: pointer;
+  transition: var(--ksa-anim);
+}
+.ksa-page-btn:hover:not(:disabled) { background: #f1f5f9; border-color: var(--ksa-border-hover); }
+.ksa-page-btn:disabled { opacity: 0.5; cursor: not-allowed; background: #f8fafc; }
+
+.ksa-page-numbers { display: flex; gap: 4px; }
+.ksa-page-number {
+  width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  background: white;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ksa-text-sub);
+  cursor: pointer;
+  transition: var(--ksa-anim);
+}
+.ksa-page-number:hover { background: #f1f5f9; color: var(--ksa-text-main); }
+.ksa-page-number.active { background: var(--ksa-primary); color: white; box-shadow: 0 2px 4px rgba(79, 70, 229, 0.2); }
+.ksa-page-dots { padding: 0 4px; color: var(--ksa-text-sub); font-weight: 700; align-self: flex-end;}
+
 /* --- SKELETON --- */
 .ksa-skeleton-stack { padding: 24px; display: flex; flex-direction: column; gap: 20px; }
 .ksa-skeleton-row { display: flex; gap: 24px; align-items: flex-start; }
@@ -295,6 +349,31 @@
 .ksa-empty-icon { color: #cbd5e1; margin-bottom: 16px; }
 .ksa-empty-state h3 { color: var(--ksa-text-main); margin: 0 0 8px 0; font-size: 18px;}
 
+/* --- SCROLL INDICATOR UI --- */
+.ksa-scroll-indicator {
+  display: none; 
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(15, 23, 42, 0.9);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 30px;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  pointer-events: none; 
+  z-index: 50;
+  animation: bounceSubtle 2s infinite ease-in-out;
+  backdrop-filter: blur(4px);
+}
+@keyframes bounceSubtle {
+  0%, 100% { transform: translate(-50%, 0); }
+  50% { transform: translate(-50%, 6px); }
+}
 
 /* =========================================================
    MOBILE RESPONSIVENESS (PERFECT ALIGNMENT & SMALLER FONTS)
@@ -302,6 +381,8 @@
 @media (max-width: 768px) {
   .ksa-layout { padding: 16px; }
   
+  .ksa-scroll-indicator { display: flex; }
+
   /* Shrink Header elements */
   .ksa-title-group h2 { font-size: 20px; }
   .ksa-title-group p { font-size: 13px; }
@@ -311,6 +392,7 @@
   .ksa-tab { padding: 6px 14px; font-size: 12px; }
 
   /* Hide standard table headers */
+  .ksa-table-wrapper { overflow-x: hidden; }
   .ksa-table thead { display: none; }
   
   /* Transparent Table Background */
@@ -408,6 +490,35 @@
   .ksa-btn-outline-primary { font-size: 12px; padding: 6px 12px;}
   .ksa-btn-reject { width: 32px; height: 32px; border-radius: 6px; }
   .ksa-btn-success { font-size: 12px; padding: 6px 12px; }
+
+  /* --- REBUILT MOBILE PAGINATION (Inline format) --- */
+  .ksa-pagination-container {
+      flex-direction: column;
+      border-radius: 16px;
+      border: 1px solid var(--ksa-border);
+      padding: 16px;
+      box-shadow: var(--ksa-shadow-sm);
+      gap: 16px;
+      background: white;
+  }
+  .ksa-pagination-controls { 
+      width: 100%; 
+      justify-content: center; /* Center the buttons */
+      flex-wrap: wrap; 
+      gap: 8px; /* Adds space between Prev, numbers, and Next */
+  }
+  .ksa-page-numbers { 
+      display: flex; 
+      gap: 4px;
+      width: auto; 
+      justify-content: center;
+      order: -1; /* Forces page numbers ABOVE prev/next buttons */
+      margin-bottom: 0; 
+  } 
+  .ksa-page-btn { 
+      flex: unset; 
+      width: auto;
+  }
 
   /* Skeleton Mobile */
   .ksa-skeleton-stack { padding: 0; }
