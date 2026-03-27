@@ -1,104 +1,111 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
 /* --- MAIN LAYOUT --- */
 .ks-dashboard-container {
-  font-family: 'Inter', sans-serif;
-  background-color: #FFFFFF; /* Pure White Background */
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: #f8fafc; /* Professional subtle gray background */
   min-height: 100vh;
-  padding: 2rem;
-  color: #1F2937;
+  padding: 32px;
+  color: #0f172a;
+  box-sizing: border-box;
 }
 
 /* --- HEADER --- */
 .ks-page-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2.5rem;
-  padding-bottom: 1rem;
-  border-bottom: 2px solid #F3F4F6;
+  align-items: flex-end;
+  margin-bottom: 36px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e2e8f0;
 }
 
 .ks-title {
-  font-size: 1.85rem;
+  font-size: 28px;
   font-weight: 800;
-  color: #111827;
-  margin: 0;
+  color: #0f172a;
+  margin: 0 0 6px 0;
   letter-spacing: -0.5px;
 }
 
 .ks-subtitle {
-  color: #6B7280;
-  font-size: 0.95rem;
-  margin-top: 4px;
+  color: #64748b;
+  font-size: 15px;
+  margin: 0;
+  font-weight: 500;
 }
 
 .ks-date-pill {
-  background: #FFFBEB; /* Amber Light */
-  color: #B45309;      /* Amber Dark */
-  font-weight: 600;
-  font-size: 0.85rem;
+  background: #ffffff;
+  color: #334155;
+  font-weight: 700;
+  font-size: 13px;
   padding: 8px 16px;
-  border-radius: 99px;
-  border: 1px solid #FCD34D;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 /* --- GRID SYSTEM --- */
 .ks-section-wrapper {
-  margin-bottom: 3rem;
+  margin-bottom: 40px;
 }
 
 .ks-section-title {
-  font-size: 1.1rem;
+  font-size: 14px;
   font-weight: 700;
-  color: #374151;
-  margin-bottom: 1.25rem;
+  color: #475569;
+  margin-bottom: 20px;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .ks-section-title::after {
   content: '';
   flex: 1;
   height: 1px;
-  background: #E5E7EB;
+  background: #e2e8f0;
 }
 
 .ks-metrics-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 1.5rem;
+  gap: 24px;
 }
 
 /* --- STAT CARD DESIGN --- */
 .ks-stat-card {
-  background: #FFFFFF;
-  border: 1px solid #E5E7EB;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
   border-radius: 16px;
-  padding: 1.5rem;
-  transition: all 0.25s ease;
+  padding: 24px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -2px rgba(0,0,0,0.02);
 }
 
-/* Hover effect for clickable cards */
+/* Hover effect leveraging CSS variables set in React */
 .ks-stat-card.clickable {
   cursor: pointer;
 }
 
 .ks-stat-card.clickable:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 24px -8px rgba(220, 38, 38, 0.15); /* Reddish shadow */
-  border-color: #FCA5A5; /* Light Red Border on hover */
+  box-shadow: 0 20px 25px -5px var(--card-hover-shadow), 0 10px 10px -5px var(--card-hover-shadow);
+  border-color: var(--card-hover-border);
 }
 
 .ks-card-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 1rem;
+  margin-bottom: 16px;
 }
 
 .ks-icon-box {
@@ -110,38 +117,36 @@
   justify-content: center;
 }
 
-.ks-trend-indicator {
-  font-size: 0.8rem;
-  color: #D1D5DB;
-}
-
 .ks-card-body {
   display: flex;
   flex-direction: column;
 }
 
 .ks-stat-value {
-  font-size: 2rem;
+  font-size: 28px;
   font-weight: 800;
-  color: #111827;
+  color: #0f172a;
   margin: 0;
-  line-height: 1.1;
+  line-height: 1.2;
+  letter-spacing: -0.5px;
 }
 
 .ks-stat-label {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #6B7280;
+  font-size: 14px;
+  font-weight: 600;
+  color: #64748b;
   margin-top: 6px;
 }
 
 .ks-alert-banner {
-  background: #FEF2F2;
-  color: #991B1B;
-  padding: 1rem;
+  background: #fef2f2;
+  color: #b91c1c;
+  padding: 16px;
   border-radius: 8px;
-  margin-bottom: 2rem;
-  border: 1px solid #FCA5A5;
+  margin-bottom: 32px;
+  border: 1px solid #fecaca;
+  font-weight: 500;
+  font-size: 14px;
 }
 
 /* --- SKELETON ANIMATION --- */
@@ -151,9 +156,9 @@
 }
 
 .skeleton-pulse {
-  background: linear-gradient(90deg, #F3F4F6 25%, #E5E7EB 50%, #F3F4F6 75%);
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
   background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
+  animation: shimmer 1.5s infinite linear;
   border-radius: 6px;
 }
 
@@ -174,21 +179,46 @@
   width: 80%;
 }
 
-/* --- RESPONSIVE --- */
-@media (max-width: 1024px) {
+/* --- RESPONSIVE ADJUSTMENTS --- */
+@media (max-width: 1200px) {
+  .ks-metrics-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
   .ks-metrics-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
-@media (max-width: 640px) {
-  .ks-metrics-grid {
-    grid-template-columns: 1fr;
+@media (max-width: 600px) {
+  .ks-dashboard-container {
+    padding: 16px;
   }
-  
+
   .ks-page-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 1rem;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+  }
+  
+  .ks-title {
+      font-size: 24px;
+  }
+
+  .ks-metrics-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .ks-section-wrapper {
+      margin-bottom: 32px;
+  }
+  
+  .ks-stat-card {
+      padding: 20px;
   }
 }
