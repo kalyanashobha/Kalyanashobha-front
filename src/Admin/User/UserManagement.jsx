@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css'; 
 import imageCompression from 'browser-image-compression'; 
 import { 
   Search, Filter, Trash2, Ban, CheckCircle, 
-  User, X, ChevronLeft, ChevronRight,
+  User, X, ChevronLeft, ChevronRight, ChevronDown,
   Briefcase, MapPin, Shield, 
   Crown, Sparkles, Phone, Calendar, Hash,
   Moon, Users, Upload 
@@ -630,6 +630,27 @@ const UserDetailModal = ({ user, onClose, onUpdateSuccess, masterData }) => {
   const [editStates, setEditStates] = useState([]);
   const [editCities, setEditCities] = useState([]);
 
+  // --- SCROLL INDICATOR LOGIC ---
+  const modalBodyRef = useRef(null);
+  const [showScrollIndicator, setShowScrollIndicator] = useState(false);
+
+  const checkScroll = () => {
+    if (modalBodyRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } = modalBodyRef.current;
+      setShowScrollIndicator(scrollHeight > clientHeight + 10 && scrollTop + clientHeight < scrollHeight - 20);
+    }
+  };
+
+  useEffect(() => {
+    const timer = setTimeout(checkScroll, 100);
+    window.addEventListener('resize', checkScroll);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('resize', checkScroll);
+    };
+  }, [isEditing, user]);
+  // -----------------------------
+
   const [formData, setFormData] = useState({
     firstName: user.firstName || '', lastName: user.lastName || '', gender: user.gender || '',
     dob: user.dob ? new Date(user.dob).toISOString().split('T')[0] : '', maritalStatus: user.maritalStatus || '',
@@ -763,10 +784,6 @@ const UserDetailModal = ({ user, onClose, onUpdateSuccess, masterData }) => {
     }
   };
 
-  const handleRemoveNewPhoto = (index) => {
-    setNewPhotos(prev => prev.filter((_, i) => i !== index));
-  };
-
   const handleSave = async () => {
     setLoading(true);
     const toastId = toast.loading("Saving updates...");
@@ -862,10 +879,9 @@ const UserDetailModal = ({ user, onClose, onUpdateSuccess, masterData }) => {
           </div>
         </div>
 
-        <div className="um-modal-body">
+        <div className="um-modal-body" ref={modalBodyRef} onScroll={checkScroll}>
           {!isEditing ? (
             <>
-              {/* VIEW MODE CODE REMAINS THE SAME */}
               <div className="um-modal-top-bar">
                  <div className="um-top-chips">
                     <span className={`um-chip ${user.isPaidMember ? 'gold-chip' : ''}`}>
@@ -977,7 +993,6 @@ const UserDetailModal = ({ user, onClose, onUpdateSuccess, masterData }) => {
           ) : (
             
           <div className="um-edit-form">
-            {/* THIS SECTION IS COMPLETELY UPDATED TO USE <select> TAGS */}
             <h3 className="um-column-title" style={{marginBottom: '15px'}}><User size={16} /> Basic Details</h3>
             <div className="um-form-grid" style={{marginBottom: '20px'}}>
               <FormGroup label="First Name"><input name="firstName" value={formData.firstName} onChange={handleInputChange} placeholder="First Name" className="um-input" /></FormGroup>
@@ -1243,8 +1258,16 @@ const UserDetailModal = ({ user, onClose, onUpdateSuccess, masterData }) => {
 
           </div>
           )}
-
         </div>
+        
+        {/* NEW SCROLL INDICATOR UI */}
+        {showScrollIndicator && (
+          <div className="um-scroll-indicator">
+            <ChevronDown size={18} />
+            <span>Scroll for more</span>
+          </div>
+        )}
+
       </div>
     </div>
   );
