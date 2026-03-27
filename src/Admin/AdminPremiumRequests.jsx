@@ -328,7 +328,7 @@ const AdminPremiumRequests = () => {
                     width: 100% !important;
                     border-collapse: collapse !important;
                     text-align: left !important;
-                    min-width: 850px !important;
+                    min-width: 850px !important; /* <--- This was breaking mobile */
                 }
                 .admin-data-table th {
                     background: #f8fafc !important;
@@ -470,7 +470,7 @@ const AdminPremiumRequests = () => {
                 }
 
                 /* =========================================================
-                   MOBILE RESPONSIVENESS (PERFECT ALIGNMENT & CLEAN CARDS)
+                   MOBILE RESPONSIVENESS (FULLY FIXED)
                    ========================================================= */
                 @media (max-width: 768px) {
                     .admin-layout-container { padding: 16px !important; }
@@ -485,7 +485,17 @@ const AdminPremiumRequests = () => {
                     .admin-search-group { max-width: 100% !important; width: 100% !important; }
                     .admin-tab-button { padding: 8px 16px !important; font-size: 13px !important; }
 
-                    /* Table to Clean Cards Transformation */
+                    /* --- CRITICAL FIX: Stop horizontal scrolling --- */
+                    .admin-table-wrapper {
+                        overflow-x: hidden !important; 
+                        width: 100% !important;
+                    }
+
+                    /* --- CRITICAL FIX: Override Desktop min-width --- */
+                    .admin-data-table {
+                        min-width: 100% !important; 
+                    }
+
                     .admin-data-table thead { display: none !important; }
                     
                     /* Remove background from table container so cards stand out */
@@ -509,10 +519,9 @@ const AdminPremiumRequests = () => {
                     .admin-data-table td {
                         display: flex !important;
                         justify-content: space-between !important;
-                        align-items: center !important; 
+                        align-items: flex-start !important; /* Top alignment so multi-line text looks good */
                         padding: 14px 16px !important;
                         border-bottom: 1px solid var(--pr-border) !important;
-                        text-align: right !important;
                         gap: 12px !important;
                     }
                     
@@ -520,6 +529,7 @@ const AdminPremiumRequests = () => {
                     .admin-data-table td:last-child { 
                         border-bottom: none !important; 
                         background-color: #f8fafc !important; 
+                        align-items: center !important;
                     }
                     
                     /* Mobile Labels */
@@ -531,20 +541,23 @@ const AdminPremiumRequests = () => {
                         text-transform: uppercase !important;
                         letter-spacing: 0.5px !important;
                         flex-shrink: 0 !important;
-                        text-align: left !important;
+                        max-width: 35% !important; /* Keep label from pushing text off screen */
+                        margin-top: 2px !important;
                     }
 
-                    /* Content Alignment */
+                    /* Content Alignment - Force wrap so text never overlaps the label */
                     .admin-info-stack { 
                         align-items: flex-end !important; 
                         text-align: right !important; 
                         margin: 0 !important;
-                        width: auto !important; 
+                        width: 60% !important; /* Gives the text a safe boundary */
+                        word-wrap: break-word !important;
+                        overflow-wrap: break-word !important;
                     }
                     
                     .admin-info-stack strong { font-size: 14px !important; }
-                    .admin-text-muted { font-size: 12px !important; }
-                    .admin-text-small { font-size: 14px !important; }
+                    .admin-text-muted { font-size: 12px !important; word-wrap: break-word !important; }
+                    .admin-text-small { font-size: 14px !important; text-align: right !important;}
 
                     .admin-status-badge { font-size: 11px !important; padding: 4px 10px !important; }
                     
