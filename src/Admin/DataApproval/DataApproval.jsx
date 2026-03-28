@@ -15,9 +15,9 @@ const DataApproval = () => {
 
     // Pagination State
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 6; // Fixed 6 items for both Desktop and Mobile
+    const itemsPerPage = 5; // Updated to 5 items for both Desktop and Mobile
 
-    // Mobile/Desktop Scroll Indicator State
+    // Mobile Scroll Indicator State
     const [showMainScroll, setShowMainScroll] = useState(false);
 
     const API_BASE = "https://kalyanashobha-back.vercel.app/api/admin/pending-data";
@@ -26,55 +26,26 @@ const DataApproval = () => {
         fetchPendingData();
     }, []);
 
-    // Filter Logic (Moved up so it can be used in pagination and scroll dependency)
-    const filteredItems = pendingItems.filter(item => {
-        const searchStr = searchTerm.toLowerCase();
-        const val = (item.value || '').toLowerCase();
-        const cat = (item.category || '').toLowerCase();
-        const parent = (item.parentValue || '').toLowerCase();
-        const fName = (item.submittedBy?.firstName || '').toLowerCase();
-        const lName = (item.submittedBy?.lastName || '').toLowerCase();
-        const uId = (item.submittedBy?.uniqueId || '').toLowerCase();
-
-        return val.includes(searchStr) || cat.includes(searchStr) || parent.includes(searchStr) || fName.includes(searchStr) || lName.includes(searchStr) || uId.includes(searchStr);
-    });
-
-    // Pagination Calculations
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = filteredItems.slice(indexOfFirstItem, indexOfLastItem);
-    const totalPages = Math.ceil(filteredItems.length / itemsPerPage) || 1;
-
     // Reset pagination when search changes
     useEffect(() => {
         setCurrentPage(1);
     }, [searchTerm]);
 
-    // --- UNIVERSAL SCROLL INDICATOR LOGIC (Matched with InterestApprovals) ---
+    // Scroll Indicator Logic
     useEffect(() => {
         const checkMainScroll = () => {
-            // 1. Safety net: If there are 2 or fewer items, we don't need a scrollbar 
-            if (currentItems.length <= 2) {
+            if (pendingItems.length === 0) {
                 setShowMainScroll(false);
                 return;
             }
-
             const scrollY = window.scrollY || document.documentElement.scrollTop;
-            const clientHeight = document.documentElement.clientHeight;
-            const scrollHeight = document.documentElement.scrollHeight;
+            const windowHeight = window.innerHeight;
+            const documentHeight = document.documentElement.scrollHeight;
 
-            // 2. Check if the document is taller than the viewport (with 80px buffer). 
-            const isScrollable = scrollHeight > clientHeight + 80;
-
-            // 3. Check if we haven't scrolled to the very bottom yet
-            const isNotAtBottom = scrollY + clientHeight < scrollHeight - 30;
-
-            // 4. Only show the indicator if it's scrollable AND we aren't at the bottom
-            setShowMainScroll(isScrollable && isNotAtBottom);
+            setShowMainScroll(documentHeight > windowHeight + 20 && scrollY + windowHeight < documentHeight - 30);
         };
 
-        const timer = setTimeout(checkMainScroll, 50); 
-
+        const timer = setTimeout(checkMainScroll, 500); 
         window.addEventListener('scroll', checkMainScroll);
         window.addEventListener('resize', checkMainScroll);
 
@@ -83,7 +54,7 @@ const DataApproval = () => {
             window.removeEventListener('scroll', checkMainScroll);
             window.removeEventListener('resize', checkMainScroll);
         };
-    }, [currentItems, currentPage]); // Re-run when currentItems changes
+    }, [pendingItems, currentPage]);
 
     const fetchPendingData = async () => {
         setIsLoading(true);
@@ -150,6 +121,25 @@ const DataApproval = () => {
         }
     };
 
+    // Filter Logic
+    const filteredItems = pendingItems.filter(item => {
+        const searchStr = searchTerm.toLowerCase();
+        const val = (item.value || '').toLowerCase();
+        const cat = (item.category || '').toLowerCase();
+        const parent = (item.parentValue || '').toLowerCase();
+        const fName = (item.submittedBy?.firstName || '').toLowerCase();
+        const lName = (item.submittedBy?.lastName || '').toLowerCase();
+        const uId = (item.submittedBy?.uniqueId || '').toLowerCase();
+
+        return val.includes(searchStr) || cat.includes(searchStr) || parent.includes(searchStr) || fName.includes(searchStr) || lName.includes(searchStr) || uId.includes(searchStr);
+    });
+
+    // Pagination Calculations
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = filteredItems.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(filteredItems.length / itemsPerPage) || 1;
+
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
     return (
@@ -181,7 +171,8 @@ const DataApproval = () => {
             <div className="kda-content">
                 {isLoading ? (
                     <div className="kda-skeleton-stack">
-                        {[1, 2, 3, 4, 5, 6].map(i => (
+                        {/* Updated to 5 skeleton items to match the itemsPerPage */}
+                        {[1, 2, 3, 4, 5].map(i => (
                             <div key={i} className="kda-skeleton-row">
                                 <div className="kda-sk-box kda-sk-cat"></div>
                                 <div className="kda-sk-box kda-sk-val"></div>
@@ -295,7 +286,7 @@ const DataApproval = () => {
                 )}
             </div>
 
-            {/* UNIVERSAL SCROLL INDICATOR */}
+            {/* SCROLL INDICATOR */}
             {showMainScroll && (
                 <div className="kda-scroll-indicator">
                     <ChevronDown size={18} />
