@@ -8,38 +8,27 @@ const Icons = {
   Phone: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>,
   Clock: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>,
   Search: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>,
-  ChevronLeft: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>,
-  ChevronRight: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>,
+  ChevronLeft: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>,
+  ChevronRight: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>,
   ChevronDown: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
 };
 
 const AdminPremiumRequests = () => {
     const [requests, setRequests] = useState([]);
     const [loading, setLoading] = useState(true);
-    // Removed 'All' tab, default is now 'Pending'
     const [activeTab, setActiveTab] = useState('Pending');
     const [searchTerm, setSearchTerm] = useState('');
     const [processingId, setProcessingId] = useState(null);
 
-    // Dynamic Pagination States
+    // Fixed Pagination States
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage, setItemsPerPage] = useState(window.innerWidth < 768 ? 3 : 5);
+    const itemsPerPage = 6; // Fixed 6 items for both Desktop and Mobile
 
     // Global Scroll Indicator State
     const [showMainScroll, setShowMainScroll] = useState(false);
 
     const API_URL = "https://kalyanashobha-back.vercel.app/api/admin";
     const token = localStorage.getItem('adminToken'); 
-
-    // Handle screen resize for dynamic pagination
-    useEffect(() => {
-        const handleResize = () => {
-            setItemsPerPage(window.innerWidth < 768 ? 3 : 5);
-            setCurrentPage(1);
-        };
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
 
     useEffect(() => {
         fetchRequests();
@@ -424,45 +413,52 @@ const AdminPremiumRequests = () => {
                 
                 .admin-status-done { color: #94a3b8 !important; font-size: 13px !important; font-weight: 600 !important; padding-right: 8px !important; text-transform: uppercase !important;}
 
-                /* Pagination UI */
-                .admin-pagination-bar {
+                /* --- NEW CIRCULAR PAGINATION UI --- */
+                .admin-pagination-container {
                     display: flex !important;
-                    justify-content: space-between !important;
+                    justify-content: center !important;
                     align-items: center !important;
-                    padding: 16px 24px !important;
-                    border-top: 1px solid var(--pr-border) !important;
-                    background: #f8fafc !important;
-                    flex-wrap: wrap !important;
-                    gap: 16px !important;
+                    padding: 24px 16px !important;
+                    gap: 24px !important;
+                    background: transparent !important;
+                    border-top: none !important;
                 }
-                .admin-pagination-text { font-size: 13px !important; color: var(--pr-text-sub) !important; }
-                .admin-pagination-controls { display: flex !important; gap: 8px !important; align-items: center !important; }
-                
-                .admin-page-btn {
-                    display: flex !important; align-items: center !important; justify-content: center !important; gap: 4px !important;
-                    padding: 6px 16px !important;
-                    border: 1px solid var(--pr-border) !important;
-                    background: white !important;
-                    border-radius: 6px !important;
-                    color: var(--pr-text-main) !important;
-                    font-size: 13px !important; font-weight: 600 !important;
+
+                .admin-page-btn-circle {
+                    width: 44px !important;
+                    height: 44px !important;
+                    border-radius: 50% !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    background: #ffffff !important;
+                    border: 1px solid #e2e8f0 !important;
+                    color: #64748b !important;
                     cursor: pointer !important;
                     transition: var(--pr-anim) !important;
+                    box-shadow: 0 1px 2px rgba(0,0,0,0.02) !important;
                 }
-                .admin-page-btn:hover:not(:disabled) { background: #f1f5f9 !important; border-color: var(--pr-border-hover) !important; }
-                .admin-page-btn:disabled { opacity: 0.5 !important; cursor: not-allowed !important; background: #f8fafc !important; border-color: var(--pr-border) !important;}
 
-                .admin-page-numbers { display: flex !important; gap: 4px !important; }
-                .admin-page-number {
-                    width: 32px !important; height: 32px !important;
-                    display: flex !important; align-items: center !important; justify-content: center !important;
-                    background: white !important; border: 1px solid transparent !important;
-                    border-radius: 6px !important; font-size: 13px !important; font-weight: 600 !important;
-                    color: var(--pr-text-sub) !important; cursor: pointer !important; transition: var(--pr-anim) !important;
+                .admin-page-btn-circle:hover:not(:disabled) {
+                    background: #f8fafc !important;
+                    color: #0f172a !important;
+                    border-color: #cbd5e1 !important;
+                    box-shadow: 0 4px 6px rgba(0,0,0,0.05) !important;
+                    transform: translateY(-1px) !important;
                 }
-                .admin-page-number:hover { background: #f1f5f9 !important; color: var(--pr-text-main) !important; }
-                .admin-page-number.active { background: var(--pr-primary) !important; color: white !important; box-shadow: 0 2px 4px rgba(79, 70, 229, 0.2) !important; }
-                .admin-page-dots { padding: 0 4px !important; color: var(--pr-text-sub) !important; font-weight: 700 !important; align-self: flex-end !important; }
+
+                .admin-page-btn-circle:disabled {
+                    opacity: 0.4 !important;
+                    cursor: not-allowed !important;
+                    background: #f8fafc !important;
+                }
+
+                .admin-page-text {
+                    font-size: 16px !important;
+                    font-weight: 600 !important;
+                    color: #475569 !important;
+                    letter-spacing: 0.3px !important;
+                }
 
                 /* Loading & Empty States */
                 .admin-state-view {
@@ -509,7 +505,7 @@ const AdminPremiumRequests = () => {
                 }
 
                 /* =========================================================
-                   MOBILE RESPONSIVENESS (PERFECT FLEX CARDS)
+                   MOBILE RESPONSIVENESS
                    ========================================================= */
                 @media (max-width: 768px) {
                     .admin-layout-container { 
@@ -536,9 +532,23 @@ const AdminPremiumRequests = () => {
                     .admin-tabs-wrapper { 
                         width: 100% !important;
                         max-width: 100% !important;
+                        /* Added slightly tighter gap and padding for mobile */
+                        gap: 4px !important;
+                        padding: 4px !important;
                     }
                     
-                    .admin-tab-button { padding: 8px 16px !important; font-size: 13px !important; }
+                    .admin-tab-button { 
+                        /* Reduced Font Size and Padding for Mobile Tab Alignment */
+                        padding: 6px 12px !important; 
+                        font-size: 12px !important; 
+                        gap: 6px !important;
+                    }
+
+                    .admin-tab-count {
+                        /* Reduced count badge padding and size */
+                        padding: 2px 6px !important;
+                        font-size: 10px !important;
+                    }
 
                     .admin-table-wrapper {
                         overflow-x: hidden !important; 
@@ -610,31 +620,18 @@ const AdminPremiumRequests = () => {
                     .admin-action-group { width: 100% !important; justify-content: flex-end !important; }
                     .admin-btn { font-size: 13px !important; padding: 8px 16px !important; }
                     
-                    /* --- INLINE MOBILE PAGINATION --- */
-                    .admin-pagination-bar {
-                        flex-direction: column !important;
-                        border-radius: var(--pr-radius) !important;
-                        border: 1px solid var(--pr-border) !important;
-                        padding: 16px !important;
-                        box-shadow: var(--pr-shadow-sm) !important;
+                    /* Clean mobile pagination padding */
+                    .admin-pagination-container {
+                        padding: 16px 0 !important;
                         gap: 16px !important;
-                        background: var(--pr-card-bg) !important;
                     }
-                    .admin-pagination-controls { 
-                        width: 100% !important; 
-                        justify-content: center !important; 
-                        flex-wrap: wrap !important; 
-                        gap: 8px !important; 
+                    .admin-page-btn-circle {
+                        width: 40px !important;
+                        height: 40px !important;
                     }
-                    .admin-page-numbers { 
-                        display: flex !important; 
-                        gap: 4px !important;
-                        width: auto !important; 
-                        justify-content: center !important;
-                        order: -1 !important; /* Forces numbers ABOVE prev/next buttons */
-                        margin-bottom: 0 !important; 
-                    } 
-                    .admin-page-btn { flex: unset !important; width: auto !important; }
+                    .admin-page-text {
+                        font-size: 14px !important;
+                    }
                 }
             `}</style>
 
@@ -763,47 +760,28 @@ const AdminPremiumRequests = () => {
                             </table>
                         </div>
 
-                        {/* Pagination Controls - Always Visible if Data Exists */}
-                        {filteredRequests.length > 0 && (
-                            <div className="admin-pagination-bar">
-                                <span className="admin-pagination-text">
-                                    Showing <strong>{indexOfFirstItem + 1}</strong> to <strong>{Math.min(indexOfLastItem, filteredRequests.length)}</strong> of <strong>{filteredRequests.length}</strong>
+                        {/* NEW CIRCULAR PAGINATION DESIGN */}
+                        {totalPages > 1 && (
+                            <div className="admin-pagination-container">
+                                <button 
+                                    className="admin-page-btn-circle" 
+                                    onClick={() => handlePageChange(currentPage - 1)}
+                                    disabled={currentPage === 1}
+                                >
+                                    <Icons.ChevronLeft />
+                                </button>
+                                
+                                <span className="admin-page-text">
+                                    Page {currentPage} of {totalPages}
                                 </span>
-                                <div className="admin-pagination-controls">
-                                    <button 
-                                        className="admin-page-btn" 
-                                        onClick={() => handlePageChange(currentPage - 1)}
-                                        disabled={currentPage === 1}
-                                    >
-                                        <Icons.ChevronLeft /> Prev
-                                    </button>
-                                    
-                                    <div className="admin-page-numbers">
-                                        {[...Array(totalPages)].map((_, index) => {
-                                            if (totalPages > 5 && (index + 1 < currentPage - 1 || index + 1 > currentPage + 1) && index !== 0 && index !== totalPages - 1) {
-                                                if (index + 1 === currentPage - 2 || index + 1 === currentPage + 2) return <span key={index} className="admin-page-dots">...</span>;
-                                                return null;
-                                            }
-                                            return (
-                                                <button 
-                                                    key={index + 1}
-                                                    className={`admin-page-number ${currentPage === index + 1 ? 'active' : ''}`}
-                                                    onClick={() => handlePageChange(index + 1)}
-                                                >
-                                                    {index + 1}
-                                                </button>
-                                            );
-                                        })}
-                                    </div>
 
-                                    <button 
-                                        className="admin-page-btn" 
-                                        onClick={() => handlePageChange(currentPage + 1)}
-                                        disabled={currentPage === totalPages}
-                                    >
-                                        Next <Icons.ChevronRight />
-                                    </button>
-                                </div>
+                                <button 
+                                    className="admin-page-btn-circle" 
+                                    onClick={() => handlePageChange(currentPage + 1)}
+                                    disabled={currentPage === totalPages}
+                                >
+                                    <Icons.ChevronRight />
+                                </button>
                             </div>
                         )}
                     </>
