@@ -1,4 +1,3 @@
-            
 import React, { useState, useEffect } from "react";
 import { Check, X, Clock, ArrowRight, Filter, RefreshCw, Phone, ChevronLeft, ChevronRight, ChevronDown } from "lucide-react";
 import axios from "axios";
@@ -18,7 +17,7 @@ export default function InterestApprovals() {
 
   // --- PAGINATION & SCROLL STATES ---
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6; // Fixed 6 items for both Desktop and Mobile
+  const itemsPerPage = 2; // Changed to 2 items 
   const [showMainScroll, setShowMainScroll] = useState(false);
 
   // Fetch Data for the active tab
@@ -64,7 +63,7 @@ export default function InterestApprovals() {
     fetchCounts();
   }, [activeTab]);
 
-  // --- PAGINATION LOGIC (Moved up so we can use currentItems in the scroll check) ---
+  // --- PAGINATION LOGIC ---
   const totalPages = Math.ceil(requests.length / itemsPerPage) || 1;
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -72,12 +71,17 @@ export default function InterestApprovals() {
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-  // --- UNIVERSAL SCROLL INDICATOR LOGIC ---
+  // --- MOBILE ONLY SCROLL INDICATOR LOGIC ---
   useEffect(() => {
     const checkMainScroll = () => {
-        // 1. Safety net: If there are 2 or fewer items, we definitely don't need a scrollbar 
-        // on a standard layout, so force it to hide.
-        if (currentItems.length <= 2) {
+        // 1. Hide on desktop entirely (checking for widths > 768px)
+        if (window.innerWidth > 768) {
+            setShowMainScroll(false);
+            return;
+        }
+
+        // 2. Hide if there are no items
+        if (currentItems.length === 0) {
             setShowMainScroll(false);
             return;
         }
@@ -86,14 +90,14 @@ export default function InterestApprovals() {
         const clientHeight = document.documentElement.clientHeight;
         const scrollHeight = document.documentElement.scrollHeight;
 
-        // 2. Check if the document is taller than the viewport. 
+        // 3. Check if the document is taller than the viewport. 
         // We use an 80px buffer to account for padding and margins.
         const isScrollable = scrollHeight > clientHeight + 80;
 
-        // 3. Check if we haven't scrolled to the very bottom yet
+        // 4. Check if we haven't scrolled to the very bottom yet
         const isNotAtBottom = scrollY + clientHeight < scrollHeight - 30;
 
-        // 4. Only show the indicator if it's scrollable AND we aren't at the bottom
+        // 5. Only show the indicator if it's scrollable AND we aren't at the bottom
         setShowMainScroll(isScrollable && isNotAtBottom);
     };
 
@@ -107,7 +111,7 @@ export default function InterestApprovals() {
         window.removeEventListener('scroll', checkMainScroll);
         window.removeEventListener('resize', checkMainScroll);
     };
-  }, [currentItems, currentPage]); // Re-run when currentItems changes
+  }, [currentItems, currentPage]); 
 
   // Handle Actions
   const handleAction = async (interestId, action, phase) => {
@@ -177,7 +181,8 @@ export default function InterestApprovals() {
       <div className="ksa-content">
         {loading ? (
            <div className="ksa-skeleton-stack">
-              {[1, 2, 3, 4, 5, 6].map(i => (
+              {/* Reduced skeleton row mapping to 2 to match new itemsPerPage */}
+              {[1, 2].map(i => (
                   <div key={i} className="ksa-skeleton-row">
                       <div className="ksa-sk-box ksa-sk-date"></div>
                       <div className="ksa-sk-box ksa-sk-flow"></div>
@@ -345,7 +350,7 @@ export default function InterestApprovals() {
         )}
       </div>
 
-      {/* UNIVERSAL SCROLL INDICATOR */}
+      {/* MOBILE SCROLL INDICATOR */}
       {showMainScroll && (
           <div className="ksa-scroll-indicator">
               <ChevronDown size={18} />
@@ -355,5 +360,3 @@ export default function InterestApprovals() {
     </div>
   );
 }
-
-
