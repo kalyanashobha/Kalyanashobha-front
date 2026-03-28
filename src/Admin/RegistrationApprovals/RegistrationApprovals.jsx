@@ -70,37 +70,32 @@ export default function RegistrationApprovals() {
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-  // --- UNIVERSAL SCROLL INDICATOR LOGIC (UPDATED FOR DESKTOP/PC) ---
+  // --- UNIVERSAL SCROLL INDICATOR LOGIC (PERFECTED) ---
   useEffect(() => {
     const checkMainScroll = () => {
-        // If there are no items, or the image modal is open, strictly hide the indicator
-        if (filteredPayments.length === 0 || selectedImage) {
+        // 1. Safety net: If there are 2 or fewer items, or the modal is open, STRICTLY hide it.
+        // This fixes the mobile bug where it showed for just 1 item.
+        if (currentItems.length <= 2 || selectedImage) {
             setShowMainScroll(false);
             return;
         }
 
         const scrollY = window.scrollY || document.documentElement.scrollTop;
         const windowHeight = window.innerHeight;
-        
-        // Use Math.max to guarantee we get the true height of the page on Desktop browsers
-        const documentHeight = Math.max(
-            document.body.scrollHeight, 
-            document.documentElement.scrollHeight,
-            document.body.offsetHeight, 
-            document.documentElement.offsetHeight
-        );
+        const documentHeight = document.documentElement.scrollHeight;
 
-        // A 50px buffer prevents the indicator from showing if the layout just barely 
-        // overflows due to a minor margin or border.
-        const isScrollable = documentHeight > (windowHeight + 50);
+        // 2. Check if the document is actually taller than the screen.
+        // Using a tiny 10px buffer ensures it shows up on Desktop correctly.
+        const isScrollable = documentHeight > windowHeight + 10;
         
-        // Hide it if we scroll within 40px of the very bottom of the page
-        const isNotAtBottom = (scrollY + windowHeight) < (documentHeight - 40);
+        // 3. Check if we haven't scrolled to the very bottom yet.
+        // Math.ceil fixes a bug where desktop displays use decimal pixels for scrolling.
+        const isNotAtBottom = Math.ceil(scrollY + windowHeight) < documentHeight - 20;
 
+        // 4. Only show the indicator if it's scrollable AND we aren't at the bottom
         setShowMainScroll(isScrollable && isNotAtBottom);
     };
 
-    // A slightly longer 100ms timeout ensures heavy desktop tables finish rendering first
     const timer = setTimeout(checkMainScroll, 100); 
     
     window.addEventListener('scroll', checkMainScroll);
@@ -111,7 +106,7 @@ export default function RegistrationApprovals() {
         window.removeEventListener('scroll', checkMainScroll);
         window.removeEventListener('resize', checkMainScroll);
     };
-  }, [currentItems, currentPage, selectedImage]); // Re-runs anytime items or modal changes
+  }, [currentItems, currentPage, selectedImage]); 
 
   const handleAction = async (paymentId, action) => {
     setProcessingId(paymentId);
@@ -369,4 +364,3 @@ export default function RegistrationApprovals() {
     </div>
   );
 }
- 
