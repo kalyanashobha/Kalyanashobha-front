@@ -260,32 +260,52 @@
 .status-forwarded { background-color: #dcfce7; color: #15803d; border-color: #bbf7d0; stroke: #15803d; }
 .status-closed { background-color: #f1f5f9; color: #475569; border-color: #e2e8f0; stroke: #475569; }
 
-/* --- PAGINATION --- */
-.avl-pagination-bar {
+/* --- NEW CIRCULAR PAGINATION UI --- */
+.avl-pagination-container {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  padding: 16px 24px;
-  border-top: 1px solid var(--avl-border);
-  background: #f8fafc;
-  flex-wrap: wrap;
-  gap: 16px;
+  padding: 24px 16px;
+  gap: 24px;
+  background: transparent; 
+  border-top: none;
 }
-.avl-pagination-text { font-size: 13px; color: var(--avl-text-sub); }
-.avl-pagination-controls { display: flex; gap: 8px; }
-.avl-page-btn {
-  display: flex; align-items: center; justify-content: center; gap: 4px;
-  padding: 6px 16px;
-  border: 1px solid var(--avl-border);
-  background: white;
-  border-radius: var(--avl-radius-sm);
-  color: var(--avl-text-main);
-  font-size: 13px; font-weight: 600;
+
+.avl-page-btn-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  color: #64748b;
   cursor: pointer;
   transition: var(--avl-anim);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
 }
-.avl-page-btn:hover:not(:disabled) { background: #f1f5f9; border-color: var(--avl-border-hover); }
-.avl-page-btn:disabled { opacity: 0.5; cursor: not-allowed; background: #f8fafc; }
+
+.avl-page-btn-circle:hover:not(:disabled) {
+  background: #f8fafc;
+  color: #0f172a;
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  transform: translateY(-1px);
+}
+
+.avl-page-btn-circle:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: #f8fafc;
+}
+
+.avl-page-text {
+  font-size: 16px;
+  font-weight: 600;
+  color: #475569;
+  letter-spacing: 0.3px;
+}
 
 /* --- STATE VIEWS --- */
 .avl-state-view {
@@ -322,7 +342,7 @@
 
 /* --- SCROLL INDICATOR UI --- */
 .avl-scroll-indicator {
-  display: none; 
+  display: flex; /* Kept visible globally on Desktop/Mobile when needed */
   position: fixed;
   bottom: 24px;
   left: 50%;
@@ -346,14 +366,11 @@
   50% { transform: translate(-50%, 6px); }
 }
 
-
 /* =========================================================
    MOBILE RESPONSIVENESS (NO HORIZONTAL SCROLLING)
    ========================================================= */
 @media (max-width: 768px) {
   .avl-layout { padding: 16px; }
-  
-  .avl-scroll-indicator { display: flex; }
 
   /* Header & Controls */
   .avl-title-group h2 { font-size: 20px; }
@@ -361,11 +378,8 @@
   .avl-controls-group { flex-direction: column; align-items: stretch; }
   .avl-search-group { max-width: 100%; }
 
-  /* TABLE -> CARDS (CRITICAL FIXES FOR HORIZONTAL OVERFLOW) */
-  .avl-table-wrapper {
-      overflow-x: hidden; /* Stop wrapper from scrolling horizontally */
-  }
-
+  /* TABLE -> CARDS */
+  .avl-table-wrapper { overflow-x: hidden; }
   .avl-data-table thead { display: none; }
   .avl-data-card { background: transparent; border: none; box-shadow: none; }
   
@@ -374,7 +388,7 @@
       display: block; 
       width: 100%; 
       box-sizing: border-box;
-      min-width: unset; /* Remove the 900px min width! */
+      min-width: unset; 
   }
   
   .avl-data-table tr {
@@ -382,14 +396,11 @@
       background: var(--avl-card-bg);
       border: 1px solid var(--avl-border);
       border-radius: 12px;
-      padding: 12px; /* Slight padding reduction */
+      padding: 12px; 
       box-shadow: var(--avl-shadow-sm);
   }
   
-  .avl-empty-cell {
-      padding: 0 !important;
-      border: none !important;
-  }
+  .avl-empty-cell { padding: 0 !important; border: none !important; }
 
   /* Flex alignment for Mobile Cells */
   .avl-data-table td {
@@ -415,21 +426,20 @@
       margin-right: 10px;
       flex-shrink: 0;
       margin-top: 2px;
-      width: 90px; /* STRICT fixed width for the label */
+      width: 90px; 
       text-align: left;
   }
 
   /* Cell Content Overrides */
   .avl-info-stack, .avl-message-box, .avl-action-group { 
-      flex: 1; /* Take exactly the remaining space */
-      max-width: calc(100% - 100px); /* Strictly prevent content from pushing screen wide */
+      flex: 1; 
+      max-width: calc(100% - 100px); 
       display: flex;
       flex-direction: column;
       align-items: flex-end; 
       text-align: right; 
   }
   
-  /* Force long text to wrap */
   .avl-info-stack strong, .avl-text-muted, .avl-message-box p, .avl-vendor-id, .avl-vendor-contact {
       word-break: break-word;
       white-space: pre-wrap;
@@ -443,17 +453,13 @@
   
   .avl-status-select { font-size: 11px; padding: 6px 24px 6px 12px; background-position: right 8px center;}
   
-  /* Pagination Stack */
-  .avl-pagination-bar {
-      flex-direction: column;
-      border-radius: 12px;
-      border: 1px solid var(--avl-border);
-      padding: 16px;
-      box-shadow: var(--avl-shadow-sm);
+  /* Circular Pagination Stack Mobile */
+  .avl-pagination-container {
+      padding: 16px 0;
       gap: 16px;
   }
-  .avl-pagination-controls { width: 100%; justify-content: space-between; }
-  .avl-page-btn { flex: 1; }
+  .avl-page-btn-circle { width: 40px; height: 40px; }
+  .avl-page-text { font-size: 14px; }
 
   /* Skeletons on Mobile */
   .avl-skeleton-row td { display: flex; flex-direction: column; align-items: flex-end; }
