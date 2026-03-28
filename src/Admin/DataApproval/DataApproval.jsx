@@ -15,7 +15,7 @@ const DataApproval = () => {
 
     // Pagination State
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 5; // Updated to 5 items for both Desktop and Mobile
+    const itemsPerPage = 4; // Changed to 4 items for both Desktop and Mobile
 
     // Mobile Scroll Indicator State
     const [showMainScroll, setShowMainScroll] = useState(false);
@@ -171,8 +171,8 @@ const DataApproval = () => {
             <div className="kda-content">
                 {isLoading ? (
                     <div className="kda-skeleton-stack">
-                        {/* Updated to 5 skeleton items to match the itemsPerPage */}
-                        {[1, 2, 3, 4, 5].map(i => (
+                        {/* Updated to show 4 skeletons matching the 4 items per page */}
+                        {[1, 2, 3, 4].map(i => (
                             <div key={i} className="kda-skeleton-row">
                                 <div className="kda-sk-box kda-sk-cat"></div>
                                 <div className="kda-sk-box kda-sk-val"></div>
