@@ -15,23 +15,12 @@ const DataApproval = () => {
 
     // Pagination State
     const [currentPage, setCurrentPage] = useState(1);
-    // Dynamic items per page: 3 for mobile, 5 for laptops
-    const [itemsPerPage, setItemsPerPage] = useState(window.innerWidth < 768 ? 3 : 5);
+    const itemsPerPage = 6; // Fixed 6 items for both Desktop and Mobile
 
     // Mobile Scroll Indicator State
     const [showMainScroll, setShowMainScroll] = useState(false);
 
     const API_BASE = "https://kalyanashobha-back.vercel.app/api/admin/pending-data";
-
-    // Resize listener to adjust items per page dynamically
-    useEffect(() => {
-        const handleResize = () => {
-            setItemsPerPage(window.innerWidth < 768 ? 3 : 5);
-            setCurrentPage(1); // Reset page on resize
-        };
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
 
     useEffect(() => {
         fetchPendingData();
@@ -182,7 +171,7 @@ const DataApproval = () => {
             <div className="kda-content">
                 {isLoading ? (
                     <div className="kda-skeleton-stack">
-                        {[1, 2, 3, 4, 5].map(i => (
+                        {[1, 2, 3, 4, 5, 6].map(i => (
                             <div key={i} className="kda-skeleton-row">
                                 <div className="kda-sk-box kda-sk-cat"></div>
                                 <div className="kda-sk-box kda-sk-val"></div>
@@ -268,47 +257,28 @@ const DataApproval = () => {
                             </table>
                         </div>
 
-                        {/* Pagination Controls - Visible even if 1 page to show bounds */}
-                        {filteredItems.length > 0 && (
+                        {/* NEW CIRCULAR PAGINATION DESIGN */}
+                        {totalPages > 1 && (
                             <div className="kda-pagination-container">
-                                <span className="kda-page-info">
-                                    Showing <span style={{fontWeight: 700}}>{indexOfFirstItem + 1}</span> to <span style={{fontWeight: 700}}>{Math.min(indexOfLastItem, filteredItems.length)}</span> of <span style={{fontWeight: 700}}>{filteredItems.length}</span> entries
+                                <button 
+                                    className="kda-page-btn-circle" 
+                                    onClick={() => paginate(currentPage - 1)} 
+                                    disabled={currentPage === 1}
+                                >
+                                    <ChevronLeft size={20} />
+                                </button>
+                                
+                                <span className="kda-page-text">
+                                    Page {currentPage} of {totalPages}
                                 </span>
-                                <div className="kda-pagination">
-                                    <button 
-                                        className="kda-page-btn" 
-                                        onClick={() => paginate(currentPage - 1)} 
-                                        disabled={currentPage === 1}
-                                    >
-                                        <ChevronLeft size={16} /> Prev
-                                    </button>
-                                    
-                                    <div className="kda-page-numbers">
-                                        {[...Array(totalPages)].map((_, index) => {
-                                            if (totalPages > 5 && (index + 1 < currentPage - 1 || index + 1 > currentPage + 1) && index !== 0 && index !== totalPages - 1) {
-                                                if (index + 1 === currentPage - 2 || index + 1 === currentPage + 2) return <span key={index} className="kda-page-dots">...</span>;
-                                                return null;
-                                            }
-                                            return (
-                                                <button 
-                                                    key={index + 1} 
-                                                    className={`kda-page-number ${currentPage === index + 1 ? 'active' : ''}`}
-                                                    onClick={() => paginate(index + 1)}
-                                                >
-                                                    {index + 1}
-                                                </button>
-                                            );
-                                        })}
-                                    </div>
 
-                                    <button 
-                                        className="kda-page-btn" 
-                                        onClick={() => paginate(currentPage + 1)} 
-                                        disabled={currentPage === totalPages}
-                                    >
-                                        Next <ChevronRight size={16} />
-                                    </button>
-                                </div>
+                                <button 
+                                    className="kda-page-btn-circle" 
+                                    onClick={() => paginate(currentPage + 1)} 
+                                    disabled={currentPage === totalPages}
+                                >
+                                    <ChevronRight size={20} />
+                                </button>
                             </div>
                         )}
                     </>
