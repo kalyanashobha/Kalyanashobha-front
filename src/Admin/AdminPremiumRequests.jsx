@@ -460,7 +460,25 @@ const AdminPremiumRequests = () => {
                     letter-spacing: 0.3px !important;
                 }
 
-                /* Loading & Empty States */
+                /* --- SKELETON ANIMATION --- */
+                .admin-skeleton-stack { padding: 24px !important; display: flex !important; flex-direction: column !important; gap: 20px !important; }
+                .admin-skeleton-row { display: flex !important; gap: 24px !important; align-items: center !important; }
+                .admin-sk-box {
+                    background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%) !important;
+                    background-size: 200% 100% !important;
+                    animation: shimmer 1.5s infinite !important;
+                    height: 20px !important;
+                    border-radius: 6px !important;
+                }
+                @keyframes shimmer { 0% { background-position: -200% 0 !important; } 100% { background-position: 200% 0 !important; } }
+                .admin-sk-user { width: 180px !important; height: 40px !important; }
+                .admin-sk-contact { width: 150px !important; height: 40px !important;}
+                .admin-sk-loc { width: 120px !important; }
+                .admin-sk-date { width: 120px !important; }
+                .admin-sk-status { width: 90px !important; border-radius: 20px !important;}
+                .admin-sk-action { width: 120px !important; height: 36px !important; margin-left: auto !important; }
+
+                /* Empty States */
                 .admin-state-view {
                     padding: 60px 24px !important;
                     display: flex !important; flex-direction: column !important;
@@ -469,14 +487,6 @@ const AdminPremiumRequests = () => {
                 }
                 .admin-state-view.empty svg { width: 48px !important; height: 48px !important; color: #cbd5e1 !important; }
                 .admin-state-view h3 { margin: 0 !important; color: var(--pr-text-main) !important; font-size: 18px !important; }
-                .admin-spinner {
-                    width: 32px !important; height: 32px !important;
-                    border: 3px solid var(--pr-border) !important;
-                    border-top-color: var(--pr-primary) !important;
-                    border-radius: 50% !important;
-                    animation: apr-spin 1s linear infinite !important;
-                }
-                @keyframes apr-spin { to { transform: rotate(360deg) !important; } }
 
                 /* --- SCROLL INDICATOR UI --- */
                 .admin-scroll-indicator {
@@ -532,20 +542,17 @@ const AdminPremiumRequests = () => {
                     .admin-tabs-wrapper { 
                         width: 100% !important;
                         max-width: 100% !important;
-                        /* Added slightly tighter gap and padding for mobile */
                         gap: 4px !important;
                         padding: 4px !important;
                     }
                     
                     .admin-tab-button { 
-                        /* Reduced Font Size and Padding for Mobile Tab Alignment */
                         padding: 6px 12px !important; 
                         font-size: 12px !important; 
                         gap: 6px !important;
                     }
 
                     .admin-tab-count {
-                        /* Reduced count badge padding and size */
                         padding: 2px 6px !important;
                         font-size: 10px !important;
                     }
@@ -620,7 +627,6 @@ const AdminPremiumRequests = () => {
                     .admin-action-group { width: 100% !important; justify-content: flex-end !important; }
                     .admin-btn { font-size: 13px !important; padding: 8px 16px !important; }
                     
-                    /* Clean mobile pagination padding */
                     .admin-pagination-container {
                         padding: 16px 0 !important;
                         gap: 16px !important;
@@ -632,6 +638,17 @@ const AdminPremiumRequests = () => {
                     .admin-page-text {
                         font-size: 14px !important;
                     }
+
+                    /* Skeleton Mobile */
+                    .admin-skeleton-stack { padding: 0 !important; }
+                    .admin-skeleton-row { 
+                        flex-direction: column !important; align-items: stretch !important; gap: 12px !important; 
+                        background: var(--pr-card-bg) !important; padding: 16px !important; border-radius: 16px !important; 
+                        border: 1px solid var(--pr-border) !important; margin-bottom: 16px !important;
+                    }
+                    .admin-sk-user, .admin-sk-contact, .admin-sk-loc, .admin-sk-date, .admin-sk-status { width: 100% !important; height: 16px !important; }
+                    .admin-sk-user { height: 32px !important; }
+                    .admin-sk-action { width: 100% !important; height: 36px !important; margin-top: 8px !important; margin-left: 0 !important;}
                 }
             `}</style>
 
@@ -676,9 +693,17 @@ const AdminPremiumRequests = () => {
 
             <div className="admin-data-card" id="premium-data-view">
                 {loading ? (
-                    <div className="admin-state-view">
-                        <span className="admin-spinner"></span>
-                        Loading requests...
+                    <div className="admin-skeleton-stack">
+                        {[1, 2, 3, 4, 5, 6].map(i => (
+                            <div key={i} className="admin-skeleton-row">
+                                <div className="admin-sk-box admin-sk-user"></div>
+                                <div className="admin-sk-box admin-sk-contact"></div>
+                                <div className="admin-sk-box admin-sk-loc"></div>
+                                <div className="admin-sk-box admin-sk-date"></div>
+                                <div className="admin-sk-box admin-sk-status"></div>
+                                <div className="admin-sk-box admin-sk-action"></div>
+                            </div>
+                        ))}
                     </div>
                 ) : filteredRequests.length === 0 ? (
                     <div className="admin-state-view empty">
@@ -760,7 +785,7 @@ const AdminPremiumRequests = () => {
                             </table>
                         </div>
 
-                        {/* NEW CIRCULAR PAGINATION DESIGN */}
+                        {/* CIRCULAR PAGINATION DESIGN */}
                         {totalPages > 1 && (
                             <div className="admin-pagination-container">
                                 <button 
@@ -788,7 +813,7 @@ const AdminPremiumRequests = () => {
                 )}
             </div>
             
-            {/* NEW SCROLL INDICATOR */}
+            {/* SCROLL INDICATOR */}
             {showMainScroll && (
                 <div className="admin-scroll-indicator">
                     <Icons.ChevronDown />
