@@ -1,104 +1,101 @@
 import React, { useState, useEffect } from "react";
-import { Check, X, Clock, ArrowRight, Filter, RefreshCw, Phone, ChevronLeft, ChevronRight, ChevronDown } from "lucide-react";
+import { Check, X, Eye, Clock, Filter, ChevronLeft, ChevronRight, ChevronDown, Search } from "lucide-react";
 import axios from "axios";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-import "./InterestApprovals.css"; 
+import "./RegistrationApprovals.css"; 
 
-export default function InterestApprovals() {
-  const [requests, setRequests] = useState([]);
+export default function RegistrationApprovals() {
+  const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  // Tabs: 'PendingAdminPhase1' (New), 'PendingAdminPhase2' (Accepted), 'Finalized' (Completed)
-  const [activeTab, setActiveTab] = useState("PendingAdminPhase1"); 
+  const [activeTab, setActiveTab] = useState("PendingVerification"); 
+  const [selectedImage, setSelectedImage] = useState(null);
   const [processingId, setProcessingId] = useState(null);
-  const [tabCounts, setTabCounts] = useState({ phase1: 0, phase2: 0 });
 
-  // --- PAGINATION & SCROLL STATES ---
+  // --- SEARCH & PAGINATION STATES ---
+  const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6; // Fixed 6 items for both Desktop and Mobile
+  const itemsPerPage = 6; 
+
+  // Mobile Scroll Indicator State
   const [showMainScroll, setShowMainScroll] = useState(false);
 
-  // Fetch Data for the active tab
-  const fetchRequests = async () => {
+  const fetchPayments = async () => {
     setLoading(true);
     try {
       const token = localStorage.getItem("adminToken");
       const response = await axios.get(
-        `https://kalyanashobha-back.vercel.app/api/admin/interest/workflow?status=${activeTab}`,
+        `https://kalyanashobha-back.vercel.app/api/admin/payment/registrations?status=${activeTab}`,
         { headers: { Authorization: token } }
       );
       if (response.data.success) {
-        setRequests(response.data.data);
-        setCurrentPage(1); // Reset page on data fetch
+        setPayments(response.data.payments);
+        setCurrentPage(1); 
+        setSearchQuery(""); // Clear search when switching tabs
       }
     } catch (error) {
-      console.error("Error fetching interests", error);
-      toast.error("Failed to load requests.");
+      console.error("Error fetching payments", error);
+      toast.error("Failed to load records.");
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchCounts = async () => {
-    try {
-      const token = localStorage.getItem("adminToken");
-      const [res1, res2] = await Promise.all([
-        axios.get(`https://kalyanashobha-back.vercel.app/api/admin/interest/workflow?status=PendingAdminPhase1`, { headers: { Authorization: token } }),
-        axios.get(`https://kalyanashobha-back.vercel.app/api/admin/interest/workflow?status=PendingAdminPhase2`, { headers: { Authorization: token } })
-      ]);
-
-      setTabCounts({
-        phase1: res1.data.success ? res1.data.data.length : 0,
-        phase2: res2.data.success ? res2.data.data.length : 0,
-      });
-    } catch (error) {
-      console.error("Error fetching counts for badges", error);
-    }
-  };
-
   useEffect(() => {
-    fetchRequests();
-    fetchCounts();
+    fetchPayments();
   }, [activeTab]);
 
-  // --- PAGINATION LOGIC (Moved up so we can use currentItems in the scroll check) ---
-  const totalPages = Math.ceil(requests.length / itemsPerPage) || 1;
+  // Reset to page 1 whenever the search query changes
+  useEffect(() => {
+      setCurrentPage(1);
+  }, [searchQuery]);
+
+  // --- FILTERING LOGIC ---
+  const filteredPayments = payments.filter((pay) => {
+      const query = searchQuery.toLowerCase();
+      const name = `${pay.userId?.firstName || ""} ${pay.userId?.lastName || ""}`.toLowerCase();
+      const uniqueId = (pay.userId?.uniqueId || "").toLowerCase();
+      const mobile = (pay.userId?.mobileNumber || "").toLowerCase();
+      const utr = (pay.utrNumber || "").toLowerCase();
+
+      return name.includes(query) || uniqueId.includes(query) || mobile.includes(query) || utr.includes(query);
+  });
+
+  // --- PAGINATION LOGIC ---
+  const totalPages = Math.ceil(filteredPayments.length / itemsPerPage) || 1;
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = requests.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = filteredPayments.slice(indexOfFirstItem, indexOfLastItem);
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-  // --- UNIVERSAL SCROLL INDICATOR LOGIC (PERFECTED) ---
+  // --- UNIVERSAL SCROLL INDICATOR LOGIC (CORRECTED) ---
   useEffect(() => {
     const checkMainScroll = () => {
-        // 1. Safety net: If there are 2 or fewer items, we definitely don't need a scrollbar 
-        // on a standard layout, so force it to hide.
-        if (currentItems.length <= 2) {
+        // 1. Safety net: If there are 2 or fewer items, or the modal is open, STRICTLY hide it.
+        if (currentItems.length <= 2 || selectedImage) {
             setShowMainScroll(false);
             return;
         }
 
         const scrollY = window.scrollY || document.documentElement.scrollTop;
-        const windowHeight = window.innerHeight;
-        const documentHeight = document.documentElement.scrollHeight;
+        const clientHeight = document.documentElement.clientHeight;
+        const scrollHeight = document.documentElement.scrollHeight;
 
         // 2. Check if the document is actually taller than the screen.
-        // Using a tiny 10px buffer ensures it shows up on Desktop correctly.
-        const isScrollable = documentHeight > windowHeight + 10;
+        // We use an 80px buffer to account for padding and margins.
+        const isScrollable = scrollHeight > clientHeight + 80;
         
         // 3. Check if we haven't scrolled to the very bottom yet.
-        // Math.ceil fixes a bug where desktop displays use decimal pixels for scrolling.
-        const isNotAtBottom = Math.ceil(scrollY + windowHeight) < documentHeight - 20;
+        const isNotAtBottom = scrollY + clientHeight < scrollHeight - 30;
 
         // 4. Only show the indicator if it's scrollable AND we aren't at the bottom
         setShowMainScroll(isScrollable && isNotAtBottom);
     };
 
-    const timer = setTimeout(checkMainScroll, 100); 
-
+    const timer = setTimeout(checkMainScroll, 50); 
+    
     window.addEventListener('scroll', checkMainScroll);
     window.addEventListener('resize', checkMainScroll);
 
@@ -107,24 +104,24 @@ export default function InterestApprovals() {
         window.removeEventListener('scroll', checkMainScroll);
         window.removeEventListener('resize', checkMainScroll);
     };
-  }, [currentItems, currentPage]); // Re-run when currentItems changes
+  }, [currentItems, currentPage, selectedImage]); 
 
-  // Handle Actions
-  const handleAction = async (interestId, action, phase) => {
-    setProcessingId(interestId);
-    const toastId = toast.loading("Processing request...");
+  const handleAction = async (paymentId, action) => {
+    setProcessingId(paymentId);
+    const toastId = toast.loading(`Processing ${action}...`);
 
     try {
       const token = localStorage.getItem("adminToken");
       await axios.post(
-        "https://kalyanashobha-back.vercel.app/api/admin/interest/process",
-        { interestId, action, phase },
+        "https://kalyanashobha-back.vercel.app/api/admin/payment/registration/verify",
+        { paymentId, action }, 
         { headers: { Authorization: token } }
       );
 
-      toast.update(toastId, { render: "Action completed successfully", type: "success", isLoading: false, autoClose: 3000 });
-      fetchRequests(); 
-      fetchCounts(); 
+      toast.update(toastId, { render: `Payment ${action}ed successfully`, type: "success", isLoading: false, autoClose: 3000 });
+      fetchPayments();
+      window.dispatchEvent(new Event("paymentUpdated"));
+
     } catch (error) {
       toast.update(toastId, { render: "Action failed. Please try again.", type: "error", isLoading: false, autoClose: 3000 });
     } finally {
@@ -133,181 +130,172 @@ export default function InterestApprovals() {
   };
 
   return (
-    <div className="ksa-layout">
+    <div className="ra-layout">
       <ToastContainer position="top-right" theme="colored" />
 
-      {/* HEADER */}
-      <div className="ksa-header">
-        <div className="ksa-title-group">
-            <h2>Connection Management</h2>
-            <p>Review new requests and manage active match connections.</p>
+      {/* HEADER SECTION */}
+      <div className="ra-header">
+        <div className="ra-title-group">
+            <h2>Registration Approvals</h2>
+            <p>Verify membership payments and activate users.</p>
         </div>
-        <button className="ksa-refresh-btn" onClick={() => { fetchRequests(); fetchCounts(); }}>
-            <RefreshCw size={14}/> Refresh
-        </button>
+        
+        <div className="ra-header-actions" style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
+           <div className="ra-search-container" style={{ display: 'flex', alignItems: 'center', background: 'white', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '8px 12px', gap: '8px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
+               <Search size={16} color="#64748b" />
+               <input 
+                   type="text" 
+                   placeholder="Search name, ID, mobile, or UTR..." 
+                   value={searchQuery}
+                   onChange={(e) => setSearchQuery(e.target.value)}
+                   style={{ border: 'none', outline: 'none', background: 'transparent', fontSize: '13px', minWidth: '220px', color: '#0f172a' }}
+               />
+               {searchQuery && (
+                   <X 
+                     size={14} 
+                     color="#94a3b8" 
+                     style={{ cursor: 'pointer' }} 
+                     onClick={() => setSearchQuery("")} 
+                   />
+               )}
+           </div>
+           <button className="ra-refresh-btn" onClick={fetchPayments}>Refresh List</button>
+        </div>
       </div>
 
       {/* TABS */}
-      <div className="ksa-tabs-container">
-        <div className="ksa-tabs">
+      <div className="ra-tabs-container">
+        <div className="ra-tabs">
             <button 
-                className={`ksa-tab ${activeTab === "PendingAdminPhase1" ? "active" : ""}`} 
-                onClick={() => setActiveTab("PendingAdminPhase1")}
+              className={`ra-tab ${activeTab === "PendingVerification" ? "active" : ""}`} 
+              onClick={() => setActiveTab("PendingVerification")}
             >
-              New Requests
-              {tabCounts.phase1 > 0 && <span className="ksa-tab-dot"></span>}
+              Pending Review
+              {activeTab === "PendingVerification" && <span className="ra-tab-dot"></span>}
             </button>
             <button 
-                className={`ksa-tab ${activeTab === "PendingAdminPhase2" ? "active" : ""}`} 
-                onClick={() => setActiveTab("PendingAdminPhase2")}
+              className={`ra-tab ${activeTab === "Success" ? "active" : ""}`} 
+              onClick={() => setActiveTab("Success")}
             >
-              Accepted Matches
-              {tabCounts.phase2 > 0 && <span className="ksa-tab-dot ksa-dot-green"></span>}
+              Approved History
             </button>
             <button 
-                className={`ksa-tab ${activeTab === "Finalized" ? "active" : ""}`} 
-                onClick={() => setActiveTab("Finalized")}
+              className={`ra-tab ${activeTab === "Rejected" ? "active" : ""}`} 
+              onClick={() => setActiveTab("Rejected")}
             >
-              Completed Matches
+              Rejected
             </button>
         </div>
       </div>
 
-      {/* CONTENT TABLE */}
-      <div className="ksa-content">
+      {/* CONTENT AREA */}
+      <div className="ra-content">
         {loading ? (
-           <div className="ksa-skeleton-stack">
+           <div className="ra-skeleton-stack">
               {[1, 2, 3, 4, 5, 6].map(i => (
-                  <div key={i} className="ksa-skeleton-row">
-                      <div className="ksa-sk-box ksa-sk-date"></div>
-                      <div className="ksa-sk-box ksa-sk-flow"></div>
-                      <div className="ksa-sk-box ksa-sk-details"></div>
-                      <div className="ksa-sk-box ksa-sk-action"></div>
+                  <div key={i} className="ra-skeleton-row">
+                      <div className="sk-box sk-date"></div>
+                      <div className="sk-box sk-user"></div>
+                      <div className="sk-box sk-amount"></div>
+                      <div className="sk-box sk-action"></div>
                   </div>
               ))}
            </div>
-        ) : requests.length === 0 ? (
-          <div className="ksa-empty-state">
-             <div className="ksa-empty-icon"><Filter size={36}/></div>
-             <h3>No requests found</h3>
-             <p>There are no requests in this stage right now.</p>
+        ) : filteredPayments.length === 0 ? (
+          <div className="ra-empty-state">
+             <div className="ra-empty-icon"><Filter size={36}/></div>
+             <h3>No records found</h3>
+             <p>
+                {searchQuery 
+                    ? `No matching records found for "${searchQuery}".` 
+                    : `There are no ${activeTab.toLowerCase()} requests at the moment.`}
+             </p>
           </div>
         ) : (
           <>
-            <div className="ksa-table-container">
-              <table className="ksa-table">
+            <div className="ra-table-container">
+              <table className="ra-table">
                   <thead>
                   <tr>
-                      <th>Date</th>
-                      <th>Match Flow</th>
-                      <th>Connection Details</th>
+                      <th>Date & Time</th>
+                      <th>User Details</th>
+                      <th>Payment Info</th>
+                      <th>Proof Of Payment</th>
                       <th>Status</th>
-                      {activeTab !== "Finalized" && <th className="ksa-text-right">Actions</th>}
+                      {(activeTab === "PendingVerification" || activeTab === "Rejected") && <th className="ra-text-right">Actions</th>}
                   </tr>
                   </thead>
                   <tbody>
-                  {currentItems.map((req) => (
-                      <tr key={req._id} className={processingId === req._id ? "ksa-row-processing" : ""}>
-
-                      {/* DATE */}
+                  {currentItems.map((pay) => (
+                      <tr key={pay._id} className={processingId === pay._id ? "ra-row-processing" : ""}>
                       <td data-label="Date">
-                          <div className="ksa-date-cell">
-                              <Clock size={14} className="ksa-icon-sub"/>
-                              <div className="ksa-date-text">
-                                  <span>{new Date(req.date).toLocaleDateString()}</span>
-                                  <small>{new Date(req.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</small>
+                          <div className="ra-date-cell">
+                              <Clock size={14} className="ra-icon-sub"/>
+                              <div className="ra-date-text">
+                                  <span>{new Date(pay.date).toLocaleDateString()}</span>
+                                  <small>{new Date(pay.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</small>
                               </div>
                           </div>
                       </td>
-
-                      {/* FLOW */}
-                      <td data-label="Match Flow">
-                          <div className="ksa-flow-cell">
-                              <div className="ksa-user-mini">
-                                  <div className="ksa-avatar-xs">{req.senderId?.firstName?.[0] || "S"}</div>
-                                  <div className="ksa-user-text">
-                                      <span className="name">{req.senderId?.firstName}</span>
-                                  </div>
-                              </div>
-                              <div className="ksa-flow-arrow"><ArrowRight size={14}/></div>
-                              <div className="ksa-user-mini">
-                                  <div className="ksa-avatar-xs receiver">{req.receiverId?.firstName?.[0] || "R"}</div>
-                                  <div className="ksa-user-text">
-                                      <span className="name">{req.receiverId?.firstName}</span>
-                                  </div>
-                              </div>
+                      <td data-label="User">
+                          <div className="ra-user-cell">
+                             <div className="ra-avatar-initial">
+                                {pay.userId?.firstName?.[0] || "U"}
+                             </div>
+                             <div className="ra-user-info">
+                                  <strong>{pay.userId?.firstName} {pay.userId?.lastName}</strong>
+                                  <span className="ra-sub-id">{pay.userId?.uniqueId || "N/A"}</span>
+                                  <span className="ra-sub-phone">{pay.userId?.mobileNumber}</span>
+                             </div>
                           </div>
                       </td>
-
-                      {/* CONNECTION DETAILS */}
-                      <td data-label="Connection Details">
-                          <div className="ksa-contact-box">
-                              {/* SENDER BLOCK */}
-                              <div className="ksa-contact-person">
-                                  <span className="ksa-contact-label">Sent By (Initiator)</span>
-                                  <span className="ksa-contact-name">
-                                      {req.senderId?.firstName} {req.senderId?.lastName} 
-                                      <span className="ksa-contact-id">({req.senderId?.uniqueId})</span>
-                                  </span>
-                                  <span className="ksa-contact-number">
-                                      <Phone size={12}/> {req.senderId?.mobileNumber || "N/A"}
-                                  </span>
-                              </div>
-
-                              {/* RECEIVER BLOCK */}
-                              <div className="ksa-contact-person receiver-block">
-                                  <span className={`ksa-contact-label ${activeTab === 'PendingAdminPhase2' ? 'accepted' : 'pending'}`}>
-                                      {activeTab === 'PendingAdminPhase2' ? "✓ Accepted By (Receiver)" : "To Receiver"}
-                                  </span>
-                                  <span className="ksa-contact-name">
-                                      {req.receiverId?.firstName} {req.receiverId?.lastName} 
-                                      <span className="ksa-contact-id">({req.receiverId?.uniqueId})</span>
-                                  </span>
-                                  <span className="ksa-contact-number">
-                                      <Phone size={12}/> {req.receiverId?.mobileNumber || "N/A"}
-                                  </span>
-                              </div>
+                      <td data-label="Amount">
+                          <div className="ra-amount-badge">
+                             ₹{pay.amount?.toLocaleString()}
                           </div>
                       </td>
-
-                      {/* STATUS */}
+                      <td data-label="Proof">
+                          <div className="ra-proof-group">
+                              <div className="ra-utr">
+                                  <span className="label">UTR:</span>
+                                  <span className="val">{pay.utrNumber}</span>
+                              </div>
+                              <button 
+                                  className="ra-view-screenshot-btn" 
+                                  onClick={() => setSelectedImage(pay.screenshotUrl)}
+                              >
+                                  <Eye size={14} /> View
+                              </button>
+                          </div>
+                      </td>
                       <td data-label="Status">
-                          <span className={`ksa-status-badge ${req.status}`}>
-                            {req.status === 'PendingAdminPhase1' ? 'Awaiting Review' : 
-                              req.status === 'PendingAdminPhase2' ? 'Action Required' : 
-                              req.status === 'Finalized' ? 'Completed' :
-                              req.status}
+                          <span className={`ra-status-badge ${pay.status.toLowerCase()}`}>
+                             {pay.status === 'PendingVerification' ? 'Pending' : pay.status}
                           </span>
                       </td>
 
-                      {/* ACTIONS */}
-                      {activeTab === "PendingAdminPhase1" && (
-                          <td data-label="Actions" className="ksa-text-right">
-                          <div className="ksa-actions">
+                      {(activeTab === "PendingVerification" || activeTab === "Rejected") && (
+                          <td data-label="Actions" className="ra-text-right">
+                          <div className="ra-actions">
                               <button 
-                                  className="ksa-btn-outline-primary" 
-                                  onClick={() => handleAction(req._id, 'approve', 1)} 
-                                  disabled={processingId === req._id}
+                                  className="ra-btn-approve" 
+                                  onClick={() => handleAction(pay._id, "approve")}
+                                  disabled={processingId === pay._id}
+                                  title="Approve Payment"
                               >
-                                  Forward Request
+                                  {processingId === pay._id ? <div className="spinner-sm"></div> : <Check size={18} />}
                               </button>
-                              <button className="ksa-btn-reject" onClick={() => handleAction(req._id, 'reject', 1)} disabled={processingId === req._id} title="Reject Request">
-                                  {processingId === req._id ? <div className="spinner-sm"></div> : <X size={18} />}
-                              </button>
-                          </div>
-                          </td>
-                      )}
 
-                      {activeTab === "PendingAdminPhase2" && (
-                          <td data-label="Actions" className="ksa-text-right">
-                          <div className="ksa-actions">
-                              <button 
-                                  className="ksa-btn-success"
-                                  onClick={() => handleAction(req._id, 'finalize', 2)} 
-                                  disabled={processingId === req._id}
-                              >
-                                  {processingId === req._id ? <div className="spinner-sm"></div> : <><Check size={16} strokeWidth={3}/> Finalize Match</>}
-                              </button>
+                              {activeTab === "PendingVerification" && (
+                                  <button 
+                                      className="ra-btn-reject" 
+                                      onClick={() => handleAction(pay._id, "reject")}
+                                      disabled={processingId === pay._id}
+                                      title="Reject Payment"
+                                  >
+                                      {processingId === pay._id ? <div className="spinner-sm"></div> : <X size={18} />}
+                                  </button>
+                              )}
                           </div>
                           </td>
                       )}
@@ -319,21 +307,21 @@ export default function InterestApprovals() {
 
             {/* NEW PAGINATION DESIGN */}
             {totalPages > 1 && (
-                <div className="ksa-pagination-container">
+                <div className="ra-pagination-container">
                     <button 
-                        className="ksa-page-btn-circle" 
+                        className="ra-page-btn-circle" 
                         onClick={() => paginate(currentPage - 1)} 
                         disabled={currentPage === 1}
                     >
                         <ChevronLeft size={20} />
                     </button>
 
-                    <span className="ksa-page-text">
+                    <span className="ra-page-text">
                         Page {currentPage} of {totalPages}
                     </span>
 
                     <button 
-                        className="ksa-page-btn-circle" 
+                        className="ra-page-btn-circle" 
                         onClick={() => paginate(currentPage + 1)} 
                         disabled={currentPage === totalPages}
                     >
@@ -347,10 +335,29 @@ export default function InterestApprovals() {
 
       {/* UNIVERSAL SCROLL INDICATOR */}
       {showMainScroll && (
-          <div className="ksa-scroll-indicator">
+          <div className="ra-scroll-indicator">
               <ChevronDown size={18} />
               <span>Scroll for more</span>
           </div>
+      )}
+
+      {/* IMAGE MODAL */}
+      {selectedImage && (
+        <div className="ra-modal-overlay" onClick={() => setSelectedImage(null)}>
+          <div className="ra-modal-anim">
+            <div className="ra-modal-content" onClick={(e) => e.stopPropagation()}>
+                <div className="ra-modal-header">
+                    <h3>Payment Proof</h3>
+                    <button className="ra-modal-close" onClick={() => setSelectedImage(null)}>
+                        <X size={20}/>
+                    </button>
+                </div>
+                <div className="ra-modal-body">
+                    <img src={selectedImage} alt="Payment Proof" />
+                </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
