@@ -322,8 +322,8 @@ export default function InterestApprovals() {
               </table>
             </div>
 
-            {/* NEW PAGINATION DESIGN */}
-            {totalPages > 1 && (
+            {/* ALWAYS VISIBLE PAGINATION DESIGN */}
+            {totalPages >= 1 && (
                 <div className="ksa-pagination-container">
                     <button 
                         className="ksa-page-btn-circle" 
