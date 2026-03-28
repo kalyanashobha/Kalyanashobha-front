@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { Check, X, Database, ChevronLeft, ChevronRight, RefreshCw, Search, ChevronDown } from 'lucide-react';
 import { ToastContainer, toast } from 'react-toastify';
@@ -17,10 +17,32 @@ const DataApproval = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 6; // Fixed 6 items for both Desktop and Mobile
 
-    // Mobile Scroll Indicator State
+    // Mobile/Desktop Scroll Indicator State
     const [showMainScroll, setShowMainScroll] = useState(false);
+    
+    // 1. ADD A REF FOR THE CONTAINER
+    const scrollContainerRef = useRef(null);
 
     const API_BASE = "https://kalyanashobha-back.vercel.app/api/admin/pending-data";
+
+    // Filter Logic (Moved up so it can be used in the scroll dependency)
+    const filteredItems = pendingItems.filter(item => {
+        const searchStr = searchTerm.toLowerCase();
+        const val = (item.value || '').toLowerCase();
+        const cat = (item.category || '').toLowerCase();
+        const parent = (item.parentValue || '').toLowerCase();
+        const fName = (item.submittedBy?.firstName || '').toLowerCase();
+        const lName = (item.submittedBy?.lastName || '').toLowerCase();
+        const uId = (item.submittedBy?.uniqueId || '').toLowerCase();
+
+        return val.includes(searchStr) || cat.includes(searchStr) || parent.includes(searchStr) || fName.includes(searchStr) || lName.includes(searchStr) || uId.includes(searchStr);
+    });
+
+    // Pagination Calculations
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = filteredItems.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(filteredItems.length / itemsPerPage) || 1;
 
     useEffect(() => {
         fetchPendingData();
@@ -30,6 +52,55 @@ const DataApproval = () => {
     useEffect(() => {
         setCurrentPage(1);
     }, [searchTerm]);
+
+    // 2. UPDATED SCROLL INDICATOR LOGIC
+    useEffect(() => {
+        const checkMainScroll = () => {
+            if (currentItems.length === 0) {
+                setShowMainScroll(false);
+                return;
+            }
+
+            // Check standard window/document scroll
+            const windowScrollY = window.scrollY || document.documentElement.scrollTop;
+            const windowHeight = window.innerHeight;
+            const documentHeight = document.documentElement.scrollHeight;
+            const hasWindowScroll = (documentHeight > windowHeight + 20) && (windowScrollY + windowHeight < documentHeight - 30);
+
+            // Check specific container scroll (crucial for Desktop/PC layouts)
+            let hasContainerScroll = false;
+            if (scrollContainerRef.current) {
+                const { scrollTop, scrollHeight, clientHeight } = scrollContainerRef.current;
+                // If scrollHeight is greater than the visible height, it means it's scrollable
+                hasContainerScroll = (scrollHeight > clientHeight + 20) && (scrollTop + clientHeight < scrollHeight - 30);
+            }
+
+            // Show indicator if EITHER the window OR the container has more room to scroll
+            setShowMainScroll(hasWindowScroll || hasContainerScroll);
+        };
+
+        // Delay slightly to allow the DOM to paint the table rows first
+        const timer = setTimeout(checkMainScroll, 300); 
+        
+        // Listeners for window
+        window.addEventListener('scroll', checkMainScroll);
+        window.addEventListener('resize', checkMainScroll);
+
+        // Listeners for the specific container
+        const containerEl = scrollContainerRef.current;
+        if (containerEl) {
+            containerEl.addEventListener('scroll', checkMainScroll);
+        }
+
+        return () => {
+            clearTimeout(timer);
+            window.removeEventListener('scroll', checkMainScroll);
+            window.removeEventListener('resize', checkMainScroll);
+            if (containerEl) {
+                containerEl.removeEventListener('scroll', checkMainScroll);
+            }
+        };
+    }, [currentItems, currentPage]); // Depend on currentItems so it recalculates when data changes
 
     const fetchPendingData = async () => {
         setIsLoading(true);
@@ -49,69 +120,6 @@ const DataApproval = () => {
             setIsLoading(false);
         }
     };
-
-    // --- FILTER & PAGINATION LOGIC (Moved up for the scroll check) ---
-    const filteredItems = pendingItems.filter(item => {
-        const searchStr = searchTerm.toLowerCase();
-        const val = (item.value || '').toLowerCase();
-        const cat = (item.category || '').toLowerCase();
-        const parent = (item.parentValue || '').toLowerCase();
-        const fName = (item.submittedBy?.firstName || '').toLowerCase();
-        const lName = (item.submittedBy?.lastName || '').toLowerCase();
-        const uId = (item.submittedBy?.uniqueId || '').toLowerCase();
-
-        return val.includes(searchStr) || cat.includes(searchStr) || parent.includes(searchStr) || fName.includes(searchStr) || lName.includes(searchStr) || uId.includes(searchStr);
-    });
-
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = filteredItems.slice(indexOfFirstItem, indexOfLastItem);
-    const totalPages = Math.ceil(filteredItems.length / itemsPerPage) || 1;
-
-    const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
-    // --- UNIVERSAL SCROLL INDICATOR LOGIC (BULLETPROOF) ---
-    useEffect(() => {
-        const checkMainScroll = () => {
-            // 1. Safety net: If there are 2 or fewer items, force it to hide.
-            if (currentItems.length <= 2) {
-                setShowMainScroll(false);
-                return;
-            }
-
-            const scrollY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop;
-            const windowHeight = window.innerHeight || document.documentElement.clientHeight;
-            
-            // 2. The most robust way to get height on all devices and browsers
-            const documentHeight = Math.max(
-                document.body.scrollHeight, 
-                document.documentElement.scrollHeight,
-                document.body.offsetHeight, 
-                document.documentElement.offsetHeight
-            );
-
-            // 3. A tiny 5px buffer so it instantly appears when resizing the window
-            const isScrollable = documentHeight > (windowHeight + 5);
-
-            // 4. Math.ceil stops decimal pixel rounding bugs on high-res monitors
-            const isNotAtBottom = Math.ceil(scrollY + windowHeight) < (documentHeight - 15);
-
-            // 5. Only show the indicator if it's scrollable AND we aren't at the bottom
-            setShowMainScroll(isScrollable && isNotAtBottom);
-        };
-
-        // A 100ms delay gives the DOM enough time to paint the new items
-        const timer = setTimeout(checkMainScroll, 100); 
-
-        window.addEventListener('scroll', checkMainScroll);
-        window.addEventListener('resize', checkMainScroll);
-
-        return () => {
-            clearTimeout(timer);
-            window.removeEventListener('scroll', checkMainScroll);
-            window.removeEventListener('resize', checkMainScroll);
-        };
-    }, [currentItems, currentPage]); 
 
     const handleAction = async (pendingId, action) => {
         if (action === 'approve') {
@@ -159,8 +167,11 @@ const DataApproval = () => {
         }
     };
 
+    const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
     return (
-        <div className="kda-layout">
+        // 3. ATTACH THE REF TO YOUR MAIN WRAPPER
+        <div className="kda-layout" ref={scrollContainerRef}>
             <ToastContainer position="top-right" theme="colored" />
 
             <div className="kda-header">
