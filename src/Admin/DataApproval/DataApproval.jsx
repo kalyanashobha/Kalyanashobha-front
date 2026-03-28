@@ -9,7 +9,7 @@ const DataApproval = () => {
     const [pendingItems, setPendingItems] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [actionLoading, setActionLoading] = useState(null); 
-    
+
     // Search State
     const [searchTerm, setSearchTerm] = useState("");
 
@@ -21,40 +21,6 @@ const DataApproval = () => {
     const [showMainScroll, setShowMainScroll] = useState(false);
 
     const API_BASE = "https://kalyanashobha-back.vercel.app/api/admin/pending-data";
-
-    useEffect(() => {
-        fetchPendingData();
-    }, []);
-
-    // Reset pagination when search changes
-    useEffect(() => {
-        setCurrentPage(1);
-    }, [searchTerm]);
-
-    // Scroll Indicator Logic
-    useEffect(() => {
-        const checkMainScroll = () => {
-            if (pendingItems.length === 0) {
-                setShowMainScroll(false);
-                return;
-            }
-            const scrollY = window.scrollY || document.documentElement.scrollTop;
-            const windowHeight = window.innerHeight;
-            const documentHeight = document.documentElement.scrollHeight;
-            
-            setShowMainScroll(documentHeight > windowHeight + 20 && scrollY + windowHeight < documentHeight - 30);
-        };
-
-        const timer = setTimeout(checkMainScroll, 500); 
-        window.addEventListener('scroll', checkMainScroll);
-        window.addEventListener('resize', checkMainScroll);
-
-        return () => {
-            clearTimeout(timer);
-            window.removeEventListener('scroll', checkMainScroll);
-            window.removeEventListener('resize', checkMainScroll);
-        };
-    }, [pendingItems, currentPage]);
 
     const fetchPendingData = async () => {
         setIsLoading(true);
@@ -75,10 +41,80 @@ const DataApproval = () => {
         }
     };
 
+    useEffect(() => {
+        fetchPendingData();
+    }, []);
+
+    // Reset pagination when search changes
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchTerm]);
+
+    // --- FILTER & PAGINATION LOGIC (Moved up for the scroll indicator) ---
+    const filteredItems = pendingItems.filter(item => {
+        const searchStr = searchTerm.toLowerCase();
+        const val = (item.value || '').toLowerCase();
+        const cat = (item.category || '').toLowerCase();
+        const parent = (item.parentValue || '').toLowerCase();
+        const fName = (item.submittedBy?.firstName || '').toLowerCase();
+        const lName = (item.submittedBy?.lastName || '').toLowerCase();
+        const uId = (item.submittedBy?.uniqueId || '').toLowerCase();
+
+        return val.includes(searchStr) || cat.includes(searchStr) || parent.includes(searchStr) || fName.includes(searchStr) || lName.includes(searchStr) || uId.includes(searchStr);
+    });
+
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = filteredItems.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(filteredItems.length / itemsPerPage) || 1;
+
+    const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+    // --- UNIVERSAL SCROLL INDICATOR LOGIC (BULLETPROOF) ---
+    useEffect(() => {
+        const checkMainScroll = () => {
+            // Safety net: Hide if 2 or fewer items
+            if (currentItems.length <= 2) {
+                setShowMainScroll(false);
+                return;
+            }
+
+            const scrollY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop;
+            const windowHeight = window.innerHeight || document.documentElement.clientHeight;
+            
+            const documentHeight = Math.max(
+                document.body.scrollHeight, 
+                document.documentElement.scrollHeight,
+                document.body.offsetHeight, 
+                document.documentElement.offsetHeight
+            );
+
+            // A tiny 5px buffer so it instantly appears when resizing the window
+            const isScrollable = documentHeight > (windowHeight + 5);
+
+            // Math.ceil stops decimal pixel rounding bugs on high-res monitors
+            const isNotAtBottom = Math.ceil(scrollY + windowHeight) < (documentHeight - 15);
+
+            setShowMainScroll(isScrollable && isNotAtBottom);
+        };
+
+        const timer = setTimeout(checkMainScroll, 100); 
+
+        window.addEventListener('scroll', checkMainScroll);
+        window.addEventListener('resize', checkMainScroll);
+
+        return () => {
+            clearTimeout(timer);
+            window.removeEventListener('scroll', checkMainScroll);
+            window.removeEventListener('resize', checkMainScroll);
+        };
+    }, [currentItems, currentPage, searchTerm]); 
+
+    // --- ACTION LOGIC ---
     const handleAction = async (pendingId, action) => {
         if (action === 'approve') {
             const currentItem = pendingItems.find(item => item._id === pendingId);
-            
+
             if (currentItem && currentItem.parentValue) {
                 const isParentStillPending = pendingItems.some(
                     pending => pending.value === currentItem.parentValue
@@ -103,10 +139,10 @@ const DataApproval = () => {
 
             if (res.data.success) {
                 toast.update(toastId, { render: `Successfully ${action}d!`, type: "success", isLoading: false, autoClose: 3000 });
-                
+
                 setPendingItems(prev => {
                     const updatedList = prev.filter(item => item._id !== pendingId);
-                    
+
                     const newTotalPages = Math.ceil(updatedList.length / itemsPerPage);
                     if (currentPage > newTotalPages && newTotalPages > 0) {
                         setCurrentPage(newTotalPages);
@@ -121,31 +157,10 @@ const DataApproval = () => {
         }
     };
 
-    // Filter Logic
-    const filteredItems = pendingItems.filter(item => {
-        const searchStr = searchTerm.toLowerCase();
-        const val = (item.value || '').toLowerCase();
-        const cat = (item.category || '').toLowerCase();
-        const parent = (item.parentValue || '').toLowerCase();
-        const fName = (item.submittedBy?.firstName || '').toLowerCase();
-        const lName = (item.submittedBy?.lastName || '').toLowerCase();
-        const uId = (item.submittedBy?.uniqueId || '').toLowerCase();
-
-        return val.includes(searchStr) || cat.includes(searchStr) || parent.includes(searchStr) || fName.includes(searchStr) || lName.includes(searchStr) || uId.includes(searchStr);
-    });
-
-    // Pagination Calculations
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = filteredItems.slice(indexOfFirstItem, indexOfLastItem);
-    const totalPages = Math.ceil(filteredItems.length / itemsPerPage) || 1;
-
-    const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
     return (
         <div className="kda-layout">
             <ToastContainer position="top-right" theme="colored" />
-            
+
             <div className="kda-header">
                 <div className="kda-title-group">
                     <h2>Master Data Approvals</h2>
@@ -267,7 +282,7 @@ const DataApproval = () => {
                                 >
                                     <ChevronLeft size={20} />
                                 </button>
-                                
+
                                 <span className="kda-page-text">
                                     Page {currentPage} of {totalPages}
                                 </span>
