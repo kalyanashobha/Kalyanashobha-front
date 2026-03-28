@@ -10,46 +10,13 @@ export default function AdminVendorLeads() {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All"); 
-  
+
   // Fixed Pagination States
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6; // Fixed to 6 for both Desktop and Mobile
+  const itemsPerPage = 4; // Changed to 4 for both Desktop and Mobile
 
-  // Universal Scroll Indicator State
+  // Mobile Scroll Indicator State
   const [showMainScroll, setShowMainScroll] = useState(false);
-
-  useEffect(() => {
-    fetchLeads();
-  }, []);
-
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchTerm, statusFilter]);
-
-  // Universal Scroll Indicator Logic
-  useEffect(() => {
-    const checkMainScroll = () => {
-        if (leads.length === 0) {
-            setShowMainScroll(false);
-            return;
-        }
-        const scrollY = window.scrollY || document.documentElement.scrollTop;
-        const windowHeight = window.innerHeight;
-        const documentHeight = document.documentElement.scrollHeight;
-        
-        setShowMainScroll(documentHeight > windowHeight + 20 && scrollY + windowHeight < documentHeight - 30);
-    };
-
-    const timer = setTimeout(checkMainScroll, 500); 
-    window.addEventListener('scroll', checkMainScroll);
-    window.addEventListener('resize', checkMainScroll);
-
-    return () => {
-        clearTimeout(timer);
-        window.removeEventListener('scroll', checkMainScroll);
-        window.removeEventListener('resize', checkMainScroll);
-    };
-  }, [leads, currentPage, statusFilter, searchTerm]);
 
   const fetchLeads = async () => {
     try {
@@ -71,11 +38,83 @@ export default function AdminVendorLeads() {
     }
   };
 
+  useEffect(() => {
+    fetchLeads();
+  }, []);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, statusFilter]);
+
+  // --- FILTERING & PAGINATION ---
+  let processedLeads = leads.filter((lead) => {
+    const searchLower = searchTerm.toLowerCase();
+    const clientName = lead.name?.toLowerCase() || "";
+    const clientPhone = lead.phone?.toLowerCase() || "";
+    const vendorName = lead.vendorId?.businessName?.toLowerCase() || "";
+    const vendorID = lead.vendorId?.vendorId?.toLowerCase() || "";
+
+    const matchesSearch = clientName.includes(searchLower) ||
+                          clientPhone.includes(searchLower) ||
+                          vendorName.includes(searchLower) ||
+                          vendorID.includes(searchLower);
+
+    const matchesStatus = statusFilter === "All" || lead.status === statusFilter;
+
+    return matchesSearch && matchesStatus;
+  });
+
+  processedLeads.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+  const totalPages = Math.ceil(processedLeads.length / itemsPerPage) || 1;
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const currentLeads = processedLeads.slice(startIndex, startIndex + itemsPerPage);
+
+  // --- MOBILE ONLY SCROLL INDICATOR LOGIC ---
+  useEffect(() => {
+    const checkMainScroll = () => {
+        // 1. Hide on desktop entirely
+        if (window.innerWidth > 768) {
+            setShowMainScroll(false);
+            return;
+        }
+
+        // 2. Hide if there is 1 or fewer items
+        if (currentLeads.length <= 1) {
+            setShowMainScroll(false);
+            return;
+        }
+
+        const scrollY = window.scrollY || document.documentElement.scrollTop;
+        const windowHeight = window.innerHeight;
+        const documentHeight = document.documentElement.scrollHeight;
+
+        // 3. Check if the document is taller than the viewport. 
+        const isScrollable = documentHeight > windowHeight + 80;
+
+        // 4. Check if we haven't scrolled to the very bottom yet
+        const isNotAtBottom = scrollY + windowHeight < documentHeight - 30;
+
+        // 5. Only show the indicator if it's scrollable AND we aren't at the bottom
+        setShowMainScroll(isScrollable && isNotAtBottom);
+    };
+
+    const timer = setTimeout(checkMainScroll, 50); 
+    window.addEventListener('scroll', checkMainScroll);
+    window.addEventListener('resize', checkMainScroll);
+
+    return () => {
+        clearTimeout(timer);
+        window.removeEventListener('scroll', checkMainScroll);
+        window.removeEventListener('resize', checkMainScroll);
+    };
+  }, [currentLeads, currentPage]);
+
   const handleStatusChange = async (leadId, newStatus) => {
     try {
       const token = localStorage.getItem("adminToken");
       const config = { headers: { Authorization: token } };
-      
+
       setLeads(prevLeads => prevLeads.map(lead => 
         lead._id === leadId ? { ...lead, status: newStatus } : lead
       ));
@@ -100,29 +139,6 @@ export default function AdminVendorLeads() {
     const options = { year: 'numeric', month: 'short', day: 'numeric' };
     return new Date(dateString).toLocaleDateString('en-IN', options);
   };
-
-  let processedLeads = leads.filter((lead) => {
-    const searchLower = searchTerm.toLowerCase();
-    const clientName = lead.name?.toLowerCase() || "";
-    const clientPhone = lead.phone?.toLowerCase() || "";
-    const vendorName = lead.vendorId?.businessName?.toLowerCase() || "";
-    const vendorID = lead.vendorId?.vendorId?.toLowerCase() || "";
-    
-    const matchesSearch = clientName.includes(searchLower) ||
-                          clientPhone.includes(searchLower) ||
-                          vendorName.includes(searchLower) ||
-                          vendorID.includes(searchLower);
-
-    const matchesStatus = statusFilter === "All" || lead.status === statusFilter;
-
-    return matchesSearch && matchesStatus;
-  });
-
-  processedLeads.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
-  const totalPages = Math.ceil(processedLeads.length / itemsPerPage) || 1;
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentLeads = processedLeads.slice(startIndex, startIndex + itemsPerPage);
 
   const SkeletonRow = () => (
     <tr className="avl-skeleton-row">
@@ -171,7 +187,7 @@ export default function AdminVendorLeads() {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        
+
         <div className="avl-filter-group">
           <Filter size={16} className="avl-filter-icon" />
           <select 
@@ -204,7 +220,8 @@ export default function AdminVendorLeads() {
             </thead>
             <tbody>
               {loading ? (
-                [...Array(6)].map((_, index) => <SkeletonRow key={index} />)
+                // Reduced from 6 to 4 to match the new page size
+                [...Array(4)].map((_, index) => <SkeletonRow key={index} />)
               ) : currentLeads.length === 0 ? (
                 <tr>
                   <td colSpan="5" className="avl-empty-cell">
@@ -221,7 +238,7 @@ export default function AdminVendorLeads() {
                     <td data-label="Date">
                         <span className="avl-date-text">{formatDate(lead.createdAt)}</span>
                     </td>
-                    
+
                     <td data-label="Client Details">
                         <div className="avl-info-stack">
                             <strong>{lead.name}</strong>
@@ -229,7 +246,7 @@ export default function AdminVendorLeads() {
                             {lead.email && <span className="avl-text-muted">{lead.email}</span>}
                         </div>
                     </td>
-                    
+
                     <td data-label="Requested Vendor">
                         <div className="avl-info-stack">
                             <span className="avl-vendor-id">{lead.vendorId?.vendorId || "N/A"}</span>
@@ -240,7 +257,7 @@ export default function AdminVendorLeads() {
                             )}
                         </div>
                     </td>
-                    
+
                     <td data-label="Requirements">
                         <div className="avl-message-box">
                             <p>{lead.message}</p>
@@ -250,7 +267,7 @@ export default function AdminVendorLeads() {
                             </div>
                         </div>
                     </td>
-                    
+
                     <td data-label="Status Action" className="avl-text-right">
                       <div className="avl-action-group">
                         <select 
@@ -272,8 +289,8 @@ export default function AdminVendorLeads() {
           </table>
         </div>
 
-        {/* CIRCULAR PAGINATION DESIGN */}
-        {!loading && totalPages > 1 && (
+        {/* ALWAYS VISIBLE CIRCULAR PAGINATION DESIGN */}
+        {!loading && totalPages >= 1 && (
             <div className="avl-pagination-container">
                 <button 
                     className="avl-page-btn-circle" 
@@ -282,7 +299,7 @@ export default function AdminVendorLeads() {
                 >
                     <ChevronLeft size={20} />
                 </button>
-                
+
                 <span className="avl-page-text">
                     Page {currentPage} of {totalPages}
                 </span>
@@ -298,7 +315,7 @@ export default function AdminVendorLeads() {
         )}
       </div>
 
-      {/* UNIVERSAL SCROLL INDICATOR */}
+      {/* MOBILE ONLY SCROLL INDICATOR */}
       {showMainScroll && (
           <div className="avl-scroll-indicator">
               <ChevronDown size={18} />
