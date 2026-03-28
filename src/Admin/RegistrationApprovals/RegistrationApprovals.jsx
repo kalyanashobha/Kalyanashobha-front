@@ -16,7 +16,7 @@ export default function RegistrationApprovals() {
   // --- SEARCH & PAGINATION STATES ---
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 3; // Changed to 3 items for both Desktop and Mobile
+  const itemsPerPage = 3; // 3 items for both Desktop and Mobile
 
   // Mobile Scroll Indicator State
   const [showMainScroll, setShowMainScroll] = useState(false);
@@ -70,11 +70,11 @@ export default function RegistrationApprovals() {
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-  // --- UNIVERSAL SCROLL INDICATOR LOGIC (CORRECTED) ---
+  // --- MOBILE ONLY SCROLL INDICATOR LOGIC ---
   useEffect(() => {
     const checkMainScroll = () => {
-        // 1. Safety net: If there are 2 or fewer items, or the modal is open, STRICTLY hide it.
-        if (currentItems.length <= 2 || selectedImage) {
+        // 1. Hide entirely on desktop, or if modal is open, or if 1 or fewer items
+        if (window.innerWidth > 768 || selectedImage || currentItems.length <= 1) {
             setShowMainScroll(false);
             return;
         }
@@ -306,8 +306,8 @@ export default function RegistrationApprovals() {
               </table>
             </div>
 
-            {/* NEW PAGINATION DESIGN */}
-            {totalPages > 1 && (
+            {/* ALWAYS VISIBLE PAGINATION DESIGN */}
+            {totalPages >= 1 && (
                 <div className="ra-pagination-container">
                     <button 
                         className="ra-page-btn-circle" 
@@ -334,7 +334,7 @@ export default function RegistrationApprovals() {
         )}
       </div>
 
-      {/* UNIVERSAL SCROLL INDICATOR */}
+      {/* MOBILE ONLY SCROLL INDICATOR */}
       {showMainScroll && (
           <div className="ra-scroll-indicator">
               <ChevronDown size={18} />
