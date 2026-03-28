@@ -70,34 +70,37 @@ export default function RegistrationApprovals() {
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-  // --- UNIVERSAL SCROLL INDICATOR LOGIC ---
+  // --- UNIVERSAL SCROLL INDICATOR LOGIC (UPDATED FOR DESKTOP/PC) ---
   useEffect(() => {
     const checkMainScroll = () => {
-        // Hide if there are zero items to show, or if the image modal is open
-        if (currentItems.length === 0 || selectedImage) {
+        // If there are no items, or the image modal is open, strictly hide the indicator
+        if (filteredPayments.length === 0 || selectedImage) {
             setShowMainScroll(false);
             return;
         }
 
         const scrollY = window.scrollY || document.documentElement.scrollTop;
         const windowHeight = window.innerHeight;
+        
+        // Use Math.max to guarantee we get the true height of the page on Desktop browsers
         const documentHeight = Math.max(
             document.body.scrollHeight, 
-            document.documentElement.scrollHeight
+            document.documentElement.scrollHeight,
+            document.body.offsetHeight, 
+            document.documentElement.offsetHeight
         );
 
-        // 1. Check if the document is actually taller than the viewport. 
-        // We use a 50px buffer to account for padding.
-        const isScrollable = documentHeight > windowHeight + 50;
+        // A 50px buffer prevents the indicator from showing if the layout just barely 
+        // overflows due to a minor margin or border.
+        const isScrollable = documentHeight > (windowHeight + 50);
         
-        // 2. Check if we haven't scrolled to the very bottom yet.
-        const isNotAtBottom = scrollY + windowHeight < documentHeight - 40;
+        // Hide it if we scroll within 40px of the very bottom of the page
+        const isNotAtBottom = (scrollY + windowHeight) < (documentHeight - 40);
 
-        // 3. Only show the indicator if it's scrollable AND we aren't at the bottom.
         setShowMainScroll(isScrollable && isNotAtBottom);
     };
 
-    // Slightly longer timeout (100ms) to ensure the taller Registration rows finish painting
+    // A slightly longer 100ms timeout ensures heavy desktop tables finish rendering first
     const timer = setTimeout(checkMainScroll, 100); 
     
     window.addEventListener('scroll', checkMainScroll);
@@ -108,7 +111,7 @@ export default function RegistrationApprovals() {
         window.removeEventListener('scroll', checkMainScroll);
         window.removeEventListener('resize', checkMainScroll);
     };
-  }, [currentItems, currentPage, selectedImage, activeTab]);
+  }, [currentItems, currentPage, selectedImage]); // Re-runs anytime items or modal changes
 
   const handleAction = async (paymentId, action) => {
     setProcessingId(paymentId);
@@ -144,7 +147,6 @@ export default function RegistrationApprovals() {
             <p>Verify membership payments and activate users.</p>
         </div>
         
-        {/* Search Bar & Refresh Button Layout */}
         <div className="ra-header-actions" style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
            <div className="ra-search-container" style={{ display: 'flex', alignItems: 'center', background: 'white', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '8px 12px', gap: '8px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
                <Search size={16} color="#64748b" />
