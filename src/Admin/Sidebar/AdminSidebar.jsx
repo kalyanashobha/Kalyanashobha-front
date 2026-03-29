@@ -115,7 +115,7 @@ export default function AdminSidebar({ closeMobileMenu }) {
     { id: "users", path: "/admin/users", icon: <Users size={18} />, iconColor: "#10B981", label: "User Registry" },
     
     // NEW ROUTE ADDED HERE
-    { id: "premium-users", path: "/admin/premium-user", icon: <UserSearch size={18} />, iconColor: "#EF4444", label: "Advanced Users" },
+    { id: "premium-users", path: "/admin/premium-user", icon: <UserSearch size={18} />, iconColor: "#EF4444", label: "Premium Users" },
     
     { id: "reg-approvals", path: "/admin/registration-approvals", icon: <CheckCircle size={18} />, iconColor: "#0EA5E9", label: "Reg. Approvals", badge: stats.pendingReg },
     { id: "interest-approvals", path: "/admin/interest-approvals", icon: <Heart size={18} />, iconColor: "#EC4899", label: "Interest Approvals", badge: totalPendingInterests },
