@@ -76,16 +76,10 @@ export default function CreateModerator() {
       }
   };
 
-  // --- MOBILE ONLY SCROLL INDICATOR LOGIC ---
+  // --- GLOBAL SCROLL INDICATOR LOGIC ---
   useEffect(() => {
     const checkMainScroll = () => {
-        // 1. Hide on desktop entirely
-        if (window.innerWidth > 768) {
-            setShowMainScroll(false);
-            return;
-        }
-
-        // 2. Hide if there is 1 or fewer items
+        // Hide if there is 1 or fewer items to prevent false positives on short pages
         if (currentModerators.length <= 1) {
             setShowMainScroll(false);
             return;
@@ -95,13 +89,13 @@ export default function CreateModerator() {
         const windowHeight = window.innerHeight;
         const documentHeight = document.documentElement.scrollHeight;
 
-        // 3. Check if the document is taller than the viewport. 
-        const isScrollable = documentHeight > windowHeight + 80;
+        // Check if the document is taller than the viewport
+        const isScrollable = documentHeight > windowHeight + 10;
 
-        // 4. Check if we haven't scrolled to the very bottom yet
+        // Check if we haven't scrolled to the very bottom yet
         const isNotAtBottom = scrollY + windowHeight < documentHeight - 30;
 
-        // 5. Only show the indicator if it's scrollable AND we aren't at the bottom
+        // Only show the indicator if it's scrollable AND we aren't at the bottom
         setShowMainScroll(isScrollable && isNotAtBottom);
     };
 
@@ -114,7 +108,7 @@ export default function CreateModerator() {
         window.removeEventListener('scroll', checkMainScroll);
         window.removeEventListener('resize', checkMainScroll);
     };
-  }, [currentModerators, currentPage]);
+  }, [currentModerators, currentPage, moderators]);
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -175,7 +169,7 @@ export default function CreateModerator() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (selectedPermissions.length === 0) {
       toast.error('Please select at least one permission.');
       return;
@@ -971,7 +965,7 @@ export default function CreateModerator() {
         )}
       </div>
 
-      {/* MOBILE ONLY SCROLL INDICATOR */}
+      {/* GLOBAL SCROLL INDICATOR */}
       {showMainScroll && (
           <div className="ks-mod-scroll-indicator">
               <ChevronDown size={18} />
