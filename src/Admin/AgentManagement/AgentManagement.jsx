@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { 
   Users, UserPlus, Trash2, Eye, X, Phone, Search, 
-  ChevronLeft, ChevronRight, Briefcase, Hash, Calendar, Mail, Lock
+  ChevronLeft, ChevronRight, Briefcase, Hash, Calendar, Mail, Lock, ChevronDown
 } from "lucide-react";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -18,14 +18,21 @@ export default function AgentManagement() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
 
-  // Pagination State for Modal
-  const [detailPage, setDetailPage] = useState(1);
-  const USERS_PER_PAGE = 5; 
-
   // Data States
   const [selectedAgent, setSelectedAgent] = useState(null); 
   const [formData, setFormData] = useState({ name: "", email: "", mobile: "", password: "" });
   const [processingId, setProcessingId] = useState(null);
+
+  // --- MAIN LIST PAGINATION STATES ---
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 3; // 3 items per page for main list
+
+  // --- MODAL PAGINATION STATES ---
+  const [detailPage, setDetailPage] = useState(1);
+  const USERS_PER_PAGE = 3; // Changed to 3 items per page to match
+
+  // Mobile Scroll Indicator State
+  const [showMainScroll, setShowMainScroll] = useState(false);
 
   // 1. Fetch All Agents
   const fetchAgents = async () => {
@@ -50,8 +57,9 @@ export default function AgentManagement() {
     fetchAgents();
   }, []);
 
-  // 2. Search Logic
+  // 2. Search Logic & Reset Page
   useEffect(() => {
+    setCurrentPage(1); // Reset to page 1 on search
     if (!searchTerm) {
       setFilteredAgents(agents);
     } else {
@@ -60,11 +68,57 @@ export default function AgentManagement() {
         agent.name.toLowerCase().includes(lowerTerm) ||
         (agent.agentCode && agent.agentCode.toLowerCase().includes(lowerTerm)) ||
         agent.mobile.includes(lowerTerm) || 
-        agent.email.toLowerCase().includes(lowerTerm) // Added search by email
+        agent.email.toLowerCase().includes(lowerTerm)
       );
       setFilteredAgents(filtered);
     }
   }, [searchTerm, agents]);
+
+  // --- MAIN LIST PAGINATION CALCULATIONS ---
+  const totalPages = Math.ceil(filteredAgents.length / itemsPerPage) || 1;
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentAgents = filteredAgents.slice(indexOfFirstItem, indexOfLastItem);
+
+  // --- MOBILE ONLY SCROLL INDICATOR LOGIC ---
+  useEffect(() => {
+    const checkMainScroll = () => {
+        // 1. Hide on desktop entirely
+        if (window.innerWidth > 768) {
+            setShowMainScroll(false);
+            return;
+        }
+
+        // 2. Hide if modal is open, or if 1 or fewer items
+        if (showAddModal || showDetailModal || currentAgents.length <= 1) {
+            setShowMainScroll(false);
+            return;
+        }
+
+        const scrollY = window.scrollY || document.documentElement.scrollTop;
+        const windowHeight = window.innerHeight;
+        const documentHeight = document.documentElement.scrollHeight;
+
+        // 3. Check if the document is taller than the viewport. 
+        const isScrollable = documentHeight > windowHeight + 80;
+
+        // 4. Check if we haven't scrolled to the very bottom yet
+        const isNotAtBottom = scrollY + windowHeight < documentHeight - 30;
+
+        // 5. Only show the indicator if it's scrollable AND we aren't at the bottom
+        setShowMainScroll(isScrollable && isNotAtBottom);
+    };
+
+    const timer = setTimeout(checkMainScroll, 50); 
+    window.addEventListener('scroll', checkMainScroll);
+    window.addEventListener('resize', checkMainScroll);
+
+    return () => {
+        clearTimeout(timer);
+        window.removeEventListener('scroll', checkMainScroll);
+        window.removeEventListener('resize', checkMainScroll);
+    };
+  }, [currentAgents, currentPage, showAddModal, showDetailModal]);
 
   // 3. Add Agent
   const handleCreateAgent = async (e) => {
@@ -110,21 +164,29 @@ export default function AgentManagement() {
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure? This action cannot be undone.")) return;
     setProcessingId(id);
+    const toastId = toast.loading("Deleting agent...");
     try {
       const token = localStorage.getItem("adminToken");
       await axios.delete(`https://kalyanashobha-back.vercel.app/api/admin/agents/${id}`, {
         headers: { Authorization: token },
       });
-      toast.success("Agent deleted successfully");
+      toast.update(toastId, { render: "Agent deleted successfully", type: "success", isLoading: false, autoClose: 2000 });
+      
+      // Adjust pagination if deleting the last item on a page
+      const newTotalPages = Math.ceil((filteredAgents.length - 1) / itemsPerPage) || 1;
+      if (currentPage > newTotalPages) {
+          setCurrentPage(newTotalPages);
+      }
+
       fetchAgents();
     } catch (err) {
-      toast.error("Delete failed");
+      toast.update(toastId, { render: "Delete failed", type: "error", isLoading: false, autoClose: 2000 });
     } finally {
       setProcessingId(null);
     }
   };
 
-  // Get Users for current page
+  // Get Users for modal current page
   const getPaginatedUsers = () => {
     if (!selectedAgent || !selectedAgent.users) return [];
     const indexOfLast = detailPage * USERS_PER_PAGE;
@@ -133,12 +195,108 @@ export default function AgentManagement() {
   };
 
   const totalDetailPages = selectedAgent?.users 
-    ? Math.ceil(selectedAgent.users.length / USERS_PER_PAGE) 
-    : 0;
+    ? Math.ceil(selectedAgent.users.length / USERS_PER_PAGE) || 1
+    : 1;
 
   return (
     <div className="am-layout">
       <ToastContainer position="top-right" theme="colored" />
+
+      {/* Embedded CSS for Pagination and Scroll Indicator */}
+      <style>{`
+        /* --- NEW CIRCULAR PAGINATION UI --- */
+        .am-pagination-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 24px 16px 0 16px;
+            margin-top: 16px;
+            gap: 24px;
+            background: transparent;
+            border-top: none;
+            width: 100%;
+        }
+
+        .am-page-btn-circle {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+        }
+
+        .am-page-btn-circle:hover:not(:disabled) {
+            background: #f8fafc;
+            color: #0f172a;
+            border-color: #cbd5e1;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transform: translateY(-1px);
+        }
+
+        .am-page-btn-circle:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            background: #f8fafc;
+        }
+
+        .am-page-text {
+            font-size: 16px;
+            font-weight: 600;
+            color: #475569;
+            letter-spacing: 0.3px;
+        }
+
+        /* --- SCROLL INDICATOR UI --- */
+        .am-scroll-indicator {
+            display: none; 
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(15, 23, 42, 0.9);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 30px;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            pointer-events: none; 
+            z-index: 50;
+            animation: bounceSubtle 2s infinite ease-in-out;
+            backdrop-filter: blur(4px);
+        }
+
+        @keyframes bounceSubtle {
+            0%, 100% { transform: translate(-50%, 0); }
+            50% { transform: translate(-50%, 6px); }
+        }
+
+        @media (max-width: 768px) {
+            .am-scroll-indicator {
+                display: flex;
+            }
+            .am-pagination-container {
+                padding: 16px 0;
+                gap: 16px;
+            }
+            .am-page-btn-circle {
+                width: 40px;
+                height: 40px;
+            }
+            .am-page-text {
+                font-size: 14px;
+            }
+        }
+      `}</style>
 
       {/* HEADER */}
       <div className="am-header">
@@ -168,22 +326,22 @@ export default function AgentManagement() {
       {/* GRID LIST */}
       <div className="am-grid">
         {loading ? (
-            /* SKELETON LOADER */
-            Array(4).fill(0).map((_, i) => (
+            /* SKELETON LOADER mapped to itemsPerPage */
+            Array(itemsPerPage).fill(0).map((_, i) => (
                 <div key={i} className="am-card skeleton-card">
                     <div className="sk-blob sk-header"></div>
                     <div className="sk-blob sk-stat"></div>
                     <div className="sk-blob sk-action"></div>
                 </div>
             ))
-        ) : filteredAgents.length === 0 ? (
-          <div className="am-empty-state">
+        ) : currentAgents.length === 0 ? (
+          <div className="am-empty-state" style={{ gridColumn: "1 / -1" }}>
              <div className="am-empty-icon"><Search size={40}/></div>
              <h3>No agents found</h3>
              <p>Try adjusting your search criteria.</p>
           </div>
         ) : (
-          filteredAgents.map((agent) => (
+          currentAgents.map((agent) => (
             <div key={agent._id} className="am-card">
               <div className="am-card-header">
                 <div className="am-avatar-box">
@@ -197,7 +355,7 @@ export default function AgentManagement() {
                 </div>
               </div>
 
-              {/* --- UPDATED: Contact Info Section --- */}
+              {/* Contact Info Section */}
               <div style={{ padding: "0 15px 12px", borderBottom: "1px solid #f0f0f0", marginBottom: "10px" }}>
                  <div style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "13px", color: "#555", marginBottom: "6px" }}>
                     <Mail size={14} style={{ color: "#888" }}/> {agent.email}
@@ -234,6 +392,39 @@ export default function AgentManagement() {
           ))
         )}
       </div>
+
+      {/* ALWAYS VISIBLE CIRCULAR PAGINATION FOR MAIN GRID */}
+      {!loading && totalPages >= 1 && (
+          <div className="am-pagination-container">
+              <button 
+                  className="am-page-btn-circle" 
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+              >
+                  <ChevronLeft size={20} />
+              </button>
+
+              <span className="am-page-text">
+                  Page {currentPage} of {totalPages}
+              </span>
+
+              <button 
+                  className="am-page-btn-circle" 
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+              >
+                  <ChevronRight size={20} />
+              </button>
+          </div>
+      )}
+
+      {/* MOBILE SCROLL INDICATOR */}
+      {showMainScroll && (
+          <div className="am-scroll-indicator">
+              <ChevronDown size={18} />
+              <span>Scroll for more</span>
+          </div>
+      )}
 
       {/* MODAL: ADD AGENT */}
       {showAddModal && (
@@ -336,11 +527,11 @@ export default function AgentManagement() {
                     </table>
                   </div>
 
-                  {/* PAGINATION */}
-                  {selectedAgent.users.length > USERS_PER_PAGE && (
-                    <div className="am-pagination">
+                  {/* PAGINATION FOR MODAL (Always Visible) */}
+                  {totalDetailPages >= 1 && (
+                    <div className="am-pagination-container" style={{ marginTop: '0', paddingTop: '16px' }}>
                       <button 
-                        className="am-page-arrow" 
+                        className="am-page-btn-circle" 
                         disabled={detailPage === 1} 
                         onClick={() => setDetailPage(p => p - 1)}
                       >
@@ -350,7 +541,7 @@ export default function AgentManagement() {
                         Page {detailPage} of {totalDetailPages}
                       </span>
                       <button 
-                        className="am-page-arrow" 
+                        className="am-page-btn-circle" 
                         disabled={detailPage === totalDetailPages} 
                         onClick={() => setDetailPage(p => p + 1)}
                       >
