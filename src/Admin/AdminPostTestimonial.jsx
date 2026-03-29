@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Trash2, Image as ImageIcon, Video, ChevronDown, CheckCircle, AlertCircle } from 'lucide-react';
+import { Trash2, Image as ImageIcon, Video, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
+import toast, { Toaster } from 'react-hot-toast';
 
 const AdminPostTestimonial = () => {
     // Form State
@@ -11,12 +12,15 @@ const AdminPostTestimonial = () => {
     const [mediaPreview, setMediaPreview] = useState(null);
     const [previewType, setPreviewType] = useState('');
     const [uploadMode, setUploadMode] = useState('image');
-    
+
     // UI State
     const [isLoading, setIsLoading] = useState(false);
-    const [message, setMessage] = useState({ type: '', text: '' });
     const [testimonials, setTestimonials] = useState([]);
     const [isFetching, setIsFetching] = useState(true);
+
+    // Pagination States
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 4; // 4 items per page for both Desktop and Mobile
 
     // Mobile Scroll Indicator State
     const [showMainScroll, setShowMainScroll] = useState(false);
@@ -28,16 +32,48 @@ const AdminPostTestimonial = () => {
         fetchTestimonials();
     }, []);
 
-    // Scroll Indicator Logic
+    // --- PAGINATION LOGIC ---
+    const totalPages = Math.ceil(testimonials.length / itemsPerPage) || 1;
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentTestimonials = testimonials.slice(indexOfFirstItem, indexOfLastItem);
+
+    const handlePageChange = (pageNumber) => {
+        if (pageNumber > 0 && pageNumber <= totalPages) {
+            setCurrentPage(pageNumber);
+        }
+    };
+
+    // --- MOBILE ONLY SCROLL INDICATOR LOGIC ---
     useEffect(() => {
         const checkMainScroll = () => {
+            // 1. Hide on desktop entirely
+            if (window.innerWidth > 768) {
+                setShowMainScroll(false);
+                return;
+            }
+
+            // 2. Hide if there is 1 or fewer items
+            if (currentTestimonials.length <= 1) {
+                setShowMainScroll(false);
+                return;
+            }
+
             const scrollY = window.scrollY || document.documentElement.scrollTop;
             const windowHeight = window.innerHeight;
             const documentHeight = document.documentElement.scrollHeight;
-            setShowMainScroll(documentHeight > windowHeight + 10 && scrollY + windowHeight < documentHeight - 60);
+
+            // 3. Check if the document is taller than the viewport. 
+            const isScrollable = documentHeight > windowHeight + 80;
+
+            // 4. Check if we haven't scrolled to the very bottom yet
+            const isNotAtBottom = scrollY + windowHeight < documentHeight - 30;
+
+            // 5. Only show the indicator if it's scrollable AND we aren't at the bottom
+            setShowMainScroll(isScrollable && isNotAtBottom);
         };
 
-        const timer = setTimeout(checkMainScroll, 500); 
+        const timer = setTimeout(checkMainScroll, 50); 
         window.addEventListener('scroll', checkMainScroll);
         window.addEventListener('resize', checkMainScroll);
 
@@ -46,15 +82,18 @@ const AdminPostTestimonial = () => {
             window.removeEventListener('scroll', checkMainScroll);
             window.removeEventListener('resize', checkMainScroll);
         };
-    }, [testimonials]);
+    }, [currentTestimonials, currentPage]);
 
     const fetchTestimonials = async () => {
         setIsFetching(true);
         try {
             const res = await axios.get(PUBLIC_API_URL);
-            if (res.data.success) setTestimonials(res.data.data);
+            if (res.data.success) {
+                setTestimonials(res.data.data);
+            }
         } catch (err) {
             console.error("Error fetching testimonials", err);
+            toast.error("Failed to load testimonials.");
         } finally {
             setIsFetching(false);
         }
@@ -85,13 +124,13 @@ const AdminPostTestimonial = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
-        setMessage({ type: '', text: '' });
 
+        const toastId = toast.loading("Publishing success story...");
         const token = localStorage.getItem('adminToken');
         const formData = new FormData();
         formData.append('authorName', authorName);
         formData.append('content', content);
-        
+
         if (uploadMode === 'video') {
             formData.append('videoUrl', videoUrl);
         } else if (media) {
@@ -107,20 +146,21 @@ const AdminPostTestimonial = () => {
             });
 
             if (res.data.success) {
-                setMessage({ type: 'success', text: 'Testimonial published successfully!' });
+                toast.success('Testimonial published successfully!', { id: toastId });
                 setAuthorName('');
                 setContent('');
                 setMedia(null);
                 setVideoUrl('');
                 setMediaPreview(null);
+                
                 // Clear file input specifically
                 const fileInput = document.getElementById('ks-media-upload');
                 if(fileInput) fileInput.value = '';
-                
+
                 fetchTestimonials();
             }
         } catch (err) {
-            setMessage({ type: 'error', text: err.response?.data?.message || "Failed to post testimonial." });
+            toast.error(err.response?.data?.message || "Failed to post testimonial.", { id: toastId });
         } finally {
             setIsLoading(false);
         }
@@ -128,26 +168,38 @@ const AdminPostTestimonial = () => {
 
     const handleDelete = async (id) => {
         if (!window.confirm("Delete this success story permanently?")) return;
+        
+        const toastId = toast.loading("Deleting story...");
         const token = localStorage.getItem('adminToken');
+        
         try {
             const res = await axios.delete(`${API_URL}/${id}`, {
                 headers: { 'Authorization': token }
             });
             if (res.data.success) {
                 setTestimonials(testimonials.filter(item => item._id !== id));
-                setMessage({ type: 'success', text: 'Success story removed from gallery.' });
+                
+                // Adjust pagination if deleting the last item on a page
+                const newTotalPages = Math.ceil((testimonials.length - 1) / itemsPerPage) || 1;
+                if (currentPage > newTotalPages) {
+                    setCurrentPage(newTotalPages);
+                }
+
+                toast.success('Success story removed from gallery.', { id: toastId });
             }
         } catch (err) {
-            setMessage({ type: 'error', text: 'Deletion failed. Please try again.' });
+            toast.error('Deletion failed. Please try again.', { id: toastId });
         }
     };
 
     return (
         <div className="ks-story-panel">
+            <Toaster position="top-right" reverseOrder={false} />
             <style>{`
                 :root {
-                    --ks-primary: #8E1B1B;
-                    --ks-primary-hover: #7a1717;
+                    /* Thick Red Theme */
+                    --ks-primary: #dc2626; 
+                    --ks-primary-hover: #b91c1c; 
                     --ks-text-dark: #0f172a;
                     --ks-text-muted: #64748b;
                     --ks-border: #e2e8f0;
@@ -156,10 +208,6 @@ const AdminPostTestimonial = () => {
                     --ks-card-bg: #ffffff;
                     --ks-danger: #ef4444;
                     --ks-danger-hover: #dc2626;
-                    --ks-success-bg: #f0fdf4;
-                    --ks-success-text: #166534;
-                    --ks-error-bg: #fef2f2;
-                    --ks-error-text: #991b1b;
                     --ks-radius: 12px;
                     --ks-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
                     --ks-anim: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
@@ -197,20 +245,6 @@ const AdminPostTestimonial = () => {
                     font-size: 15px;
                 }
 
-                .ks-notification {
-                    padding: 14px 16px;
-                    border-radius: 8px;
-                    margin-bottom: 24px;
-                    font-size: 14px;
-                    font-weight: 600;
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                }
-
-                .ks-notify-good { background: var(--ks-success-bg); color: var(--ks-success-text); border: 1px solid #bbf7d0; }
-                .ks-notify-bad { background: var(--ks-error-bg); color: var(--ks-error-text); border: 1px solid #fecaca; }
-
                 .ks-layout-grid {
                     display: grid;
                     grid-template-columns: 1fr;
@@ -236,6 +270,7 @@ const AdminPostTestimonial = () => {
                     padding-bottom: 12px;
                 }
 
+                /* Form Elements */
                 .ks-upload-toggles {
                     display: flex;
                     gap: 8px;
@@ -298,7 +333,7 @@ const AdminPostTestimonial = () => {
                 .ks-text-input:focus {
                     border-color: var(--ks-primary);
                     outline: none;
-                    box-shadow: 0 0 0 4px rgba(142, 27, 27, 0.1);
+                    box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.1);
                 }
 
                 .ks-action-button {
@@ -313,13 +348,13 @@ const AdminPostTestimonial = () => {
                     cursor: pointer;
                     transition: var(--ks-anim);
                     margin-top: 10px;
-                    box-shadow: 0 2px 4px rgba(142, 27, 27, 0.2);
+                    box-shadow: 0 2px 4px rgba(220, 38, 38, 0.2);
                 }
 
                 .ks-action-button:hover:not(:disabled) {
                     background: var(--ks-primary-hover);
                     transform: translateY(-1px);
-                    box-shadow: 0 4px 6px rgba(142, 27, 27, 0.3);
+                    box-shadow: 0 4px 6px rgba(220, 38, 38, 0.3);
                 }
 
                 .ks-action-button:disabled {
@@ -348,16 +383,10 @@ const AdminPostTestimonial = () => {
                     object-fit: contain;
                 }
 
-                /* Custom Scrollbar for Feed */
+                /* Gallery / Feed Area */
                 .ks-feed-scroll-area {
-                    max-height: 550px;
-                    overflow-y: auto;
-                    padding-right: 8px;
+                    width: 100%;
                 }
-                .ks-feed-scroll-area::-webkit-scrollbar { width: 6px; }
-                .ks-feed-scroll-area::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 8px; }
-                .ks-feed-scroll-area::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; }
-                .ks-feed-scroll-area::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
                 .ks-story-feed {
                     display: flex;
@@ -447,8 +476,81 @@ const AdminPostTestimonial = () => {
                     border: 1px dashed var(--ks-border);
                 }
 
+                /* --- SKELETON STYLES --- */
+                .ks-skeleton-item {
+                    display: flex;
+                    align-items: center;
+                }
+                .ks-sk-thumbnail, .ks-sk-text {
+                    background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+                    background-size: 200% 100%;
+                    animation: ks-shimmer 1.5s infinite;
+                }
+                .ks-sk-thumbnail {
+                    width: 60px; height: 60px; border-radius: 8px; margin-right: 16px; flex-shrink: 0;
+                }
+                .ks-sk-text {
+                    height: 14px; border-radius: 4px; margin-bottom: 8px;
+                }
+                .ks-sk-title { width: 40%; height: 16px; margin-bottom: 12px; }
+                .ks-sk-desc { width: 90%; }
+                .ks-sk-desc.short { width: 60%; margin-bottom: 0; }
+
+                @keyframes ks-shimmer {
+                    0% { background-position: -200% 0; }
+                    100% { background-position: 200% 0; }
+                }
+
+                /* --- PAGINATION STYLES --- */
+                .ks-pagination-container {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    padding: 24px 0 0 0;
+                    margin-top: 16px;
+                    gap: 24px;
+                    background: transparent;
+                    border-top: 1px solid var(--ks-border);
+                }
+
+                .ks-page-btn-circle {
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    background: #ffffff;
+                    border: 1px solid var(--ks-border);
+                    color: var(--ks-text-sub);
+                    cursor: pointer;
+                    transition: var(--ks-anim);
+                    box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+                }
+
+                .ks-page-btn-circle:hover:not(:disabled) {
+                    background: #f8fafc;
+                    color: var(--ks-text-dark);
+                    border-color: var(--ks-border-hover);
+                    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+                    transform: translateY(-1px);
+                }
+
+                .ks-page-btn-circle:disabled {
+                    opacity: 0.4;
+                    cursor: not-allowed;
+                    background: #f8fafc;
+                }
+
+                .ks-page-text {
+                    font-size: 15px;
+                    font-weight: 600;
+                    color: var(--ks-text-sub);
+                    letter-spacing: 0.3px;
+                }
+
                 /* --- SCROLL INDICATOR UI --- */
-                .ks-mod-scroll-indicator {
+                .ks-scroll-indicator {
                   display: none; 
                   position: fixed;
                   bottom: 24px;
@@ -497,7 +599,7 @@ const AdminPostTestimonial = () => {
                     .ks-story-panel { padding: 16px; }
                     .ks-content-box { padding: 20px; border-radius: 16px;}
                     
-                    .ks-mod-scroll-indicator { display: flex; }
+                    .ks-scroll-indicator { display: flex; }
                     
                     .ks-panel-header h2 { font-size: 22px; }
                     .ks-panel-header p { font-size: 13px; }
@@ -511,7 +613,7 @@ const AdminPostTestimonial = () => {
                     /* Feed Mobile Adjustments */
                     .ks-feed-item {
                         padding: 12px;
-                        align-items: flex-start; /* Aligns items to top so long text flows better */
+                        align-items: flex-start;
                     }
                     .ks-item-thumbnail {
                         width: 50px; height: 50px; margin-right: 12px;
@@ -520,6 +622,9 @@ const AdminPostTestimonial = () => {
                     .ks-item-details p { font-size: 12px; }
                     
                     .ks-remove-action { padding: 6px; align-self: center;}
+
+                    .ks-pagination-container { gap: 16px; }
+                    .ks-page-text { font-size: 14px; }
                 }
             `}</style>
 
@@ -528,17 +633,11 @@ const AdminPostTestimonial = () => {
                 <p>Manage the premium testimonials displayed to users.</p>
             </div>
 
-            {message.text && (
-                <div className={`ks-notification ${message.type === 'success' ? 'ks-notify-good' : 'ks-notify-bad'}`}>
-                    {message.type === 'success' ? <CheckCircle size={18}/> : <AlertCircle size={18}/>}
-                    {message.text}
-                </div>
-            )}
-
             <div className="ks-layout-grid">
+                {/* Form Column */}
                 <div className="ks-content-box">
                     <h3 className="ks-box-heading">Create Testimonial</h3>
-                    
+
                     <div className="ks-upload-toggles">
                         <button 
                             type="button" 
@@ -591,16 +690,27 @@ const AdminPostTestimonial = () => {
                     </form>
                 </div>
 
+                {/* Live Gallery Column */}
                 <div className="ks-content-box">
                     <h3 className="ks-box-heading">Live Gallery ({testimonials.length})</h3>
                     <div className="ks-feed-scroll-area">
                         <div className="ks-story-feed">
                             {isFetching ? (
-                                <p className="ks-empty-gallery">Refreshing gallery...</p>
+                                /* Skeleton Loader mapped to itemsPerPage */
+                                [...Array(itemsPerPage)].map((_, i) => (
+                                    <div className="ks-feed-item ks-skeleton-item" key={i}>
+                                        <div className="ks-sk-thumbnail"></div>
+                                        <div className="ks-item-details" style={{ width: '100%' }}>
+                                            <div className="ks-sk-text ks-sk-title"></div>
+                                            <div className="ks-sk-text ks-sk-desc"></div>
+                                            <div className="ks-sk-text ks-sk-desc short"></div>
+                                        </div>
+                                    </div>
+                                ))
                             ) : testimonials.length === 0 ? (
                                 <p className="ks-empty-gallery">No success stories found. Publish one to get started.</p>
                             ) : (
-                                testimonials.map((item) => (
+                                currentTestimonials.map((item) => (
                                     <div className="ks-feed-item" key={item._id}>
                                         {item.mediaType === 'video' ? (
                                             <video className="ks-item-thumbnail" src={item.mediaUrl} muted />
@@ -618,18 +728,42 @@ const AdminPostTestimonial = () => {
                                 ))
                             )}
                         </div>
+
+                        {/* ALWAYS VISIBLE PAGINATION */}
+                        {!isFetching && totalPages >= 1 && (
+                            <div className="ks-pagination-container">
+                                <button 
+                                    className="ks-page-btn-circle" 
+                                    onClick={() => handlePageChange(currentPage - 1)} 
+                                    disabled={currentPage === 1}
+                                >
+                                    <ChevronLeft size={20} />
+                                </button>
+
+                                <span className="ks-page-text">
+                                    Page {currentPage} of {totalPages}
+                                </span>
+
+                                <button 
+                                    className="ks-page-btn-circle" 
+                                    onClick={() => handlePageChange(currentPage + 1)} 
+                                    disabled={currentPage === totalPages}
+                                >
+                                    <ChevronRight size={20} />
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
 
-            {/* MOBILE SCROLL INDICATOR */}
+            {/* MOBILE ONLY SCROLL INDICATOR */}
             {showMainScroll && (
-                <div className="ks-mod-scroll-indicator">
+                <div className="ks-scroll-indicator">
                     <ChevronDown size={18} />
                     <span>Scroll for more</span>
                 </div>
             )}
-
         </div>
     );
 };
