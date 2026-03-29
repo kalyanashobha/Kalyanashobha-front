@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css'; 
-import { RefreshCw, Paperclip, X, CheckCircle, Clock, ChevronDown } from 'lucide-react';
+import { RefreshCw, Paperclip, X, CheckCircle, Clock, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import './AdminHelpCenter.css'; 
 
 const AdminHelpCenter = () => {
@@ -16,12 +16,24 @@ const AdminHelpCenter = () => {
   // State to toggle inline image viewing
   const [showImage, setShowImage] = useState(false);
 
+  // --- PAGINATION STATES ---
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 4; // Set to 4 items per page
+
   // Mobile Scroll Indicator State
   const [showMainScroll, setShowMainScroll] = useState(false);
 
   useEffect(() => {
     fetchIssues();
   }, []);
+
+  // --- PAGINATION LOGIC ---
+  const totalPages = Math.ceil(issues.length / itemsPerPage) || 1;
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = issues.slice(indexOfFirstItem, indexOfLastItem);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   // --- MOBILE ONLY SCROLL INDICATOR LOGIC ---
   useEffect(() => {
@@ -33,7 +45,7 @@ const AdminHelpCenter = () => {
         }
 
         // 2. Hide if there is 1 or fewer items, OR if the modal is currently open
-        if (issues.length <= 1 || selectedIssue) {
+        if (currentItems.length <= 1 || selectedIssue) {
             setShowMainScroll(false);
             return;
         }
@@ -62,7 +74,7 @@ const AdminHelpCenter = () => {
         window.removeEventListener('scroll', checkMainScroll);
         window.removeEventListener('resize', checkMainScroll);
     };
-  }, [issues, selectedIssue]);
+  }, [currentItems, currentPage, selectedIssue]);
 
   const fetchIssues = async () => {
     setLoading(true);
@@ -172,11 +184,11 @@ const AdminHelpCenter = () => {
             </thead>
             <tbody>
               {loading ? (
-                /* Skeleton Loading Rows */
+                /* Skeleton Loading Rows - reduced to 4 items */
                 <tr>
                     <td colSpan="5" className="kah-empty-cell">
                         <div className="kah-skeleton-stack">
-                            {[1, 2, 3, 4, 5].map((i) => (
+                            {[1, 2, 3, 4].map((i) => (
                                 <div key={i} className="kah-skeleton-row">
                                     <div className="kah-sk-box kah-sk-date"></div>
                                     <div className="kah-sk-box kah-sk-user"></div>
@@ -200,8 +212,8 @@ const AdminHelpCenter = () => {
                   </td>
                 </tr>
               ) : (
-                /* Actual Data Rows */
-                issues.map((issue) => (
+                /* Actual Data Rows (mapped to currentItems) */
+                currentItems.map((issue) => (
                   <tr key={issue._id}>
                     <td data-label="Date">
                         <div className="kah-date-cell">
@@ -245,6 +257,32 @@ const AdminHelpCenter = () => {
             </tbody>
           </table>
         </div>
+
+        {/* ALWAYS VISIBLE CIRCULAR PAGINATION DESIGN */}
+        {!loading && totalPages >= 1 && (
+            <div className="kah-pagination-container">
+                <button 
+                    className="kah-page-btn-circle" 
+                    onClick={() => paginate(currentPage - 1)} 
+                    disabled={currentPage === 1}
+                >
+                    <ChevronLeft size={20} />
+                </button>
+
+                <span className="kah-page-text">
+                    Page {currentPage} of {totalPages}
+                </span>
+
+                <button 
+                    className="kah-page-btn-circle" 
+                    onClick={() => paginate(currentPage + 1)} 
+                    disabled={currentPage === totalPages}
+                >
+                    <ChevronRight size={20} />
+                </button>
+            </div>
+        )}
+
       </div>
 
       {/* MOBILE ONLY SCROLL INDICATOR */}
