@@ -687,12 +687,6 @@ export default function CreateModerator() {
           }
         }
 
-        @media (min-width: 1024px) {
-          .ks-mod-permissions-grid {
-            grid-template-columns: repeat(3, 1fr);
-          }
-        }
-
         /* =========================================================
            MOBILE RESPONSIVENESS (NO HORIZONTAL SCROLLING FIX)
            ========================================================= */
@@ -750,19 +744,26 @@ export default function CreateModerator() {
           .ks-mod-actions-cell { width: 100%; justify-content: flex-end; }
           .ks-mod-action-btn { font-size: 12px; padding: 6px 12px; }
 
-          /* Mobile Pagination Styling */
+          /* Mobile Pagination Styling FIX */
           .ks-mod-pagination-bar {
               flex-direction: column;
-              margin: 0 -20px -20px -20px; 
+              margin: 16px -20px -20px -20px; 
               padding: 16px 20px;
+              align-items: center;
+              justify-content: center;
+              gap: 12px;
           }
           
           .ks-mod-pagination-controls { 
               width: 100%; 
-              justify-content: space-between; 
+              justify-content: center; 
+              gap: 12px;
           }
           
-          .ks-mod-page-btn { flex: 1; }
+          .ks-mod-page-btn { 
+              flex: initial; 
+              padding: 8px 20px; 
+          }
 
           /* Skeleton Mobile */
           .ks-mod-skeleton-row td {
