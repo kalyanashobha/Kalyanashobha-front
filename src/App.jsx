@@ -167,7 +167,7 @@ function App() {
         <Route path="moderater" element={<CreateModerator/>} />
         <Route path="fee-settings" element={<AdminFeeSettings/>} />
         <Route path="premium-users" element={<AdminPremiumRequests/>} />
-<Route path="premium-users" element={<UserList/>} />
+<Route path="premium-user" element={<UserList/>} />
 
 
       </Route>
