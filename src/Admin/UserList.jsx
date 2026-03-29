@@ -5,14 +5,17 @@ const UserList = () => {
     const [allRequests, setAllRequests] = useState([]);
     const [loading, setLoading] = useState(false);
     
+    // Search states
     const [searchQuery, setSearchQuery] = useState('');
     const [searchInput, setSearchInput] = useState(''); 
     
+    // Pagination state
     const [currentPage, setCurrentPage] = useState(1);
     const LIMIT = 5;
 
     const API_BASE_URL = 'https://kalyanashobha-back.vercel.app';
 
+    // 1. Fetch data
     const fetchResolvedUsers = async () => {
         setLoading(true);
         const token = localStorage.getItem('adminToken'); 
@@ -41,10 +44,12 @@ const UserList = () => {
         }
     };
 
+    // Fetch on initial mount
     useEffect(() => {
         fetchResolvedUsers();
     }, []);
 
+    // 2. Client-Side Search Filtering
     const filteredRequests = useMemo(() => {
         if (!searchQuery) return allRequests;
         
@@ -63,6 +68,7 @@ const UserList = () => {
         });
     }, [allRequests, searchQuery]);
 
+    // 3. Client-Side Pagination Calculations
     const totalUsers = filteredRequests.length;
     const totalPages = Math.ceil(totalUsers / LIMIT) || 1;
     
@@ -71,6 +77,7 @@ const UserList = () => {
         return filteredRequests.slice(startIndex, startIndex + LIMIT);
     }, [filteredRequests, currentPage]);
 
+    // Handlers
     const handleSearchSubmit = (e) => {
         e.preventDefault();
         setCurrentPage(1); 
@@ -86,327 +93,333 @@ const UserList = () => {
         setCurrentPage(1);
     };
 
+    // --- INTERNAL CSS ---
+    const internalCss = `
+        .ul-wrapper {
+            font-family: 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            max-width: 1050px;
+            margin: 40px auto;
+            padding: 32px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05), 0 4px 6px rgba(0, 0, 0, 0.02);
+            color: #1f2937;
+        }
+        
+        .ul-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 2px solid #f3f4f6;
+            padding-bottom: 16px;
+            margin-bottom: 24px;
+        }
+
+        .ul-header h2 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 700;
+            color: #111827;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ul-header h2::before {
+            content: '';
+            display: block;
+            width: 12px;
+            height: 12px;
+            background-color: #b91c1c;
+            border-radius: 50%;
+        }
+
+        .ul-record-count {
+            font-size: 14px;
+            color: #6b7280;
+            background-color: #f3f4f6;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        .ul-search-form {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .ul-input {
+            flex: 1;
+            padding: 12px 16px;
+            font-size: 15px;
+            color: #111827;
+            background-color: #f9fafb;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .ul-input:focus {
+            background-color: #ffffff;
+            border-color: #b91c1c;
+            box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.15);
+        }
+
+        .ul-btn {
+            padding: 12px 24px;
+            font-size: 15px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+        }
+
+        .ul-btn-primary {
+            background-color: #b91c1c;
+            color: #ffffff;
+            box-shadow: 0 2px 4px rgba(185, 28, 28, 0.2);
+        }
+
+        .ul-btn-primary:hover:not(:disabled) {
+            background-color: #991b1b;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px rgba(185, 28, 28, 0.25);
+        }
+
+        .ul-btn-primary:disabled {
+            background-color: #fca5a5;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .ul-btn-secondary {
+            background-color: #ffffff;
+            color: #374151;
+            border: 1px solid #d1d5db;
+        }
+
+        .ul-btn-secondary:hover:not(:disabled) {
+            background-color: #f3f4f6;
+            color: #111827;
+        }
+
+        .ul-table-wrapper {
+            overflow-x: auto;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 24px;
+        }
+
+        .ul-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        .ul-table th {
+            background-color: #f9fafb;
+            color: #6b7280;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 16px;
+            font-weight: 600;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .ul-table td {
+            padding: 16px;
+            border-bottom: 1px solid #f3f4f6;
+            color: #4b5563;
+            font-size: 14px;
+            vertical-align: middle;
+        }
+
+        .ul-table tbody tr {
+            transition: background-color 0.15s ease;
+        }
+
+        .ul-table tbody tr:hover {
+            background-color: #f9fafb;
+        }
+
+        .ul-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .ul-primary-text {
+            color: #111827;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .ul-secondary-text {
+            color: #6b7280;
+            font-size: 13px;
+        }
+
+        .ul-badge {
+            display: inline-flex;
+            align-items: center;
+            background-color: #ecfdf5;
+            color: #059669;
+            padding: 4px 10px;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 600;
+            border: 1px solid #a7f3d0;
+        }
+
+        .ul-pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .ul-page-info {
+            color: #4b5563;
+            font-size: 14px;
+        }
+
+        .ul-empty-state {
+            text-align: center;
+            padding: 48px 24px;
+            color: #6b7280;
+        }
+
+        @media (max-width: 640px) {
+            .ul-search-form {
+                flex-direction: column;
+            }
+            .ul-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+        }
+    `;
+
     return (
-        <div className="admin-container">
-            {/* INTERNAL CSS BLOCK */}
-            <style>{`
-                .admin-container {
-                    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-                    max-width: 1050px;
-                    margin: 40px auto;
-                    padding: 30px;
-                    background-color: #ffffff;
-                    border-radius: 12px;
-                    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0,0,0,0.02);
-                    color: #111827;
-                }
-
-                .admin-header {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    border-bottom: 2px solid #fee2e2;
-                    padding-bottom: 20px;
-                    margin-bottom: 24px;
-                }
-
-                .admin-header h2 {
-                    margin: 0;
-                    color: #b91c1c;
-                    font-size: 24px;
-                    font-weight: 700;
-                    letter-spacing: -0.02em;
-                }
-
-                .record-count {
-                    background-color: #f3f4f6;
-                    color: #4b5563;
-                    padding: 6px 14px;
-                    border-radius: 20px;
-                    font-size: 13px;
-                    font-weight: 600;
-                }
-
-                .record-count strong {
-                    color: #111827;
-                }
-
-                .search-form {
-                    display: flex;
-                    gap: 12px;
-                    margin-bottom: 24px;
-                }
-
-                .search-input {
-                    flex: 1;
-                    padding: 12px 16px;
-                    font-size: 15px;
-                    color: #374151;
-                    background-color: #f9fafb;
-                    border: 1px solid #d1d5db;
-                    border-radius: 8px;
-                    outline: none;
-                    transition: all 0.2s ease-in-out;
-                }
-
-                .search-input:focus {
-                    background-color: #ffffff;
-                    border-color: #b91c1c;
-                    box-shadow: 0 0 0 4px rgba(185, 28, 28, 0.1);
-                }
-
-                .btn {
-                    padding: 12px 24px;
-                    font-size: 14px;
-                    font-weight: 600;
-                    border-radius: 8px;
-                    cursor: pointer;
-                    transition: all 0.2s ease;
-                    border: none;
-                }
-
-                .btn:disabled {
-                    opacity: 0.6;
-                    cursor: not-allowed;
-                }
-
-                .btn-primary {
-                    background-color: #b91c1c;
-                    color: #ffffff;
-                }
-
-                .btn-primary:hover:not(:disabled) {
-                    background-color: #991b1b;
-                    transform: translateY(-1px);
-                }
-
-                .btn-primary:active:not(:disabled) {
-                    transform: translateY(0);
-                }
-
-                .btn-secondary {
-                    background-color: #ffffff;
-                    color: #4b5563;
-                    border: 1px solid #d1d5db;
-                }
-
-                .btn-secondary:hover:not(:disabled) {
-                    background-color: #f3f4f6;
-                    color: #111827;
-                }
-
-                .table-wrapper {
-                    overflow-x: auto;
-                    border: 1px solid #e5e7eb;
-                    border-radius: 8px;
-                    margin-bottom: 24px;
-                }
-
-                .admin-table {
-                    width: 100%;
-                    border-collapse: collapse;
-                    text-align: left;
-                    white-space: nowrap;
-                }
-
-                .admin-table th {
-                    background-color: #fef2f2;
-                    color: #991b1b;
-                    padding: 16px;
-                    font-size: 12px;
-                    font-weight: 700;
-                    text-transform: uppercase;
-                    letter-spacing: 0.05em;
-                    border-bottom: 2px solid #fca5a5;
-                }
-
-                .admin-table td {
-                    padding: 16px;
-                    font-size: 14px;
-                    color: #374151;
-                    border-bottom: 1px solid #f3f4f6;
-                    vertical-align: middle;
-                }
-
-                .admin-table tbody tr {
-                    transition: background-color 0.15s ease;
-                }
-
-                .admin-table tbody tr:hover {
-                    background-color: #f9fafb;
-                }
-
-                .admin-table tbody tr:last-child td {
-                    border-bottom: none;
-                }
-
-                .unique-id {
-                    font-family: monospace;
-                    background: #f3f4f6;
-                    padding: 4px 8px;
-                    border-radius: 4px;
-                    color: #4b5563;
-                    font-weight: 600;
-                }
-
-                .contact-subtext {
-                    font-size: 12px;
-                    color: #6b7280;
-                    margin-top: 4px;
-                }
-
-                .status-badge {
-                    display: inline-flex;
-                    align-items: center;
-                    background-color: #dcfce7;
-                    color: #166534;
-                    padding: 6px 12px;
-                    border-radius: 9999px;
-                    font-size: 12px;
-                    font-weight: 600;
-                    text-transform: capitalize;
-                }
-
-                .empty-state {
-                    text-align: center;
-                    padding: 48px 20px;
-                    color: #6b7280;
-                    font-size: 15px;
-                }
-
-                .pagination-wrapper {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    padding-top: 10px;
-                }
-
-                .page-info {
-                    font-size: 14px;
-                    color: #6b7280;
-                    font-weight: 500;
-                }
-
-                @media (max-width: 640px) {
-                    .admin-container {
-                        margin: 10px;
-                        padding: 20px;
-                    }
-                    .admin-header {
-                        flex-direction: column;
-                        align-items: flex-start;
-                        gap: 12px;
-                    }
-                    .search-form {
-                        flex-direction: column;
-                    }
-                    .search-input, .btn {
-                        width: 100%;
-                    }
-                }
-            `}</style>
-
-            <Toaster position="top-right" />
+        <>
+            <style>{internalCss}</style>
             
-            <div className="admin-header">
-                <h2>Resolved Premium Users</h2>
-                <div className="record-count">
-                    Total Records: <strong>{totalUsers}</strong>
+            <div className="ul-wrapper">
+                <Toaster position="top-right" />
+                
+                <div className="ul-header">
+                    <h2>Resolved Premium Users</h2>
+                    <span className="ul-record-count">
+                        Total Records: <strong>{totalUsers}</strong>
+                    </span>
                 </div>
-            </div>
 
-            <form className="search-form" onSubmit={handleSearchSubmit}>
-                <input
-                    type="text"
-                    className="search-input"
-                    placeholder="Search by Name, Email, Mobile, or Profile ID..."
-                    value={searchInput}
-                    onChange={(e) => setSearchInput(e.target.value)}
-                />
-                <button type="submit" className="btn btn-primary" disabled={loading}>
-                    {loading ? 'Searching...' : 'Search'}
-                </button>
-                {searchQuery && (
-                    <button type="button" className="btn btn-secondary" onClick={handleClearSearch}>
-                        Clear
+                <form className="ul-search-form" onSubmit={handleSearchSubmit}>
+                    <input
+                        type="text"
+                        placeholder="Search by Name, Email, Mobile, or Profile ID..."
+                        className="ul-input"
+                        value={searchInput}
+                        onChange={(e) => setSearchInput(e.target.value)}
+                    />
+                    <button type="submit" className="ul-btn ul-btn-primary" disabled={loading}>
+                        {loading ? 'Searching...' : 'Search'}
                     </button>
-                )}
-            </form>
+                    {searchQuery && (
+                        <button type="button" className="ul-btn ul-btn-secondary" onClick={handleClearSearch}>
+                            Clear
+                        </button>
+                    )}
+                </form>
 
-            <div className="table-wrapper">
-                <table className="admin-table">
-                    <thead>
-                        <tr>
-                            <th>Profile ID</th>
-                            <th>Name</th>
-                            <th>Contact Info</th>
-                            <th>Location</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {loading ? (
+                <div className="ul-table-wrapper">
+                    <table className="ul-table">
+                        <thead>
                             <tr>
-                                <td colSpan="5" className="empty-state">
-                                    <strong style={{ color: '#b91c1c' }}>Loading records...</strong>
-                                </td>
+                                <th>Profile ID</th>
+                                <th>Name</th>
+                                <th>Contact Info</th>
+                                <th>Location</th>
+                                <th>Status</th>
                             </tr>
-                        ) : currentUsers.length > 0 ? (
-                            currentUsers.map((req) => {
-                                const user = req.userId;
-                                if (!user) return null; 
+                        </thead>
+                        <tbody>
+                            {loading ? (
+                                <tr>
+                                    <td colSpan="5" className="ul-empty-state">
+                                        <strong style={{ color: '#b91c1c', fontSize: '16px' }}>Loading records...</strong>
+                                    </td>
+                                </tr>
+                            ) : currentUsers.length > 0 ? (
+                                currentUsers.map((req) => {
+                                    const user = req.userId;
+                                    if (!user) return null; 
 
-                                return (
-                                    <tr key={req._id}>
-                                        <td><span className="unique-id">{user.uniqueId}</span></td>
-                                        <td style={{ fontWeight: 500 }}>{user.firstName} {user.lastName}</td>
-                                        <td>
-                                            <div>{user.mobileNumber}</div>
-                                            <div className="contact-subtext">{user.email}</div>
-                                        </td>
-                                        <td>{user.city}, {user.state}</td>
-                                        <td>
-                                            <span className="status-badge">{req.status}</span>
-                                        </td>
-                                    </tr>
-                                );
-                            })
-                        ) : (
-                            <tr>
-                                <td colSpan="5" className="empty-state">
-                                    No resolved users found matching your search.
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
-            </div>
+                                    return (
+                                        <tr key={req._id}>
+                                            <td>
+                                                <span className="ul-primary-text">{user.uniqueId}</span>
+                                            </td>
+                                            <td>
+                                                <span className="ul-primary-text">{user.firstName} {user.lastName}</span>
+                                            </td>
+                                            <td>
+                                                <span className="ul-primary-text">{user.mobileNumber}</span>
+                                                <span className="ul-secondary-text">{user.email}</span>
+                                            </td>
+                                            <td>
+                                                <span className="ul-primary-text">{user.city}</span>
+                                                <span className="ul-secondary-text">{user.state}</span>
+                                            </td>
+                                            <td>
+                                                <span className="ul-badge">{req.status}</span>
+                                            </td>
+                                        </tr>
+                                    );
+                                })
+                            ) : (
+                                <tr>
+                                    <td colSpan="5" className="ul-empty-state">
+                                        No resolved users found matching your search.
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
 
-            {/* Pagination Controls */}
-            {!loading && totalPages > 0 && (
-                <div className="pagination-wrapper">
-                    <button 
-                        className="btn btn-secondary"
-                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                        disabled={currentPage === 1}
-                    >
-                        &laquo; Previous
-                    </button>
-                    
-                    <div className="page-info">
-                        Page <strong style={{ color: '#111827' }}>{currentPage}</strong> of <strong>{totalPages}</strong>
+                {/* Pagination Controls */}
+                {!loading && totalPages > 0 && (
+                    <div className="ul-pagination">
+                        <button 
+                            className="ul-btn ul-btn-secondary"
+                            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                            disabled={currentPage === 1}
+                            style={{ opacity: currentPage === 1 ? 0.5 : 1 }}
+                        >
+                            &laquo; Previous
+                        </button>
+                        
+                        <div className="ul-page-info">
+                            Page <strong style={{ color: '#111827' }}>{currentPage}</strong> of <strong>{totalPages}</strong>
+                        </div>
+
+                        <button 
+                            className="ul-btn ul-btn-secondary"
+                            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                            disabled={currentPage === totalPages}
+                            style={{ opacity: currentPage === totalPages ? 0.5 : 1 }}
+                        >
+                            Next &raquo;
+                        </button>
                     </div>
-
-                    <button 
-                        className="btn btn-secondary"
-                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                        disabled={currentPage === totalPages}
-                    >
-                        Next &raquo;
-                    </button>
-                </div>
-            )}
-        </div>
+                )}
+            </div>
+        </>
     );
 };
 
