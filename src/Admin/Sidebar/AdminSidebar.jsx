@@ -3,7 +3,7 @@ import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { 
   LayoutDashboard, Users, Heart, LogOut, CheckCircle, 
   Briefcase, Store, Award, Layers, HelpCircle, Target, FileCheck, 
-  FileEdit, MessageSquare, UserPlus, Settings, Crown, ChevronDown
+  FileEdit, MessageSquare, UserPlus, Settings, Crown, ChevronDown, UserSearch
 } from "lucide-react";
 import axios from "axios";
 import "./AdminSidebar.css";
@@ -20,11 +20,11 @@ export default function AdminSidebar({ closeMobileMenu }) {
     pendingData: 0,
     pendingPremium: 0,
     pendingVendorLeads: 0,
-    pendingHelpCenter: 0 // Added state for help center
+    pendingHelpCenter: 0 
   });
 
   const [adminInfo, setAdminInfo] = useState(null);
-  const [canScroll, setCanScroll] = useState(true); // For scroll indicator
+  const [canScroll, setCanScroll] = useState(true); 
 
   useEffect(() => {
     const info = JSON.parse(localStorage.getItem('adminInfo'));
@@ -46,7 +46,6 @@ export default function AdminSidebar({ closeMobileMenu }) {
       const API_BASE = "https://kalyanashobha-back.vercel.app";
       const timestamp = new Date().getTime(); 
 
-      // Added helpCenterRes to the Promise.all array
       const [statsRes, phase1Res, phase2Res, pendingDataRes, premiumRes, vendorLeadsRes, helpCenterRes] = await Promise.all([
         axios.get(`${API_BASE}/api/admin/stats?t=${timestamp}`, { headers }).catch(() => ({ data: { success: false } })),
         axios.get(`${API_BASE}/api/admin/interest/workflow?status=PendingAdminPhase1&t=${timestamp}`, { headers }).catch(() => ({ data: { success: false } })),
@@ -62,7 +61,6 @@ export default function AdminSidebar({ closeMobileMenu }) {
           newVendorLeadsCount = vendorLeadsRes.data.data.filter(lead => lead.status === 'New').length;
       }
 
-      // Calculate pending help center issues
       let newHelpCenterCount = 0;
       if (helpCenterRes.data.success && helpCenterRes.data.data) {
           newHelpCenterCount = helpCenterRes.data.data.filter(issue => issue.status === 'Pending').length;
@@ -75,7 +73,7 @@ export default function AdminSidebar({ closeMobileMenu }) {
         pendingData: pendingDataRes.data.success ? pendingDataRes.data.data.length : 0, 
         pendingPremium: premiumRes.data.success ? premiumRes.data.data.filter(req => req.status === 'Pending').length : 0,
         pendingVendorLeads: newVendorLeadsCount,
-        pendingHelpCenter: newHelpCenterCount // Update state
+        pendingHelpCenter: newHelpCenterCount 
       });
 
     } catch (e) {
@@ -91,7 +89,7 @@ export default function AdminSidebar({ closeMobileMenu }) {
     window.addEventListener("dataUpdated", fetchCounts); 
     window.addEventListener("premiumUpdated", fetchCounts); 
     window.addEventListener("vendorLeadUpdated", fetchCounts); 
-    window.addEventListener("helpCenterUpdated", fetchCounts); // Listen for help center updates
+    window.addEventListener("helpCenterUpdated", fetchCounts); 
     window.addEventListener("focus", fetchCounts);
 
     const intervalId = setInterval(() => {
@@ -112,16 +110,16 @@ export default function AdminSidebar({ closeMobileMenu }) {
 
   const totalPendingInterests = stats.newRequests + stats.acceptedMatches;
 
-  // Added iconColor to give each item a distinct, premium look
   const allLinks = [
     { id: "dashboard", path: "/admin/dashboard", icon: <LayoutDashboard size={18} />, iconColor: "#3B82F6", label: "Dashboard" },
     { id: "users", path: "/admin/users", icon: <Users size={18} />, iconColor: "#10B981", label: "User Registry" },
+    { id: "user-list", path: "/admin/user-list", icon: <UserSearch size={18} />, iconColor: "#059669", label: "Advanced User List" }, // NEW OPTION ADDED HERE
     { id: "reg-approvals", path: "/admin/registration-approvals", icon: <CheckCircle size={18} />, iconColor: "#0EA5E9", label: "Reg. Approvals", badge: stats.pendingReg },
     { id: "interest-approvals", path: "/admin/interest-approvals", icon: <Heart size={18} />, iconColor: "#EC4899", label: "Interest Approvals", badge: totalPendingInterests },
     { id: "data-approval", path: "/admin/data-approval", icon: <FileCheck size={18} />, iconColor: "#8B5CF6", label: "Data Approval", badge: stats.pendingData },
     { id: "premium-users", path: "/admin/premium-users", icon: <Crown size={18} />, iconColor: "#F59E0B", label: "Premium Requests", badge: stats.pendingPremium },
     { id: "vendor-leads", path: "/admin/vendor-leads", icon: <Target size={18} />, iconColor: "#14B8A6", label: "Vendor Leads", badge: stats.pendingVendorLeads },
-    { id: "help-center", path: "/admin/help-center", icon: <HelpCircle size={18} />, iconColor: "#84CC16", label: "Help Center", badge: stats.pendingHelpCenter }, // Moved here with badge
+    { id: "help-center", path: "/admin/help-center", icon: <HelpCircle size={18} />, iconColor: "#84CC16", label: "Help Center", badge: stats.pendingHelpCenter }, 
     { id: "agents", path: "/admin/agents", icon: <Briefcase size={18} />, iconColor: "#64748B", label: "Agents" },
     { id: "vendors", path: "/admin/vendors", icon: <Store size={18} />, iconColor: "#F97316", label: "Vendors" },
     { id: "user-certificates", path: "/admin/user-certificates", icon: <Award size={18} />, iconColor: "#EAB308", label: "User Acceptance" },
@@ -138,20 +136,16 @@ export default function AdminSidebar({ closeMobileMenu }) {
     return adminInfo.permissions?.includes(link.id);
   });
 
-  // --- Check if the menu can be scrolled ---
   const checkScroll = useCallback(() => {
     if (navRef.current) {
       const { scrollTop, scrollHeight, clientHeight } = navRef.current;
-      // If there is more than 5px left to scroll, show the arrow
       setCanScroll(scrollHeight - scrollTop > clientHeight + 5);
     }
   }, []);
 
   useEffect(() => {
-    // Check immediately
     checkScroll(); 
 
-    // Check again after a tiny delay to ensure CSS styles are fully painted
     const timeoutId = setTimeout(() => {
       checkScroll();
     }, 150);
@@ -161,7 +155,7 @@ export default function AdminSidebar({ closeMobileMenu }) {
       clearTimeout(timeoutId);
       window.removeEventListener('resize', checkScroll);
     }
-  }, [filteredLinks.length, checkScroll]); // Re-run whenever links are loaded
+  }, [filteredLinks.length, checkScroll]); 
 
   const handleLogout = () => {
     if (closeMobileMenu) closeMobileMenu(); 
@@ -194,7 +188,6 @@ export default function AdminSidebar({ closeMobileMenu }) {
                 >
                   {({ isActive }) => (
                     <>
-                      {/* Set the color inline. If active, it overrides to white via CSS currentColor */}
                       <div 
                         className="ks-nav-icon-wrapper" 
                         style={{ color: isActive ? '#FFFFFF' : link.iconColor }}
@@ -213,7 +206,6 @@ export default function AdminSidebar({ closeMobileMenu }) {
           </ul>
         </nav>
 
-        {/* Scroll Indicator */}
         {canScroll && (
           <div className="ks-scroll-indicator">
             <ChevronDown size={20} color="#9CA3AF" />
