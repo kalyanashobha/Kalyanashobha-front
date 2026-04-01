@@ -102,8 +102,8 @@ const Interests = () => {
     // 1. Gracefully dismiss the confirmation toast
     toast.dismiss(toastId); 
 
-    // 2. Trigger the processing toast
-    const loadingToast = toast.loading("Processing...");
+    // 2. Trigger the processing toast and capture its ID
+    const loadingToastId = toast.loading("Processing...");
 
     const token = localStorage.getItem('token');
 
@@ -116,19 +116,17 @@ const Interests = () => {
       const data = await res.json();
 
       if (data.success) {
-        // 3. Replace the loading toast with a success toast seamlessly
-        toast.success(
-          action === 'accept' ? 'Request Accepted' : 'Request Declined', 
-          { id: loadingToast }
-        );
-        fetchInterests(true); 
+        // Wait for the UI data to refresh FIRST
+        await fetchInterests(true); 
+        // 3. Update the existing loading toast to a success toast
+        toast.success(action === 'accept' ? "Request accepted successfully!" : "Request declined.", { id: loadingToastId });
       } else {
-        // Replace with error toast
-        toast.error(data.message || "Action failed", { id: loadingToast });
+        // Update the existing loading toast to an error toast
+        toast.error(data.message || "Action failed", { id: loadingToastId });
       }
     } catch (err) {
-      // Replace with network error toast
-      toast.error("Network error", { id: loadingToast });
+      // Update the existing loading toast to a network error toast
+      toast.error("Network error", { id: loadingToastId });
     }
   };
 
