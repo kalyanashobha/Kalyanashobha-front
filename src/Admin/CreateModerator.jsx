@@ -24,18 +24,21 @@ export default function CreateModerator() {
   // Global Scroll Indicator State
   const [showMainScroll, setShowMainScroll] = useState(false);
 
+  // UPDATED PERMISSIONS LIST to match all options from AdminSidebar
   const availablePermissions = [
     { id: "dashboard", label: "Dashboard" },
     { id: "users", label: "User Registry" },
+    { id: "premium-users", label: "Premium Users" },
     { id: "reg-approvals", label: "Registration Approvals" },
     { id: "interest-approvals", label: "Interest Approvals" },
+    { id: "data-approval", label: "Data Approval" },
+    { id: "premium-requests", label: "Premium Requests" },
+    { id: "vendor-leads", label: "Vendor Leads" },
+    { id: "help-center", label: "Help Center" },
     { id: "agents", label: "Agents Management" },
     { id: "vendors", label: "Vendors Management" },
     { id: "user-certificates", label: "User Acceptance" },
     { id: "add-data", label: "Add Data Fields" },
-    { id: "vendor-leads", label: "Vendor Leads" },
-    { id: "help-center", label: "Help Center" },
-    { id: "data-approval", label: "Data Approval" },
     { id: "manage-pages", label: "Manage Pages" },
     { id: "testimonials", label: "Testimonials" },
     { id: "fee-settings", label: "Fee Settings" },
