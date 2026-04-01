@@ -4,11 +4,11 @@ import toast, { Toaster } from 'react-hot-toast';
 const UserList = () => {
     const [allRequests, setAllRequests] = useState([]);
     const [loading, setLoading] = useState(false);
-    
+
     // Search states
     const [searchQuery, setSearchQuery] = useState('');
     const [searchInput, setSearchInput] = useState(''); 
-    
+
     // Pagination state
     const [currentPage, setCurrentPage] = useState(1);
     const LIMIT = 5;
@@ -52,12 +52,12 @@ const UserList = () => {
     // 2. Client-Side Search Filtering
     const filteredRequests = useMemo(() => {
         if (!searchQuery) return allRequests;
-        
+
         const lowerSearch = searchQuery.toLowerCase();
         return allRequests.filter(req => {
             const user = req.userId;
             if (!user) return false; 
-            
+
             return (
                 (user.firstName && user.firstName.toLowerCase().includes(lowerSearch)) ||
                 (user.lastName && user.lastName.toLowerCase().includes(lowerSearch)) ||
@@ -71,7 +71,7 @@ const UserList = () => {
     // 3. Client-Side Pagination Calculations
     const totalUsers = filteredRequests.length;
     const totalPages = Math.ceil(totalUsers / LIMIT) || 1;
-    
+
     const currentUsers = useMemo(() => {
         const startIndex = (currentPage - 1) * LIMIT;
         return filteredRequests.slice(startIndex, startIndex + LIMIT);
@@ -207,7 +207,7 @@ const UserList = () => {
         }
 
         .ul-table-wrapper {
-            overflow-x: auto;
+            /* Removed overflow-x: auto */
             border: 1px solid #e5e7eb;
             border-radius: 8px;
             margin-bottom: 24px;
@@ -217,7 +217,8 @@ const UserList = () => {
             width: 100%;
             border-collapse: collapse;
             text-align: left;
-            white-space: nowrap;
+            /* Removed white-space: nowrap to allow wrapping */
+            word-break: break-word;
         }
 
         .ul-table th {
@@ -292,7 +293,13 @@ const UserList = () => {
             color: #6b7280;
         }
 
-        @media (max-width: 640px) {
+        /* --- RESPONSIVE MOBILE STYLES --- */
+        @media (max-width: 768px) {
+            .ul-wrapper {
+                padding: 16px;
+                margin: 16px auto;
+            }
+
             .ul-search-form {
                 flex-direction: column;
             }
@@ -301,16 +308,80 @@ const UserList = () => {
                 align-items: flex-start;
                 gap: 12px;
             }
+
+            /* Convert Table to Cards */
+            .ul-table-wrapper {
+                border: none; /* Remove outer border */
+            }
+            
+            .ul-table, .ul-table tbody, .ul-table tr, .ul-table td {
+                display: block;
+                width: 100%;
+            }
+
+            .ul-table thead {
+                display: none; /* Hide standard column headers */
+            }
+
+            .ul-table tbody tr {
+                margin-bottom: 16px;
+                border: 1px solid #e5e7eb;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            }
+
+            .ul-table tbody tr:hover {
+                background-color: transparent; /* Disable hover effect on mobile */
+            }
+
+            .ul-table td {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                text-align: right;
+                padding: 12px 16px;
+                border-bottom: 1px solid #f3f4f6;
+            }
+
+            .ul-table td:last-child {
+                border-bottom: none;
+            }
+
+            /* Insert the data-label as a pseudo-element before the actual content */
+            .ul-table td::before {
+                content: attr(data-label);
+                font-size: 12px;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                font-weight: 600;
+                color: #6b7280;
+                margin-right: 16px;
+                text-align: left;
+                flex-shrink: 0;
+            }
+
+            .ul-primary-text, .ul-secondary-text {
+                text-align: right; /* Ensure text aligns to the right inside the card */
+            }
+
+            .ul-pagination {
+                flex-direction: column;
+                gap: 16px;
+            }
+            
+            .ul-btn {
+                width: 100%;
+            }
         }
     `;
 
     return (
         <>
             <style>{internalCss}</style>
-            
+
             <div className="ul-wrapper">
                 <Toaster position="top-right" />
-                
+
                 <div className="ul-header">
                     <h2>Resolved Premium Users</h2>
                     <span className="ul-record-count">
@@ -361,21 +432,26 @@ const UserList = () => {
 
                                     return (
                                         <tr key={req._id}>
-                                            <td>
+                                            {/* Note the data-label attributes added below */}
+                                            <td data-label="Profile ID">
                                                 <span className="ul-primary-text">{user.uniqueId}</span>
                                             </td>
-                                            <td>
+                                            <td data-label="Name">
                                                 <span className="ul-primary-text">{user.firstName} {user.lastName}</span>
                                             </td>
-                                            <td>
-                                                <span className="ul-primary-text">{user.mobileNumber}</span>
-                                                <span className="ul-secondary-text">{user.email}</span>
+                                            <td data-label="Contact Info">
+                                                <div>
+                                                    <span className="ul-primary-text">{user.mobileNumber}</span>
+                                                    <span className="ul-secondary-text">{user.email}</span>
+                                                </div>
                                             </td>
-                                            <td>
-                                                <span className="ul-primary-text">{user.city}</span>
-                                                <span className="ul-secondary-text">{user.state}</span>
+                                            <td data-label="Location">
+                                                <div>
+                                                    <span className="ul-primary-text">{user.city}</span>
+                                                    <span className="ul-secondary-text">{user.state}</span>
+                                                </div>
                                             </td>
-                                            <td>
+                                            <td data-label="Status">
                                                 <span className="ul-badge">{req.status}</span>
                                             </td>
                                         </tr>
@@ -403,7 +479,7 @@ const UserList = () => {
                         >
                             &laquo; Previous
                         </button>
-                        
+
                         <div className="ul-page-info">
                             Page <strong style={{ color: '#111827' }}>{currentPage}</strong> of <strong>{totalPages}</strong>
                         </div>
