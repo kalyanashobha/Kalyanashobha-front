@@ -46,7 +46,7 @@ const Interests = () => {
   const [receivedList, setReceivedList] = useState([]);
   const [loading, setLoading] = useState(true);
   
-  // NEW: Track the ID of the request currently being processed
+  // Track the ID of the request currently being processed
   const [processingId, setProcessingId] = useState(null);
 
   const neutralAvatar = "https://cdn-icons-png.flaticon.com/512/847/847969.png"; 
@@ -106,7 +106,7 @@ const Interests = () => {
     // 1. Gracefully dismiss the confirmation toast
     toast.dismiss(toastId); 
 
-    // 2. Set the processing ID to disable buttons
+    // 2. Set the processing ID to disable buttons on that specific row
     setProcessingId(interestId);
 
     // 3. Trigger the processing toast and capture its ID
@@ -125,17 +125,16 @@ const Interests = () => {
       if (data.success) {
         // Wait for the UI data to refresh FIRST
         await fetchInterests(true); 
-        // Update the existing loading toast to a success toast
-        toast.success(action === 'accept' ? "Request accepted successfully!" : "Request declined.", { id: loadingToastId });
+        // Simply dismiss the processing toast - no success message shown!
+        toast.dismiss(loadingToastId);
       } else {
-        // Update the existing loading toast to an error toast
+        // Only show error toast if something went wrong
         toast.error(data.message || "Action failed", { id: loadingToastId });
       }
     } catch (err) {
-      // Update the existing loading toast to a network error toast
       toast.error("Network error", { id: loadingToastId });
     } finally {
-      // 4. Clear the processing ID to re-enable buttons (or let them disappear on refresh)
+      // 4. Clear the processing ID to re-enable interactions
       setProcessingId(null);
     }
   };
@@ -296,7 +295,7 @@ const Interests = () => {
         }} 
       />
 
-      {/* Add a tiny CSS string for the spinner animation if you don't have it globally */}
+      {/* CSS string for the spinner animation */}
       <style>{`
         .spinner { animation: spin 1s linear infinite; margin-left: 4px; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
