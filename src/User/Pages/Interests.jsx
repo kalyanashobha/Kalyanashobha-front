@@ -101,10 +101,10 @@ const Interests = () => {
   const performAction = async (interestId, action, toastId) => {
     // 1. Gracefully dismiss the confirmation toast
     toast.dismiss(toastId); 
-    
+
     // 2. Trigger the processing toast
     const loadingToast = toast.loading("Processing...");
-    
+
     const token = localStorage.getItem('token');
 
     try {
@@ -115,19 +115,20 @@ const Interests = () => {
       });
       const data = await res.json();
 
-      // 3. Dismiss the processing toast as soon as we get a response
-      toast.dismiss(loadingToast);
-
       if (data.success) {
-        // Just refresh the data, no stuck success toast
+        // 3. Replace the loading toast with a success toast seamlessly
+        toast.success(
+          action === 'accept' ? 'Request Accepted' : 'Request Declined', 
+          { id: loadingToast }
+        );
         fetchInterests(true); 
       } else {
-        toast.error(data.message || "Action failed");
+        // Replace with error toast
+        toast.error(data.message || "Action failed", { id: loadingToast });
       }
     } catch (err) {
-      // Make sure to dismiss the processing toast if there's an error too
-      toast.dismiss(loadingToast);
-      toast.error("Network error");
+      // Replace with network error toast
+      toast.error("Network error", { id: loadingToast });
     }
   };
 
@@ -239,11 +240,11 @@ const Interests = () => {
       const acceptedSent = sentList
         .filter(i => ['Finalized', 'Accepted'].includes(i.status))
         .map(i => ({ ...i, profile: i.receiverId || i.receiverProfile }));
-        
+
       const acceptedRec = receivedList
         .filter(i => ['Finalized', 'Accepted'].includes(i.status))
         .map(i => ({ ...i, profile: i.senderId }));
-        
+
       return [...acceptedSent, ...acceptedRec].map(item => ({ ...item, type: 'connected' }));
     }
     return [];
@@ -255,7 +256,7 @@ const Interests = () => {
   return (
     <div className="page-container">
       <Navbar />
-      
+
       <Toaster 
         position="top-center" 
         containerStyle={{
