@@ -143,6 +143,7 @@ const CustomTimePicker = ({ isOpen, onClose, onSet, initialTime }) => {
 
 const AdminUserManagement = () => {
   const [users, setUsers] = useState([]);
+  const [agents, setAgents] = useState([]); // List of agents
   const [loading, setLoading] = useState(false); 
   const [processingId, setProcessingId] = useState(null); 
 
@@ -165,8 +166,10 @@ const AdminUserManagement = () => {
   const [advStates, setAdvStates] = useState([]);
   const [advCities, setAdvCities] = useState([]);
 
+  // Filters
   const [searchTerm, setSearchTerm] = useState("");
   const [referralFilter, setReferralFilter] = useState("all");
+  const [agentFilter, setAgentFilter] = useState(""); // Filter by specific Agent ID
   const [advFilters, setAdvFilters] = useState(INITIAL_FILTERS);
 
   // --- MAIN PAGE SCROLL INDICATOR LOGIC ---
@@ -201,10 +204,11 @@ const AdminUserManagement = () => {
   // ----------------------------------------
 
   useEffect(() => {
-    const fetchInitialMasterData = async () => {
+    const fetchInitialMasterDataAndAgents = async () => {
       try {
+        const token = localStorage.getItem('adminToken');
         const [
-          commRes, countryRes, eduRes, occRes, mtRes, starRes, moonRes
+          commRes, countryRes, eduRes, occRes, mtRes, starRes, moonRes, agentRes
         ] = await Promise.all([
           axios.get(`${API_BASE_URL}/public/get-all-communities`),
           axios.get(`${API_BASE_URL}/public/master-data/Country`),
@@ -212,7 +216,8 @@ const AdminUserManagement = () => {
           axios.get(`${API_BASE_URL}/public/master-data/Designation`), 
           axios.get(`${API_BASE_URL}/public/master-data/MotherTongue`),
           axios.get(`${API_BASE_URL}/public/master-data/Star`),
-          axios.get(`${API_BASE_URL}/public/master-data/Moonsign`)
+          axios.get(`${API_BASE_URL}/public/master-data/Moonsign`),
+          axios.get(`${API_BASE_URL}/admin/agents`, { headers: { Authorization: token } })
         ]);
 
         if (commRes.data.success) setMasterCommunities(commRes.data.data);
@@ -222,32 +227,49 @@ const AdminUserManagement = () => {
         if (mtRes.data.success) setMasterMotherTongues(mtRes.data.data); 
         if (starRes.data.success) setMasterStars(starRes.data.data); 
         if (moonRes.data.success) setMasterMoonsigns(moonRes.data.data); 
+        
+        // Setup Agents for Dropdown
+        if (agentRes.data.success) setAgents(agentRes.data.agents || []);
 
       } catch (err) {
-        console.error("Failed to load master data", err);
+        console.error("Failed to load initial data", err);
       }
     };
 
-    fetchInitialMasterData();
+    fetchInitialMasterDataAndAgents();
   }, []);
 
   const fetchUsers = async () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('adminToken');
-      const response = await axios.get(`${API_BASE_URL}/admin/users/advanced`, {
-        headers: { Authorization: token },
-        params: {
-          search: searchTerm,
-          referralType: referralFilter === 'all' ? '' : referralFilter,
-          page: page,
-          limit: 6 
-        }
-      });
 
-      if (response.data.success) {
-        setUsers(response.data.users);
-        setTotalPages(response.data.totalPages || 1);
+      // Condition: Use dedicated agent fetch route if an agent is selected
+      if (agentFilter) {
+        const response = await axios.get(`${API_BASE_URL}/admin/agents/${agentFilter}/users`, {
+            headers: { Authorization: token }
+        });
+        
+        if (response.data.success) {
+            setUsers(response.data.data || []);
+            setTotalPages(1); // Specific agent fetch returns all matched un-paginated
+        }
+      } else {
+        // Fallback: Default advanced fetch
+        const response = await axios.get(`${API_BASE_URL}/admin/users/advanced`, {
+          headers: { Authorization: token },
+          params: {
+            search: searchTerm,
+            referralType: referralFilter === 'all' ? '' : referralFilter,
+            page: page,
+            limit: 6 
+          }
+        });
+
+        if (response.data.success) {
+          setUsers(response.data.users);
+          setTotalPages(response.data.totalPages || 1);
+        }
       }
     } catch (error) {
       toast.error("Failed to fetch users");
@@ -261,7 +283,7 @@ const AdminUserManagement = () => {
         const timer = setTimeout(() => fetchUsers(), 500);
         return () => clearTimeout(timer);
     }
-  }, [searchTerm, referralFilter, page, showAdvanced]);
+  }, [searchTerm, referralFilter, agentFilter, page, showAdvanced]);
 
   const handleAdvChange = async (e) => {
     const { name, value } = e.target;
@@ -483,11 +505,40 @@ const AdminUserManagement = () => {
                 />
               </div>
               <div className="um-filters">
-                <select value={referralFilter} onChange={(e) => setReferralFilter(e.target.value)} className="um-select">
+                <select 
+                  value={referralFilter} 
+                  onChange={(e) => {
+                    setReferralFilter(e.target.value);
+                    setAgentFilter(''); // Reset agent filter when switching general referral types
+                    setPage(1);
+                  }} 
+                  className="um-select"
+                  disabled={!!agentFilter}
+                >
                   <option value="all">Source: All</option>
                   <option value="self">Self (Direct)</option>
                   <option value="agent">Agent Referred</option>
                 </select>
+
+                {/* --- AGENT FILTER DROPDOWN --- */}
+                <select 
+                  value={agentFilter} 
+                  onChange={(e) => {
+                    const selectedId = e.target.value;
+                    setAgentFilter(selectedId);
+                    setPage(1);
+                    if(selectedId) {
+                      setReferralFilter('agent');
+                    }
+                  }} 
+                  className="um-select"
+                >
+                  <option value="">Filter by Agent (All)</option>
+                  {agents.map(a => (
+                    <option key={a._id} value={a._id}>{a.name} ({a.agentCode})</option>
+                  ))}
+                </select>
+
               </div>
             </div>
           )}
@@ -518,7 +569,7 @@ const AdminUserManagement = () => {
           )}
         </div>
 
-        {!loading && !showAdvanced && users.length > 0 && (
+        {!loading && !showAdvanced && !agentFilter && users.length > 0 && (
             <div className="um-pagination">
                 <button disabled={page === 1} onClick={() => setPage(p => p - 1)} className="um-page-btn"><ChevronLeft size={16} /></button>
                 <span className="um-page-info">Page {page} of {totalPages}</span>
