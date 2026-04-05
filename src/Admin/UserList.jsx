@@ -5,6 +5,10 @@ const UserList = () => {
     const [allRequests, setAllRequests] = useState([]);
     const [loading, setLoading] = useState(false);
 
+    // Agent Dropdown States
+    const [agents, setAgents] = useState([]);
+    const [selectedAgent, setSelectedAgent] = useState('');
+
     // Search states
     const [searchQuery, setSearchQuery] = useState('');
     const [searchInput, setSearchInput] = useState(''); 
@@ -18,13 +22,37 @@ const UserList = () => {
 
     const API_BASE_URL = 'https://kalyanashobha-back.vercel.app';
 
-    // 1. Fetch data
-    const fetchResolvedUsers = async () => {
+    // 1. Fetch Agents for the Dropdown
+    const fetchAgents = async () => {
+        const token = localStorage.getItem('adminToken');
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/admin/agents`, {
+                method: 'GET',
+                headers: { 'Authorization': token }
+            });
+            const data = await response.json();
+            if (data.success) {
+                // Adjust based on how your agent API returns data (e.g., data.agents or data.data)
+                setAgents(data.agents || data.data || []);
+            }
+        } catch (error) {
+            console.error("Error fetching agents:", error);
+            toast.error("Failed to load agents list");
+        }
+    };
+
+    // 2. Fetch Resolved Users (Dynamic based on selected agent)
+    const fetchResolvedUsers = async (agentId = '') => {
         setLoading(true);
         const token = localStorage.getItem('adminToken'); 
 
         try {
-            const response = await fetch(`${API_BASE_URL}/api/admin/premium-requests/resolved`, {
+            // Determine URL based on whether an agent is selected
+            const endpoint = agentId 
+                ? `${API_BASE_URL}/api/admin/agents/${agentId}/premium-resolved`
+                : `${API_BASE_URL}/api/admin/premium-requests/resolved`;
+
+            const response = await fetch(endpoint, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -47,8 +75,9 @@ const UserList = () => {
         }
     };
 
-    // Fetch on initial mount
+    // Fetch Agents and Users on initial mount
     useEffect(() => {
+        fetchAgents();
         fetchResolvedUsers();
     }, []);
 
@@ -67,7 +96,32 @@ const UserList = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    // 2. Client-Side Search Filtering & Validation
+    // Handlers
+    const handleAgentChange = (e) => {
+        const newAgentId = e.target.value;
+        setSelectedAgent(newAgentId);
+        setCurrentPage(1); // Reset pagination
+        setSearchInput(''); // Clear search text when switching agents
+        setSearchQuery('');
+        fetchResolvedUsers(newAgentId);
+    };
+
+    const handleSearchSubmit = (e) => {
+        e.preventDefault();
+        setCurrentPage(1); 
+        setSearchQuery(searchInput);
+        if (searchInput) {
+            toast.success(`Showing results for "${searchInput}"`);
+        }
+    };
+
+    const handleClearSearch = () => {
+        setSearchInput('');
+        setSearchQuery('');
+        setCurrentPage(1);
+    };
+
+    // 3. Client-Side Search Filtering & Validation
     const filteredRequests = useMemo(() => {
         const validRequests = allRequests.filter(req => req.userId);
 
@@ -86,7 +140,7 @@ const UserList = () => {
         });
     }, [allRequests, searchQuery]);
 
-    // 3. Client-Side Pagination Calculations
+    // 4. Client-Side Pagination Calculations
     const totalUsers = filteredRequests.length;
     const totalPages = Math.ceil(totalUsers / LIMIT) || 1;
 
@@ -95,21 +149,6 @@ const UserList = () => {
         return filteredRequests.slice(startIndex, startIndex + LIMIT);
     }, [filteredRequests, currentPage]);
 
-    // Handlers
-    const handleSearchSubmit = (e) => {
-        e.preventDefault();
-        setCurrentPage(1); 
-        setSearchQuery(searchInput);
-        if (searchInput) {
-            toast.success(`Showing results for "${searchInput}"`);
-        }
-    };
-
-    const handleClearSearch = () => {
-        setSearchInput('');
-        setSearchQuery('');
-        setCurrentPage(1);
-    };
 
     // --- INTERNAL CSS ---
     const internalCss = `
@@ -161,18 +200,48 @@ const UserList = () => {
             font-weight: 500;
         }
 
+        .ul-filters-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 24px;
+            background: #f9fafb;
+            padding: 16px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .ul-agent-select {
+            width: 100%;
+            max-width: 300px;
+            padding: 12px 16px;
+            font-size: 14px;
+            color: #111827;
+            background-color: #ffffff;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            outline: none;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .ul-agent-select:focus {
+            border-color: #b91c1c;
+            box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.15);
+        }
+
         .ul-search-form {
             display: flex;
             gap: 12px;
-            margin-bottom: 24px;
+            width: 100%;
         }
 
         .ul-input {
             flex: 1;
             padding: 12px 16px;
-            font-size: 15px;
+            font-size: 14px;
             color: #111827;
-            background-color: #f9fafb;
+            background-color: #ffffff;
             border: 1px solid #d1d5db;
             border-radius: 8px;
             outline: none;
@@ -180,19 +249,19 @@ const UserList = () => {
         }
 
         .ul-input:focus {
-            background-color: #ffffff;
             border-color: #b91c1c;
             box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.15);
         }
 
         .ul-btn {
             padding: 12px 24px;
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 600;
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.2s ease;
             border: none;
+            white-space: nowrap;
         }
 
         .ul-btn-primary {
@@ -216,6 +285,7 @@ const UserList = () => {
             border: 1px solid #e5e7eb;
             border-radius: 8px;
             margin-bottom: 24px;
+            overflow-x: auto;
         }
 
         .ul-table {
@@ -321,6 +391,8 @@ const UserList = () => {
 
             .ul-search-form { flex-direction: column; }
             .ul-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+            
+            .ul-agent-select { max-width: 100%; }
 
             .ul-table-wrapper { border: none; margin-bottom: 8px; }
             
@@ -363,7 +435,6 @@ const UserList = () => {
             .ul-pagination { flex-direction: column; gap: 16px; margin-top: 16px; padding-bottom: 40px; }
             .ul-btn { width: 100%; }
 
-            /* Enhanced Floating Scroll Indicator */
             .mobile-scroll-indicator {
                 display: flex;
                 position: fixed;
@@ -387,7 +458,6 @@ const UserList = () => {
                 transition: opacity 0.3s ease, visibility 0.3s ease;
             }
 
-            /* Fade out class controlled by React state */
             .mobile-scroll-indicator.hide {
                 opacity: 0;
                 visibility: hidden;
@@ -444,23 +514,41 @@ const UserList = () => {
                     </span>
                 </div>
 
-                <form className="ul-search-form" onSubmit={handleSearchSubmit}>
-                    <input
-                        type="text"
-                        placeholder="Search by Name, Email, Mobile, or Profile ID..."
-                        className="ul-input"
-                        value={searchInput}
-                        onChange={(e) => setSearchInput(e.target.value)}
-                    />
-                    <button type="submit" className="ul-btn ul-btn-primary" disabled={loading}>
-                        {loading ? 'Searching...' : 'Search'}
-                    </button>
-                    {searchQuery && (
-                        <button type="button" className="ul-btn ul-btn-secondary" onClick={handleClearSearch}>
-                            Clear
+                <div className="ul-filters-container">
+                    {/* Agent Dropdown */}
+                    <select 
+                        className="ul-agent-select"
+                        value={selectedAgent}
+                        onChange={handleAgentChange}
+                        disabled={loading}
+                    >
+                        <option value="">All Agents (Global)</option>
+                        {agents.map((agent) => (
+                            <option key={agent._id} value={agent._id}>
+                                {agent.name} {agent.agentCode ? `(${agent.agentCode})` : ''}
+                            </option>
+                        ))}
+                    </select>
+
+                    {/* Search Form */}
+                    <form className="ul-search-form" onSubmit={handleSearchSubmit}>
+                        <input
+                            type="text"
+                            placeholder="Search by Name, Email, Mobile, or Profile ID..."
+                            className="ul-input"
+                            value={searchInput}
+                            onChange={(e) => setSearchInput(e.target.value)}
+                        />
+                        <button type="submit" className="ul-btn ul-btn-primary" disabled={loading}>
+                            {loading ? 'Searching...' : 'Search'}
                         </button>
-                    )}
-                </form>
+                        {searchQuery && (
+                            <button type="button" className="ul-btn ul-btn-secondary" onClick={handleClearSearch}>
+                                Clear
+                            </button>
+                        )}
+                    </form>
+                </div>
 
                 <div className="ul-table-wrapper">
                     <table className="ul-table">
@@ -508,7 +596,7 @@ const UserList = () => {
                             ) : (
                                 <tr>
                                     <td colSpan="5" className="ul-empty-state">
-                                        No resolved users found matching your search.
+                                        No resolved users found matching your filters.
                                     </td>
                                 </tr>
                             )}
