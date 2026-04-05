@@ -152,7 +152,7 @@ const AdminPostTestimonial = () => {
                 setMedia(null);
                 setVideoUrl('');
                 setMediaPreview(null);
-                
+
                 // Clear file input specifically
                 const fileInput = document.getElementById('ks-media-upload');
                 if(fileInput) fileInput.value = '';
@@ -168,17 +168,17 @@ const AdminPostTestimonial = () => {
 
     const handleDelete = async (id) => {
         if (!window.confirm("Delete this success story permanently?")) return;
-        
+
         const toastId = toast.loading("Deleting story...");
         const token = localStorage.getItem('adminToken');
-        
+
         try {
             const res = await axios.delete(`${API_URL}/${id}`, {
                 headers: { 'Authorization': token }
             });
             if (res.data.success) {
                 setTestimonials(testimonials.filter(item => item._id !== id));
-                
+
                 // Adjust pagination if deleting the last item on a page
                 const newTotalPages = Math.ceil((testimonials.length - 1) / itemsPerPage) || 1;
                 if (currentPage > newTotalPages) {
@@ -599,7 +599,11 @@ const AdminPostTestimonial = () => {
                     .ks-story-panel { padding: 16px; }
                     .ks-content-box { padding: 20px; border-radius: 16px;}
                     
-                    .ks-scroll-indicator { display: flex; }
+                    /* FIXED SCROLL INDICATOR */
+                    .ks-scroll-indicator { 
+                        display: inline-flex; 
+                        width: max-content; 
+                    }
                     
                     .ks-panel-header h2 { font-size: 22px; }
                     .ks-panel-header p { font-size: 13px; }
