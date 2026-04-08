@@ -7,7 +7,7 @@ import Faq from "./User/Components/Faq";
 import Herobanner from "./User/Components/Herobanner.jsx";
 import Footer from "./User/Components/Footer.jsx";
 import Terms from "./User/Components/Terms";
-import Refund from "./User/Components/Refund"
+import Refund from "./User/Components/Refund";
 import AboutUs from "./User/Components/About";
 import Testimonials from "./User/Components/Testimonials.jsx";
 import ProcessFlow from "./User/Components/ProcessFlow.jsx";
@@ -46,7 +46,7 @@ import AdminFeeSettings from "./Admin/AdminFeeSettings.jsx";
 import AdminPremiumRequests from "./Admin/AdminPremiumRequests.jsx"; 
 import AdminPageContent from "./Admin/AdminPageContent/AdminPageContent.jsx";
 import UserList from "./Admin/UserList.jsx";
-
+import ModeratorLogin from "./Admin/ModeratorLogin.jsx";
 
 
 // 1. Protected Route Component (FOR USERS)
@@ -80,6 +80,21 @@ const PublicAdminRoute = ({ children }) => {
   return token ? <Navigate to="/admin/dashboard" replace /> : children;
 };
 
+// 6. Protected Route Component (FOR MODERATOR)
+const ProtectedModeratorRoute = ({ children }) => {
+  // Uses adminToken just like Admin as requested
+  const token = localStorage.getItem("adminToken");
+  return token ? children : <Navigate to="/moderator" replace />;
+};
+
+// 7. Public Route Component (FOR MODERATOR)
+const PublicModeratorRoute = ({ children }) => {
+  // Uses adminToken just like Admin as requested
+  const token = localStorage.getItem("adminToken");
+  // If moderator already logged in, send directly to their dashboard
+  return token ? <Navigate to="/moderator/dashboard" replace /> : children;
+};
+
 function App() {
   return (
     <Routes>
@@ -88,8 +103,8 @@ function App() {
       <Route path="/terms" element={<Terms/>} />
       <Route path="/refund" element={<Refund/>} />
       <Route path="/faq" element={<Faq/>} />
-      
-      {/* NEW: Standalone About and Testimonials pages */}
+
+      {/* Standalone About and Testimonials pages */}
       <Route path="/about" element={
         <>
           <Navbar />
@@ -141,6 +156,20 @@ function App() {
         </ProtectedAgentRoute>
       } />
 
+      {/* --- MODERATOR ROUTES --- */}
+      {/* Acts as the login page directly on /moderator */}
+      <Route path="/moderator" element={
+        <PublicModeratorRoute>
+          <ModeratorLogin />
+        </PublicModeratorRoute>
+      } />
+
+      {/* Moderator dashboard route structure */}
+      <Route path="/moderator/dashboard" element={<ProtectedModeratorRoute><AdminLayout /></ProtectedModeratorRoute>}>
+        <Route index element={<AdminDashboard />} />
+        {/* You can add specific nested moderator allowed routes here later if needed */}
+      </Route>
+
       {/* --- ADMIN ROUTES --- */}
       <Route path="/admin/login" element={
         <PublicAdminRoute>
@@ -167,9 +196,7 @@ function App() {
         <Route path="moderater" element={<CreateModerator/>} />
         <Route path="fee-settings" element={<AdminFeeSettings/>} />
         <Route path="premium-users" element={<AdminPremiumRequests/>} />
-<Route path="premium-user" element={<UserList/>} />
-
-
+        <Route path="premium-user" element={<UserList/>} />
       </Route>
       
     </Routes>
