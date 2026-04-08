@@ -67,27 +67,34 @@ const ProtectedAgentRoute = ({ children }) => {
   return token ? children : <Navigate to="/agent/login" replace />;
 };
 
-// 4. Protected Route Component (FOR ADMIN)
+// 4. Public Route Component (FOR AGENTS)
+const PublicAgentRoute = ({ children }) => {
+  const token = localStorage.getItem("agentToken");
+  // If agent already logged in, send directly to their dashboard
+  return token ? <Navigate to="/agent/dashboard" replace /> : children;
+};
+
+// 5. Protected Route Component (FOR ADMIN)
 const ProtectedAdminRoute = ({ children }) => {
   const token = localStorage.getItem("adminToken");
   return token ? children : <Navigate to="/admin/login" replace />;
 };
 
-// 5. Public Route Component (FOR ADMIN)
+// 6. Public Route Component (FOR ADMIN)
 const PublicAdminRoute = ({ children }) => {
   const token = localStorage.getItem("adminToken");
   // If admin already logged in, send directly to their dashboard
   return token ? <Navigate to="/admin/dashboard" replace /> : children;
 };
 
-// 6. Protected Route Component (FOR MODERATOR)
+// 7. Protected Route Component (FOR MODERATOR)
 const ProtectedModeratorRoute = ({ children }) => {
   // Uses adminToken just like Admin as requested
   const token = localStorage.getItem("adminToken");
   return token ? children : <Navigate to="/moderator" replace />;
 };
 
-// 7. Public Route Component (FOR MODERATOR)
+// 8. Public Route Component (FOR MODERATOR)
 const PublicModeratorRoute = ({ children }) => {
   // Uses adminToken just like Admin as requested
   const token = localStorage.getItem("adminToken");
@@ -149,7 +156,14 @@ function App() {
       <Route path="/payment-registration" element={<ProtectedRoute><PayRegistration /></ProtectedRoute>} />
 
       {/* --- AGENT PORTAL ROUTES --- */}
-      <Route path="/agent/login" element={<AgentLogin />} />
+      <Route path="/agent" element={<Navigate to="/agent/login" replace />} />
+      
+      <Route path="/agent/login" element={
+        <PublicAgentRoute>
+          <AgentLogin />
+        </PublicAgentRoute>
+      } />
+      
       <Route path="/agent/dashboard" element={
         <ProtectedAgentRoute>
           <AgentDashboard />
@@ -176,10 +190,10 @@ function App() {
           <AdminLogin />
         </PublicAdminRoute>
       } />
-      
+
       <Route path="/admin" element={<ProtectedAdminRoute><AdminLayout /></ProtectedAdminRoute>}>
         <Route index element={<Navigate to="dashboard" replace />} />
-        
+
         <Route path="dashboard" element={<AdminDashboard />} />
         <Route path="users" element={<UserManagement />} />
         <Route path="registration-approvals" element={<RegistrationApprovals />} />
@@ -198,7 +212,7 @@ function App() {
         <Route path="premium-users" element={<AdminPremiumRequests/>} />
         <Route path="premium-user" element={<UserList/>} />
       </Route>
-      
+
     </Routes>
   );
 }
