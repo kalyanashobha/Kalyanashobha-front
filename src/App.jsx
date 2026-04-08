@@ -46,7 +46,7 @@ import AdminFeeSettings from "./Admin/AdminFeeSettings.jsx";
 import AdminPremiumRequests from "./Admin/AdminPremiumRequests.jsx"; 
 import AdminPageContent from "./Admin/AdminPageContent/AdminPageContent.jsx";
 import UserList from "./Admin/UserList.jsx";
-import ModeratorLogin from "./Admin/ModeratorLogin.jsx";
+import ModeratorLogin from "./Admin/Login/ModeratorLogin.jsx";
 
 
 // 1. Protected Route Component (FOR USERS)
