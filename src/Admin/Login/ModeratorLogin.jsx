@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import './AdminLogin.css'; // You can rename this CSS file if needed
-import AdminNavbar from "../Components/AdminNavbar.jsx"; // Update to ModeratorNavbar if you have one
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import './AdminLogin.css'; 
+import AdminNavbar from "../Components/AdminNavbar.jsx"; 
 
 const ModeratorLogin = () => {
     const navigate = useNavigate();
@@ -55,16 +57,43 @@ const ModeratorLogin = () => {
         try {
             const res = await axios.post(`${API_BASE}/login-verify`, { email: safeEmail, otp: safeOtp });
             if (res.data.success) {
-                // Kept keys the same or you can change them to 'moderatorToken' if your app expects it
+                
+                // --- ROLE VERIFICATION CHECK ---
+                if (res.data.admin.role === 'SuperAdmin') {
+                    // Show professional toast error
+                    toast.error("Access Restricted: This portal is for Moderators only. Please use the Admin login.", {
+                        position: "top-center",
+                        autoClose: 5000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        theme: "colored",
+                    });
+                    
+                    // Clear the OTP field so they can't just click verify again
+                    setOtp('');
+                    setIsLoading(false);
+                    return; // Stop the function here so they don't get logged in
+                }
+
+                // If they ARE a Moderator, proceed normally
                 localStorage.setItem('adminToken', res.data.token);
                 localStorage.setItem('adminInfo', JSON.stringify(res.data.admin));
 
+                toast.success('Authentication successful! Redirecting...', {
+                    position: "top-right",
+                    theme: "colored"
+                });
+
                 setMessage({ type: 'success', text: 'Login Successful! Redirecting...' });
                 // Updated redirect path to moderator dashboard
-                setTimeout(() => navigate('/moderator/dashboard'), 1000);
+                setTimeout(() => navigate('/moderator/dashboard'), 1500);
             }
         } catch (err) {
-            setMessage({ type: 'error', text: err.response?.data?.message || "Invalid OTP." });
+            const errorMsg = err.response?.data?.message || "Invalid OTP.";
+            toast.error(errorMsg, { theme: "colored" });
+            setMessage({ type: 'error', text: errorMsg });
         } finally {
             setIsLoading(false);
         }
@@ -149,6 +178,9 @@ const ModeratorLogin = () => {
     return (
       <>
         <AdminNavbar/>
+
+        {/* Toast Container for notifications */}
+        <ToastContainer />
 
         <div className="admin-login-container">
             <div className="login-card">
