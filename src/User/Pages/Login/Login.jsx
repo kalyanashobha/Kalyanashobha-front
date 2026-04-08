@@ -45,7 +45,7 @@ const CustomInput = ({ label, name, type = "text", value, onChange, placeholder,
 const Login = () => {
   const navigate = useNavigate(); 
   const location = useLocation(); 
-  
+
   const [step, setStep] = useState(1);   
   const [loading, setLoading] = useState(false);
 
@@ -56,12 +56,43 @@ const Login = () => {
 
   const [otp, setOtp] = useState(new Array(6).fill(""));
   const [error, setError] = useState('');
-  
+
   const [timeLeft, setTimeLeft] = useState(30);
   const [canResend, setCanResend] = useState(false);
 
   const otpRefs = useRef([]);
   const API_BASE_URL = "https://kalyanashobha-back.vercel.app/api/auth";
+
+  // --- HARDWARE BACK BUTTON INTERCEPTION ---
+  useEffect(() => {
+    // When the component first loads, replace the current history state with step 1
+    window.history.replaceState({ step: 1 }, '');
+
+    const handlePopState = (event) => {
+      // If the back button is pressed, check if we have a saved step in history
+      if (event.state && event.state.step) {
+        setStep(event.state.step);
+      } else {
+        // Fallback to step 1
+        setStep(1);
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  // Helper function to handle step changes AND browser history injection
+  const changeStep = (newStep) => {
+    window.history.pushState({ step: newStep }, '');
+    setStep(newStep);
+    setError(''); // Clear any lingering errors when moving screens
+  };
+
+  // Helper for UI "Back" buttons to keep history clean
+  const handleUIBack = () => {
+    window.history.back(); // This triggers the popstate listener automatically
+  };
 
   // --- Auto-fill email from Registration ---
   useEffect(() => {
@@ -87,7 +118,7 @@ const Login = () => {
   const handleCredentialsSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    
+
     if (!email || !password) {
       setError('Please enter both email and password.');
       return;
@@ -105,7 +136,7 @@ const Login = () => {
       const data = await response.json();
 
       if (data.success) {
-        setStep(2);
+        changeStep(2); // Updates state and history
         setOtp(new Array(6).fill("")); 
         setTimeLeft(30); 
         setCanResend(false);
@@ -125,7 +156,7 @@ const Login = () => {
       setError("Please enter the full 6-digit code.");
       return;
     }
-    
+
     setLoading(true);
     setError('');
 
@@ -140,10 +171,10 @@ const Login = () => {
 
       if (data.success) {
         toast.success("Login Successful!");
-        
+
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
-        
+
         const extractedUserId = data.user?._id || data.user?.id || data.userId;
         localStorage.setItem('userId', extractedUserId); 
 
@@ -180,7 +211,7 @@ const Login = () => {
       const data = await response.json();
 
       if (data.success) {
-        setStep(4); 
+        changeStep(4); // Updates state and history
         setOtp(new Array(6).fill(""));
         setTimeLeft(30); 
         setCanResend(false);
@@ -211,8 +242,7 @@ const Login = () => {
       const data = await response.json();
 
       if (data.success) {
-        setStep(5); 
-        setError("");
+        changeStep(5); // Updates state and history
       } else {
         setError(data.message);
       }
@@ -240,11 +270,10 @@ const Login = () => {
 
       if (data.success) {
         toast.success("Password Reset Successful! You can now login.");
-        setStep(1);
+        changeStep(1); // Return to login state
         setPassword("");
         setNewPassword("");
         setOtp(new Array(6).fill(""));
-        setError("");
       } else {
         setError(data.message);
       }
@@ -298,50 +327,39 @@ const Login = () => {
 
   // --- ENHANCED OTP HANDLERS ---
   const handleOtpChange = (e, index) => {
-    // Remove any hidden spaces inserted by mobile keyboards
     let value = e.target.value.replace(/\s/g, '');
-    
-    // Stop immediately if the user typed a letter or symbol
     if (!/^\d*$/.test(value)) return;
 
     const newOtp = [...otp];
 
-    // Handle "Paste" (If the user pastes "123456" into the first box)
     if (value.length > 1) {
         const pastedData = value.split('').slice(0, 6);
         for (let i = 0; i < pastedData.length; i++) {
             newOtp[i] = pastedData[i];
         }
         setOtp(newOtp);
-        
-        // Auto-focus the last box after pasting
+
         const focusIndex = pastedData.length < 6 ? pastedData.length : 5;
         otpRefs.current[focusIndex]?.focus();
         return;
     }
 
-    // Handle normal single-digit typing
     const lastChar = value.slice(-1);
     newOtp[index] = lastChar;
     setOtp(newOtp);
 
-    // Auto-advance to the next input box
     if (lastChar && index < 5) {
       otpRefs.current[index + 1]?.focus();
     }
   };
 
   const handleKeyDown = (e, index) => {
-    // Handle backspace navigation
     if (e.key === "Backspace" && !otp[index] && index > 0) {
       otpRefs.current[index - 1]?.focus();
     }
-    
-    // Handle the "Enter" key safely
+
     if (e.key === "Enter") {
-       e.preventDefault(); // Stop the form from submitting prematurely
-       
-       // Give React 100 milliseconds to update the state with the final digit
+       e.preventDefault(); 
        setTimeout(() => {
            if (step === 2) verifyOtp();
            if (step === 4) handleForgotOtpVerify();
@@ -361,7 +379,7 @@ const Login = () => {
       <Toaster position="top-center" reverseOrder={false} /> 
       <div className="login-wrapper">
         <div className="login-card fade-in">
-          
+
           <div className="brand-header">
             <h2>Welcome Back</h2>
             <p className="subtitle">Secure login to Kalyana Shobha</p>
@@ -400,7 +418,7 @@ const Login = () => {
                 {loading ? <><span className="spinner-sm"></span> Verifying...</> : <>Continue <Icons.ArrowRight/></>}
               </button>
               <div className="footer-links">
-                <button type="button" onClick={() => { setStep(3); setError(""); }} className="link-btn" disabled={loading}>
+                <button type="button" onClick={() => changeStep(3)} className="link-btn" disabled={loading}>
                   Forgot Password?
                 </button>
               </div>
@@ -462,7 +480,7 @@ const Login = () => {
               <button type="submit" className="login-btn" disabled={loading}>
                 {loading ? <><span className="spinner-sm"></span> Sending...</> : "Send OTP"}
               </button>
-              <button type="button" className="link-btn" onClick={() => { setStep(1); setError(""); }} style={{marginTop: '15px', width: '100%'}} disabled={loading}>
+              <button type="button" className="link-btn" onClick={handleUIBack} style={{marginTop: '15px', width: '100%'}} disabled={loading}>
                 Back to Login
               </button>
             </form>
@@ -532,6 +550,3 @@ const Login = () => {
 };
 
 export default Login;
-
-
-
