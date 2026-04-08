@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
@@ -24,6 +24,41 @@ const AdminLogin = () => {
     // UPDATED: Now pointing to live Vercel backend 
     const API_BASE = "https://kalyanashobha-back.vercel.app/api/admin/auth";
 
+    // --- HARDWARE BACK BUTTON INTERCEPTION ---
+    useEffect(() => {
+        // Replace current history state with the initial view when component mounts
+        window.history.replaceState({ view: 'login' }, '');
+
+        const handlePopState = (event) => {
+            // If the back button is pressed, check if we have a saved view in history
+            if (event.state && event.state.view) {
+                setView(event.state.view);
+            } else {
+                // Fallback to login
+                setView('login');
+            }
+            // Clear any lingering errors/messages and OTP when navigating back
+            setMessage({ type: '', text: '' });
+            setOtp('');
+        };
+
+        window.addEventListener('popstate', handlePopState);
+        return () => window.removeEventListener('popstate', handlePopState);
+    }, []);
+
+    // Helper function to handle view changes AND browser history injection
+    const changeView = (newView) => {
+        window.history.pushState({ view: newView }, '');
+        setView(newView);
+        setMessage({ type: '', text: '' }); // Clear errors
+    };
+
+    // Helper for UI "Back" buttons to keep history stack clean
+    const handleUIBack = () => {
+        window.history.back(); // This triggers the popstate listener automatically
+    };
+
+
     // ==================== LOGIN WORKFLOW ====================
 
     // --- STEP 1: SEND PASSWORD ---
@@ -36,7 +71,7 @@ const AdminLogin = () => {
         try {
             const res = await axios.post(`${API_BASE}/login-init`, { email: safeEmail, password });
             if (res.data.success) {
-                setView('login-otp');
+                changeView('login-otp'); // Updated to use history helper
                 setMessage({ type: 'success', text: 'OTP sent to your email.' });
             }
         } catch (err) {
@@ -57,10 +92,9 @@ const AdminLogin = () => {
         try {
             const res = await axios.post(`${API_BASE}/login-verify`, { email: safeEmail, otp: safeOtp });
             if (res.data.success) {
-                
+
                 // --- ROLE VERIFICATION CHECK ---
                 if (res.data.admin.role !== 'SuperAdmin') {
-                    // Show professional toast error
                     toast.error("Access Restricted: This portal is strictly for Super Administrators. Please use the Moderator login.", {
                         position: "top-center",
                         autoClose: 5000,
@@ -70,14 +104,12 @@ const AdminLogin = () => {
                         draggable: true,
                         theme: "colored",
                     });
-                    
-                    // Clear the OTP field so they can't just click verify again
+
                     setOtp('');
                     setIsLoading(false);
-                    return; // Stop the function here so they don't get logged in
+                    return; 
                 }
 
-                // If they ARE a SuperAdmin, proceed normally
                 localStorage.setItem('adminToken', res.data.token);
                 localStorage.setItem('adminInfo', JSON.stringify(res.data.admin));
 
@@ -85,7 +117,7 @@ const AdminLogin = () => {
                     position: "top-right",
                     theme: "colored"
                 });
-                
+
                 setMessage({ type: 'success', text: 'Login Successful! Redirecting...' });
                 setTimeout(() => navigate('/admin/dashboard'), 1500);
             }
@@ -110,8 +142,8 @@ const AdminLogin = () => {
         try {
             const res = await axios.post(`${API_BASE}/forgot-password`, { email: safeEmail });
             if (res.data.success) {
-                setView('forgot-otp');
-                setOtp(''); // Clear any previous OTP
+                changeView('forgot-otp'); // Updated to use history helper
+                setOtp(''); 
                 setMessage({ type: 'success', text: 'Password reset OTP sent to your email.' });
             }
         } catch (err) {
@@ -131,7 +163,7 @@ const AdminLogin = () => {
         try {
             const res = await axios.post(`${API_BASE}/verify-otp`, { email: safeEmail, otp: safeOtp });
             if (res.data.success) {
-                setView('reset-password');
+                changeView('reset-password'); // Updated to use history helper
                 setMessage({ type: 'success', text: 'OTP Verified. Create a new password.' });
             }
         } catch (err) {
@@ -158,7 +190,7 @@ const AdminLogin = () => {
                 setPassword(''); setNewPassword(''); setConfirmPassword(''); setOtp('');
 
                 // Return to login after 2 seconds
-                setTimeout(() => setView('login'), 2000);
+                setTimeout(() => changeView('login'), 2000); // Updated to use history helper
             }
         } catch (err) {
             setMessage({ type: 'error', text: err.response?.data?.message || "Failed to reset password." });
@@ -167,9 +199,9 @@ const AdminLogin = () => {
         }
     };
 
-    // --- OTP INPUT HANDLER (Strips spaces and non-numbers instantly) ---
+    // --- OTP INPUT HANDLER ---
     const handleOtpChange = (e) => {
-        const cleanValue = e.target.value.replace(/\D/g, '').slice(0, 6); // Keep only digits, max 6
+        const cleanValue = e.target.value.replace(/\D/g, '').slice(0, 6); 
         setOtp(cleanValue);
     };
 
@@ -177,14 +209,12 @@ const AdminLogin = () => {
     return (
       <>
         <AdminNavbar/>
-        
-        {/* Toast Container for notifications */}
+
         <ToastContainer />
 
         <div className="admin-login-container">
             <div className="login-card">
 
-                {/* Header */}
                 <div className="login-header">
                     <h2>KalyanaShobha</h2>
                     <p>
@@ -195,7 +225,6 @@ const AdminLogin = () => {
                     </p>
                 </div>
 
-                {/* Alerts */}
                 {message.text && (
                     <div className={`alert alert-${message.type}`}>
                         {message.text}
@@ -226,7 +255,7 @@ const AdminLogin = () => {
                         <div style={{ textAlign: 'right', marginBottom: '20px' }}>
                             <span 
                                 style={{ color: '#c0392b', fontSize: '13px', cursor: 'pointer', fontWeight: 'bold' }} 
-                                onClick={() => { setView('forgot-email'); setMessage({ type: '', text: '' }); }}
+                                onClick={() => changeView('forgot-email')}
                             >
                                 Forgot Password?
                             </span>
@@ -257,7 +286,7 @@ const AdminLogin = () => {
                             {isLoading ? 'Verifying...' : 'Verify & Enter Dashboard'}
                         </button>
 
-                        <div className="back-link" onClick={() => { setView('login'); setMessage({type:'', text:''}); setOtp(''); }}>
+                        <div className="back-link" onClick={handleUIBack}>
                             &larr; Cancel & Back to Login
                         </div>
                     </form>
@@ -279,7 +308,7 @@ const AdminLogin = () => {
                             {isLoading ? 'Sending...' : 'Send OTP'}
                         </button>
 
-                        <div className="back-link" onClick={() => { setView('login'); setMessage({type:'', text:''}); }}>
+                        <div className="back-link" onClick={handleUIBack}>
                             &larr; Back to Login
                         </div>
                     </form>
@@ -301,7 +330,7 @@ const AdminLogin = () => {
                             {isLoading ? 'Verifying...' : 'Verify OTP'}
                         </button>
 
-                        <div className="back-link" onClick={() => { setView('login'); setMessage({type:'', text:''}); setOtp(''); }}>
+                        <div className="back-link" onClick={handleUIBack}>
                             &larr; Cancel Reset
                         </div>
                     </form>
