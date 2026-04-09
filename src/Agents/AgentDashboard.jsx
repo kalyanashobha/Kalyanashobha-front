@@ -159,7 +159,7 @@ const AgentDashboard = () => {
 
   // --- SEARCH AND PAGINATION STATES ---
   const ITEMS_PER_PAGE = 10;
-  
+
   const [clientSearch, setClientSearch] = useState('');
   const [clientPage, setClientPage] = useState(1);
 
@@ -189,29 +189,30 @@ const AgentDashboard = () => {
   const handleScrollCheck = useCallback(() => {
     let isScrollable = false;
     let isAtBottom = false;
-    
+
     const BUFFER = activeTab === 'register' ? 220 : 180; 
 
-    if (mainScrollRef.current) {
+    // 1. Check if the internal <main> container is the one scrolling
+    if (mainScrollRef.current && mainScrollRef.current.scrollHeight > mainScrollRef.current.clientHeight + 10) {
+      isScrollable = true;
       const { scrollTop, scrollHeight, clientHeight } = mainScrollRef.current;
       
-      if (scrollHeight > clientHeight + 10) {
+      if (scrollTop + clientHeight >= scrollHeight - BUFFER) {
+        isAtBottom = true;
+      }
+    } 
+    // 2. ONLY check the global window if the main container is NOT scrolling
+    else {
+      const winHeight = window.innerHeight;
+      const docHeight = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+
+      if (docHeight > winHeight + 10) {
         isScrollable = true;
-        if (scrollTop + clientHeight >= scrollHeight - BUFFER) {
+        const scrollY = Math.ceil(window.scrollY || document.documentElement.scrollTop);
+
+        if (scrollY + winHeight >= docHeight - BUFFER) {
           isAtBottom = true;
         }
-      }
-    }
-
-    const winHeight = window.innerHeight;
-    const docHeight = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
-    
-    if (docHeight > winHeight + 10) {
-      isScrollable = true;
-      const scrollY = Math.ceil(window.scrollY || document.documentElement.scrollTop);
-      
-      if (scrollY + winHeight >= docHeight - BUFFER) {
-        isAtBottom = true;
       }
     }
 
@@ -222,7 +223,7 @@ const AgentDashboard = () => {
     handleScrollCheck();
     window.addEventListener('scroll', handleScrollCheck, { passive: true });
     window.addEventListener('resize', handleScrollCheck);
-    
+
     let resizeObserver;
     if (mainScrollRef.current) {
       resizeObserver = new ResizeObserver(() => handleScrollCheck());
@@ -343,7 +344,7 @@ const AgentDashboard = () => {
   const handleNavClick = (tab) => {
     setActiveTab(tab);
     setIsMobileMenuOpen(false); 
-    
+
     if (tab === 'users') { setClientSearch(''); setClientPage(1); }
     if (tab === 'premium') { setPremiumSearch(''); setPremiumPage(1); }
     if (tab === 'mem_payments') { setPaymentSearch(''); setPaymentPage(1); }
@@ -437,17 +438,17 @@ const AgentDashboard = () => {
       setRegStep(prev => Math.min(prev + 1, TOTAL_STEPS)); 
       window.scrollTo(0,0);
       if(mainScrollRef.current) mainScrollRef.current.scrollTo(0,0);
-      
+
       setTimeout(handleScrollCheck, 150);
       setTimeout(handleScrollCheck, 500);
     } 
   };
-  
+
   const prevRegStep = () => { 
     setRegStep(prev => Math.max(prev - 1, 1)); 
     window.scrollTo(0,0); 
     if(mainScrollRef.current) mainScrollRef.current.scrollTo(0,0);
-    
+
     setTimeout(handleScrollCheck, 150);
     setTimeout(handleScrollCheck, 500);
   };
@@ -551,7 +552,7 @@ const AgentDashboard = () => {
         <div className="crm-mobile-brand">
           <img src="/Kalyanashobha.png" alt="KalyanaShobha Logo" className="crm-mob-brand-img" />
         </div>
-        
+
         {/* NEW ANIMATED HAMBURGER TO X BUTTON */}
         <button 
           className={`crm-burger-btn ${isMobileMenuOpen ? 'is-open' : ''}`} 
@@ -833,7 +834,7 @@ const AgentDashboard = () => {
         {activeTab === 'register' && (
           <div className="crm-fade-in crm-register-view">
             <div className="crm-form-card">
-              
+
               <div className="crm-premium-stepper">
                 <div className="crm-stepper-text">STEP {regStep} OF {TOTAL_STEPS}</div>
                 <div className="crm-stepper-bar-container">
@@ -843,14 +844,14 @@ const AgentDashboard = () => {
 
               <div className="crm-form-body">
                 <form id="crm-agent-reg" onSubmit={handleRegisterSubmit}>
-                  
+
                   {/* STEP 1: Basic Setup (2 inputs) */}
                   {regStep === 1 && (
                     <div className="crm-step-panel crm-slide-up">
                       <div className="crm-step-top-icon">
                         <User size={32} strokeWidth={2} className="crm-user-line-icon" />
                       </div>
-                      
+
                       <h2 className="crm-step-main-title">This profile is for</h2>
                       <div className="crm-pro-radio-grid mt-4">
                           {['Myself', 'My Son', 'My Daughter', 'My Brother', 'My Sister', 'Friend'].map(opt => (
