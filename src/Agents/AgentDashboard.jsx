@@ -185,48 +185,41 @@ const AgentDashboard = () => {
     navigate('/agent', { replace: true });
   }, [navigate]);
 
-  // --- GUARANTEED SCROLL HIDING LOGIC ---
+  // --- BULLETPROOF SCROLL HIDING LOGIC ---
   const handleScrollCheck = useCallback(() => {
-    let isScrollable = false;
-    let isAtBottom = false;
+    // Increased buffer specifically for production layout shifts / mobile nav bars
+    const BUFFER = activeTab === 'register' ? 300 : 250; 
+    let needsIndicator = false;
 
-    const BUFFER = activeTab === 'register' ? 220 : 180; 
-
+    // Check <main> element scroll
     if (mainScrollRef.current) {
       const { scrollTop, scrollHeight, clientHeight } = mainScrollRef.current;
-
       if (scrollHeight > clientHeight + 10) {
-        isScrollable = true;
-        if (scrollTop + clientHeight >= scrollHeight - BUFFER) {
-          isAtBottom = true;
-        }
+        // Math.ceil secures sub-pixel rendering in production environments
+        const mainAtBottom = Math.ceil(scrollTop + clientHeight) >= (scrollHeight - BUFFER);
+        if (!mainAtBottom) needsIndicator = true;
       }
     }
 
-    const winHeight = window.innerHeight;
+    // Check Window/Document scroll (Fallback)
+    const winHeight = window.innerHeight || document.documentElement.clientHeight;
     const docHeight = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
-
-    if (docHeight > winHeight + 10) {
-      isScrollable = true;
+    
+    if (!needsIndicator && docHeight > winHeight + 10) {
       const scrollY = Math.ceil(window.scrollY || document.documentElement.scrollTop);
-
-      if (scrollY + winHeight >= docHeight - BUFFER) {
-        isAtBottom = true;
-      }
+      const winAtBottom = (scrollY + winHeight) >= (docHeight - BUFFER);
+      if (!winAtBottom) needsIndicator = true;
     }
 
-    setShowScroll(isScrollable && !isAtBottom);
+    setShowScroll(needsIndicator);
   }, [activeTab]);
 
   useEffect(() => {
     handleScrollCheck();
     
-    // Listeners for manual scrolling & resizing
     window.addEventListener('scroll', handleScrollCheck, { passive: true });
     window.addEventListener('resize', handleScrollCheck);
 
-    // FIXED: Robust Resize Observer that checks both the specific ref AND the entire document body
-    // This catches layout shifts in production that happen post-render.
     const resizeObserver = new ResizeObserver(() => {
       handleScrollCheck();
     });
@@ -236,7 +229,6 @@ const AgentDashboard = () => {
     }
     resizeObserver.observe(document.body); 
 
-    // Staggered fallbacks extended slightly for production network/CSS delays
     const t1 = setTimeout(handleScrollCheck, 150);
     const t2 = setTimeout(handleScrollCheck, 500);
     const t3 = setTimeout(handleScrollCheck, 1000);
@@ -253,12 +245,13 @@ const AgentDashboard = () => {
     };
   }, [handleScrollCheck, activeTab, regStep, dashboardLoading, stats, usersList, interestsStatus, memPayments, premiumUsers]);
 
+  // --- FIXED: Scrolls completely to the bottom instead of just 400px ---
   const scrollToBottom = () => {
     const el = mainScrollRef.current;
     if (el && el.scrollHeight > el.clientHeight + 5) {
-      el.scrollBy({ top: 400, behavior: 'smooth' });
+      el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
     } else {
-      window.scrollBy({ top: 400, behavior: 'smooth' });
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
     }
   };
 
