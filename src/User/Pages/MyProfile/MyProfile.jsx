@@ -125,15 +125,19 @@ const InputField = ({ label, name, type = "text", value, onChange }) => (
   </div>
 );
 
-// STRICT NATIVE DROPDOWN (Used for Community/Sub-Community)
-const SelectField = ({ label, name, value, options, onChange }) => (
+// STRICT NATIVE DROPDOWN (Updated to handle empty arrays gracefully)
+const SelectField = ({ label, name, value, options, onChange, disabled }) => (
   <div className="mp-input-group">
-    <select className="mp-input" name={name} value={value || ''} onChange={onChange}>
+    <select className="mp-input" name={name} value={value || ''} onChange={onChange} disabled={disabled}>
       <option value="" disabled hidden></option>
-      {options && options.map((opt, i) => {
-        const val = typeof opt === 'string' ? opt : opt?.name;
-        return val ? <option key={i} value={val}>{val}</option> : null;
-      })}
+      {options && options.length > 0 ? (
+        options.map((opt, i) => {
+          const val = typeof opt === 'string' ? opt : (opt?.name || opt?.subCommunityName || opt?.value);
+          return val ? <option key={i} value={val}>{val}</option> : null;
+        })
+      ) : (
+        <option value="" disabled>No options available</option>
+      )}
     </select>
     <label className={value ? 'mp-label-active' : ''}>{label}</label>
   </div>
@@ -258,14 +262,8 @@ const MyProfile = () => {
   const countOptions = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
 
   useEffect(() => { 
-    // FIXED RACE CONDITION: Wait for BOTH endpoints to finish before hiding skeleton loader
-    const loadAllData = async () => {
-      setLoading(true);
-      await Promise.all([fetchInitialMasterData(), fetchProfile()]);
-      setLoading(false);
-    };
-    loadAllData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    fetchInitialMasterData();
+    fetchProfile(); 
   }, []);
 
   const fetchInitialMasterData = async () => {
@@ -300,7 +298,7 @@ const MyProfile = () => {
 
   const fetchProfile = async () => {
     const token = localStorage.getItem('token');
-    if (!token) return; 
+    if (!token) { setLoading(false); return; }
     try {
       const res = await fetch(`${API_BASE_URL}/user/my-profile`, {
         headers: { 'Content-Type': 'application/json', 'Authorization': token }
@@ -336,7 +334,7 @@ const MyProfile = () => {
       }
     } catch (err) {
       toast.error("Failed to load profile");
-    }
+    } finally { setLoading(false); }
   };
 
   const handleUpdate = async (e) => {
@@ -405,7 +403,6 @@ const MyProfile = () => {
         }
       }
       else if (name === 'community') {
-        // Clear subCommunity immediately when Community changes
         setFormData(prev => ({ ...prev, community: value, subCommunity: '' }));
       }
     }
@@ -438,11 +435,15 @@ const MyProfile = () => {
   const removeNewPhoto = (indexToRemove) => setNewPhotos(newPhotos.filter((_, index) => index !== indexToRemove));
   const calculateAge = (dob) => dob ? Math.abs(new Date(Date.now() - new Date(dob).getTime()).getUTCFullYear() - 1970) : "N/A";
 
-  // FIXED CASE SENSITIVITY: Ensure it finds the exact community even if casing differs
+  // FIX: Robustly find the community (ignoring case & trailing spaces)
   const selectedCommObj = masterData.communities.find(
-    c => c.name && formData.community && c.name.toLowerCase() === formData.community.toLowerCase()
+    c => c?.name?.trim().toLowerCase() === formData?.community?.trim().toLowerCase()
   );
-  const editModeSubCommunities = selectedCommObj ? (selectedCommObj.subCommunities || []) : [];
+
+  // FIX: Added fallbacks in case the API uses different property names for sub-communities
+  const editModeSubCommunities = selectedCommObj 
+    ? (selectedCommObj.subCommunities || selectedCommObj.subCastes || selectedCommObj.subCaste || selectedCommObj.subcommunities || []) 
+    : [];
 
   return (
     <div className="mp-page-wrapper">
@@ -590,7 +591,7 @@ const MyProfile = () => {
 
                     {/* STRICT NATIVE SELECT FIELDS FOR COMMUNITY */}
                     <SelectField label="Community" name="community" value={formData.community} options={masterData.communities} onChange={handleChange} />
-                    <SelectField label="Sub-Community / Caste" name="subCommunity" value={formData.subCommunity} options={editModeSubCommunities} onChange={handleChange} />
+                    <SelectField label="Sub-Community / Caste" name="subCommunity" value={formData.subCommunity} options={editModeSubCommunities} onChange={handleChange} disabled={!formData.community} />
                   </div>
                 </div>
 
