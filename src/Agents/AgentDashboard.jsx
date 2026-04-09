@@ -185,35 +185,29 @@ const AgentDashboard = () => {
     navigate('/agent', { replace: true });
   }, [navigate]);
 
-  // --- FIXED: DYNAMICALLY BOUNDED SCROLL LOGIC ---
+  // --- BULLETPROOF SCROLL HIDING LOGIC ---
   const handleScrollCheck = useCallback(() => {
-    // Standard buffer reduced to avoid swallowing short pages
-    const BUFFER = activeTab === 'register' ? 300 : 100; 
+    // Increased buffer specifically for production layout shifts / mobile nav bars
+    const BUFFER = activeTab === 'register' ? 300 : 250; 
     let needsIndicator = false;
 
     // Check <main> element scroll
     if (mainScrollRef.current) {
       const { scrollTop, scrollHeight, clientHeight } = mainScrollRef.current;
-      const maxScroll = scrollHeight - clientHeight;
-      
-      // Ensure there is actually >20px of scrollable room before showing arrow
-      if (maxScroll > 20) { 
-        // dynamically cap the buffer so it never out-scales the available scroll room
-        const safeBuffer = Math.min(BUFFER, maxScroll - 10);
-        const isAtBottom = Math.ceil(scrollTop) >= (maxScroll - safeBuffer);
-        if (!isAtBottom) needsIndicator = true;
+      if (scrollHeight > clientHeight + 10) {
+        // Math.ceil secures sub-pixel rendering in production environments
+        const mainAtBottom = Math.ceil(scrollTop + clientHeight) >= (scrollHeight - BUFFER);
+        if (!mainAtBottom) needsIndicator = true;
       }
     }
 
     // Check Window/Document scroll (Fallback)
     const winHeight = window.innerHeight || document.documentElement.clientHeight;
     const docHeight = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
-    const maxWinScroll = docHeight - winHeight;
     
-    if (!needsIndicator && maxWinScroll > 20) {
-      const safeWinBuffer = Math.min(BUFFER, maxWinScroll - 10);
+    if (!needsIndicator && docHeight > winHeight + 10) {
       const scrollY = Math.ceil(window.scrollY || document.documentElement.scrollTop);
-      const winAtBottom = scrollY >= (maxWinScroll - safeWinBuffer);
+      const winAtBottom = (scrollY + winHeight) >= (docHeight - BUFFER);
       if (!winAtBottom) needsIndicator = true;
     }
 
@@ -251,6 +245,7 @@ const AgentDashboard = () => {
     };
   }, [handleScrollCheck, activeTab, regStep, dashboardLoading, stats, usersList, interestsStatus, memPayments, premiumUsers]);
 
+  // --- FIXED: Scrolls completely to the bottom instead of just 400px ---
   const scrollToBottom = () => {
     const el = mainScrollRef.current;
     if (el && el.scrollHeight > el.clientHeight + 5) {
