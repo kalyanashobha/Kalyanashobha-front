@@ -125,23 +125,37 @@ const InputField = ({ label, name, type = "text", value, onChange }) => (
   </div>
 );
 
-// STRICT NATIVE DROPDOWN (Updated to handle empty arrays gracefully)
-const SelectField = ({ label, name, value, options, onChange, disabled }) => (
-  <div className="mp-input-group">
-    <select className="mp-input" name={name} value={value || ''} onChange={onChange} disabled={disabled}>
-      <option value="" disabled hidden></option>
-      {options && options.length > 0 ? (
-        options.map((opt, i) => {
-          const val = typeof opt === 'string' ? opt : (opt?.name || opt?.subCommunityName || opt?.value);
-          return val ? <option key={i} value={val}>{val}</option> : null;
-        })
-      ) : (
-        <option value="" disabled>No options available</option>
-      )}
-    </select>
-    <label className={value ? 'mp-label-active' : ''}>{label}</label>
-  </div>
-);
+// STRICT NATIVE DROPDOWN (Updated to prevent blank boxes when data is missing/loading)
+const SelectField = ({ label, name, value, options, onChange, disabled }) => {
+  // Check if current DB value exists in the options array
+  const valueExists = value && options && options.some(opt => {
+    const val = typeof opt === 'string' ? opt : (opt?.name || opt?.subCommunityName || opt?.value);
+    return val === value;
+  });
+
+  return (
+    <div className="mp-input-group">
+      <select className="mp-input" name={name} value={value || ''} onChange={onChange} disabled={disabled}>
+        <option value="" disabled hidden></option>
+        
+        {/* Fallback: Show the current value even if it's not in the dropdown list yet */}
+        {value && !valueExists && (
+          <option value={value}>{value}</option>
+        )}
+
+        {options && options.length > 0 ? (
+          options.map((opt, i) => {
+            const val = typeof opt === 'string' ? opt : (opt?.name || opt?.subCommunityName || opt?.value);
+            return val ? <option key={i} value={val}>{val}</option> : null;
+          })
+        ) : (
+          <option value="" disabled>No options available</option>
+        )}
+      </select>
+      <label className={value ? 'mp-label-active' : ''}>{label}</label>
+    </div>
+  );
+};
 
 // TYPABLE + SELECTABLE COMBOBOX (Used for Country/State/City)
 const ComboField = ({ label, name, value, options, onChange, disabled }) => {
@@ -261,9 +275,14 @@ const MyProfile = () => {
 
   const countOptions = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
 
+  // FIX: Synchronized loading to resolve race conditions
   useEffect(() => { 
-    fetchInitialMasterData();
-    fetchProfile(); 
+    const loadAllData = async () => {
+      setLoading(true);
+      await Promise.all([fetchInitialMasterData(), fetchProfile()]);
+      setLoading(false);
+    };
+    loadAllData();
   }, []);
 
   const fetchInitialMasterData = async () => {
@@ -298,7 +317,8 @@ const MyProfile = () => {
 
   const fetchProfile = async () => {
     const token = localStorage.getItem('token');
-    if (!token) { setLoading(false); return; }
+    if (!token) return; 
+    
     try {
       const res = await fetch(`${API_BASE_URL}/user/my-profile`, {
         headers: { 'Content-Type': 'application/json', 'Authorization': token }
@@ -334,7 +354,7 @@ const MyProfile = () => {
       }
     } catch (err) {
       toast.error("Failed to load profile");
-    } finally { setLoading(false); }
+    } 
   };
 
   const handleUpdate = async (e) => {
@@ -435,15 +455,9 @@ const MyProfile = () => {
   const removeNewPhoto = (indexToRemove) => setNewPhotos(newPhotos.filter((_, index) => index !== indexToRemove));
   const calculateAge = (dob) => dob ? Math.abs(new Date(Date.now() - new Date(dob).getTime()).getUTCFullYear() - 1970) : "N/A";
 
-  // FIX: Robustly find the community (ignoring case & trailing spaces)
-  const selectedCommObj = masterData.communities.find(
-    c => c?.name?.trim().toLowerCase() === formData?.community?.trim().toLowerCase()
-  );
-
-  // FIX: Added fallbacks in case the API uses different property names for sub-communities
-  const editModeSubCommunities = selectedCommObj 
-    ? (selectedCommObj.subCommunities || selectedCommObj.subCastes || selectedCommObj.subCaste || selectedCommObj.subcommunities || []) 
-    : [];
+  // EXACT MATCH logic from your AdminUserManagement file
+  const selectedCommObj = masterData.communities.find(c => c.name === formData.community);
+  const editModeSubCommunities = selectedCommObj ? (selectedCommObj.subCommunities || []) : [];
 
   return (
     <div className="mp-page-wrapper">
