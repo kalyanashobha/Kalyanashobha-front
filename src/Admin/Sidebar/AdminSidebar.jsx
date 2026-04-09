@@ -20,7 +20,8 @@ export default function AdminSidebar({ closeMobileMenu }) {
     pendingData: 0,
     pendingPremium: 0,
     pendingVendorLeads: 0,
-    pendingHelpCenter: 0 
+    pendingHelpCenter: 0,
+    pendingVendors: 0 // Added state for vendor approval requests
   });
 
   const [adminInfo, setAdminInfo] = useState(null);
@@ -46,14 +47,19 @@ export default function AdminSidebar({ closeMobileMenu }) {
       const API_BASE = "https://kalyanashobha-back.vercel.app";
       const timestamp = new Date().getTime(); 
 
-      const [statsRes, phase1Res, phase2Res, pendingDataRes, premiumRes, vendorLeadsRes, helpCenterRes] = await Promise.all([
+      // Added vendors endpoint to the Promise.all array to fetch unapproved vendors
+      const [
+        statsRes, phase1Res, phase2Res, pendingDataRes, 
+        premiumRes, vendorLeadsRes, helpCenterRes, vendorsRes
+      ] = await Promise.all([
         axios.get(`${API_BASE}/api/admin/stats?t=${timestamp}`, { headers }).catch(() => ({ data: { success: false } })),
         axios.get(`${API_BASE}/api/admin/interest/workflow?status=PendingAdminPhase1&t=${timestamp}`, { headers }).catch(() => ({ data: { success: false } })),
         axios.get(`${API_BASE}/api/admin/interest/workflow?status=PendingAdminPhase2&t=${timestamp}`, { headers }).catch(() => ({ data: { success: false } })),
         axios.get(`${API_BASE}/api/admin/pending-data?t=${timestamp}`, { headers }).catch(() => ({ data: { success: false } })),
         axios.get(`${API_BASE}/api/admin/premium-requests?t=${timestamp}`, { headers }).catch(() => ({ data: { success: false } })),
         axios.get(`${API_BASE}/api/admin/vendor-leads?t=${timestamp}`, { headers }).catch(() => ({ data: { success: false } })),
-        axios.get(`${API_BASE}/api/admin/help-center/issues?t=${timestamp}`, { headers }).catch(() => ({ data: { success: false } }))
+        axios.get(`${API_BASE}/api/admin/help-center/issues?t=${timestamp}`, { headers }).catch(() => ({ data: { success: false } })),
+        axios.get(`${API_BASE}/api/admin/vendors?t=${timestamp}`, { headers }).catch(() => ({ data: { success: false } }))
       ]);
 
       let newVendorLeadsCount = 0;
@@ -66,6 +72,12 @@ export default function AdminSidebar({ closeMobileMenu }) {
           newHelpCenterCount = helpCenterRes.data.data.filter(issue => issue.status === 'Pending').length;
       }
 
+      // Calculate pending vendors that are waiting for admin approval
+      let pendingVendorsCount = 0;
+      if (vendorsRes.data.success && vendorsRes.data.vendors) {
+          pendingVendorsCount = vendorsRes.data.vendors.filter(v => !v.isApproved).length;
+      }
+
       setStats({
         pendingReg: statsRes.data.success ? statsRes.data.stats.actionQueue.pendingRegistrationPayments : 0,
         newRequests: phase1Res.data.success ? phase1Res.data.data.length : 0,
@@ -73,7 +85,8 @@ export default function AdminSidebar({ closeMobileMenu }) {
         pendingData: pendingDataRes.data.success ? pendingDataRes.data.data.length : 0, 
         pendingPremium: premiumRes.data.success ? premiumRes.data.data.filter(req => req.status === 'Pending').length : 0,
         pendingVendorLeads: newVendorLeadsCount,
-        pendingHelpCenter: newHelpCenterCount 
+        pendingHelpCenter: newHelpCenterCount,
+        pendingVendors: pendingVendorsCount // Set the count here
       });
 
     } catch (e) {
@@ -90,6 +103,7 @@ export default function AdminSidebar({ closeMobileMenu }) {
     window.addEventListener("premiumUpdated", fetchCounts); 
     window.addEventListener("vendorLeadUpdated", fetchCounts); 
     window.addEventListener("helpCenterUpdated", fetchCounts); 
+    window.addEventListener("vendorUpdated", fetchCounts); // Ensure it catches vendor updates
     window.addEventListener("focus", fetchCounts);
 
     const intervalId = setInterval(() => {
@@ -103,6 +117,7 @@ export default function AdminSidebar({ closeMobileMenu }) {
         window.removeEventListener("premiumUpdated", fetchCounts);
         window.removeEventListener("vendorLeadUpdated", fetchCounts);
         window.removeEventListener("helpCenterUpdated", fetchCounts);
+        window.removeEventListener("vendorUpdated", fetchCounts);
         window.removeEventListener("focus", fetchCounts);
         clearInterval(intervalId);
     }
@@ -120,8 +135,11 @@ export default function AdminSidebar({ closeMobileMenu }) {
     { id: "premium-users", path: "/admin/premium-users", icon: <Crown size={18} />, iconColor: "#F59E0B", label: "Premium Requests", badge: stats.pendingPremium },
     { id: "vendor-leads", path: "/admin/vendor-leads", icon: <Target size={18} />, iconColor: "#14B8A6", label: "Vendor Leads", badge: stats.pendingVendorLeads },
     { id: "help-center", path: "/admin/help-center", icon: <HelpCircle size={18} />, iconColor: "#84CC16", label: "Help Center", badge: stats.pendingHelpCenter }, 
+    
+    // MOVED: Vendors is now above Agents and includes the notification badge
+    { id: "vendors", path: "/admin/vendors", icon: <Store size={18} />, iconColor: "#F97316", label: "Vendors", badge: stats.pendingVendors },
     { id: "agents", path: "/admin/agents", icon: <Briefcase size={18} />, iconColor: "#64748B", label: "Agents" },
-    { id: "vendors", path: "/admin/vendors", icon: <Store size={18} />, iconColor: "#F97316", label: "Vendors" },
+    
     { id: "user-certificates", path: "/admin/user-certificates", icon: <Award size={18} />, iconColor: "#EAB308", label: "User Acceptance" },
     { id: "add-data", path: "/admin/add-fields", icon: <Layers size={18} />, iconColor: "#6366F1", label: "Add Data" },
     { id: "manage-pages", path: "/admin/page-content", icon: <FileEdit size={18} />, iconColor: "#334155", label: "Manage Pages" },
@@ -157,19 +175,15 @@ export default function AdminSidebar({ closeMobileMenu }) {
     }
   }, [filteredLinks.length, checkScroll]); 
 
-  // --- UPDATED LOGOUT LOGIC ---
   const handleLogout = () => {
     if (closeMobileMenu) closeMobileMenu(); 
-    
-    // Fetch the role right before clearing to ensure correct routing
+
     const info = JSON.parse(localStorage.getItem('adminInfo') || '{}');
     const isSuperAdmin = info.role === 'SuperAdmin';
 
-    // Clear local storage
     localStorage.removeItem('adminToken');
     localStorage.removeItem('adminInfo');
-    
-    // Route based on role
+
     if (isSuperAdmin) {
       navigate('/admin/login');
     } else {
