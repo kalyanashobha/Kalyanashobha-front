@@ -1418,20 +1418,20 @@ const UserDashboard = () => {
                    <div className="dash-grid-2">
                      <DashboardComboInput label="Moonsign" name="moonsign" value={extraDetailsForm.moonsign} onChange={handleExtraDetailsChange} options={dynamicOptions.Moonsign} required={true} onKeyDown={handleEnterToNext} />
                      <DashboardComboInput label="Star (Nakshatram)" name="star" value={extraDetailsForm.star} onChange={handleExtraDetailsChange} options={dynamicOptions.Star} required={true} onKeyDown={handleEnterToNext}/>
-                     <DashboardComboInput label="Pada/Quarter" name="pada" value={extraDetailsForm.pada} onChange={handleExtraDetailsChange} options={dynamicOptions.Pada} required={false} onKeyDown={handleEnterToNext}/>
+                     <DashboardComboInput label="Pada/Quarter" name="pada" value={extraDetailsForm.pada} onChange={handleExtraDetailsChange} options={dynamicOptions.Pada} required={true} onKeyDown={handleEnterToNext}/>
                      <DashboardComboInput label="Mother Tongue" name="motherTongue" value={extraDetailsForm.motherTongue} onChange={handleExtraDetailsChange} options={dynamicOptions.MotherTongue} required={true} onKeyDown={handleEnterToNext}/>
 
                      <div className="dash-form-group">
-                       <label className="dash-label">Time of Birth</label>
+                       <label className="dash-label">Time of Birth <span className="dash-required">*</span></label>
                        <div style={{ position: 'relative' }}>
-                         <input type="text" name="timeOfBirth" className="dash-input" placeholder="02:30 PM" value={extraDetailsForm.timeOfBirth} readOnly onClick={() => setShowTimePicker(true)} style={{ cursor: 'pointer' }} />
+                         <input type="text" name="timeOfBirth" className="dash-input" placeholder="02:30 PM" value={extraDetailsForm.timeOfBirth} readOnly onClick={() => setShowTimePicker(true)} style={{ cursor: 'pointer' }} required />
                          <div style={{ position: 'absolute', right: '12px', top: '12px', color: '#64748b', pointerEvents: 'none' }}><Icons.ChevronDown /></div>
                        </div>
                      </div>
 
-                     <div className="dash-form-group"><label className="dash-label">Place of Birth</label><input type="text" name="placeOfBirth" className="dash-input" placeholder="City or Village name" value={extraDetailsForm.placeOfBirth} onChange={handleExtraDetailsChange}/></div>
-                     <div className="dash-form-group"><label className="dash-label">Native Location</label><input type="text" name="nativeLocation" className="dash-input" placeholder="Native Place" value={extraDetailsForm.nativeLocation} onChange={handleExtraDetailsChange}/></div>
-                     <DashboardComboInput label="Complexion" name="complexion" value={extraDetailsForm.complexion} onChange={handleExtraDetailsChange} options={dynamicOptions.Complexion} required={false} onKeyDown={handleEnterToNext}/>
+                     <div className="dash-form-group"><label className="dash-label">Place of Birth <span className="dash-required">*</span></label><input type="text" name="placeOfBirth" className="dash-input" placeholder="City or Village name" value={extraDetailsForm.placeOfBirth} onChange={handleExtraDetailsChange} required /></div>
+                     <div className="dash-form-group"><label className="dash-label">Native Location <span className="dash-required">*</span></label><input type="text" name="nativeLocation" className="dash-input" placeholder="Native Place" value={extraDetailsForm.nativeLocation} onChange={handleExtraDetailsChange} required /></div>
+                     <DashboardComboInput label="Complexion" name="complexion" value={extraDetailsForm.complexion} onChange={handleExtraDetailsChange} options={dynamicOptions.Complexion} required={true} onKeyDown={handleEnterToNext}/>
 
                    </div>
                  </div>
@@ -1440,8 +1440,8 @@ const UserDashboard = () => {
                    <h4 className="dash-section-title">Family Information</h4>
                    <div className="dash-grid-2">
                      <div className="dash-form-group">
-                       <label className="dash-label">Family Type</label>
-                       <select name="familyType" className="dash-input" value={extraDetailsForm.familyType} onChange={handleExtraDetailsChange}>
+                       <label className="dash-label">Family Type <span className="dash-required">*</span></label>
+                       <select name="familyType" className="dash-input" value={extraDetailsForm.familyType} onChange={handleExtraDetailsChange} required>
                          <option value="">Select Family Type</option>
                          <option value="Nuclear">Nuclear</option>
                          <option value="Joint">Joint</option>
@@ -1450,22 +1450,22 @@ const UserDashboard = () => {
                      </div>
                      <div className="dash-form-group"><label className="dash-label">Father's Name <span className="dash-required">*</span></label><input type="text" name="fatherName" className="dash-input" value={extraDetailsForm.fatherName} onChange={handleExtraDetailsChange} required/></div>
                      <div className="dash-form-group">
-                       <label className="dash-label">Father's Occupation</label>
-                       <select name="fatherOccupation" className="dash-input" value={extraDetailsForm.fatherOccupation} onChange={handleExtraDetailsChange}>
+                       <label className="dash-label">Father's Occupation <span className="dash-required">*</span></label>
+                       <select name="fatherOccupation" className="dash-input" value={extraDetailsForm.fatherOccupation} onChange={handleExtraDetailsChange} required>
                          <option value="">Select Occupation</option><option value="Employed">Employed</option><option value="Business">Business</option><option value="Professional">Professional</option><option value="Retired">Retired</option><option value="Not Employed">Not Employed</option><option value="Passed Away">Passed Away</option>
                        </select>
                      </div>
                      <div className="dash-form-group"><label className="dash-label">Mother's Name <span className="dash-required">*</span></label><input type="text" name="motherName" className="dash-input" value={extraDetailsForm.motherName} onChange={handleExtraDetailsChange} required/></div>
                      <div className="dash-form-group">
-                       <label className="dash-label">Mother's Occupation</label>
-                       <select name="motherOccupation" className="dash-input" value={extraDetailsForm.motherOccupation} onChange={handleExtraDetailsChange}>
+                       <label className="dash-label">Mother's Occupation <span className="dash-required">*</span></label>
+                       <select name="motherOccupation" className="dash-input" value={extraDetailsForm.motherOccupation} onChange={handleExtraDetailsChange} required>
                          <option value="">Select Occupation</option><option value="Homemaker">Homemaker</option><option value="Employed">Employed</option><option value="Business">Business</option><option value="Professional">Professional</option><option value="Retired">Retired</option><option value="Passed Away">Passed Away</option>
                        </select>
                      </div>
-                     <div className="dash-form-group"><label className="dash-label">No. of Brothers</label><select name="noOfBrothers" className="dash-input" value={extraDetailsForm.noOfBrothers} onChange={handleExtraDetailsChange}>{siblingOptions.map(num => <option key={num} value={num}>{num}</option>)}</select></div>
-                     <div className="dash-form-group"><label className="dash-label">Brothers Married</label><select name="noOfBrothersMarried" className="dash-input" value={extraDetailsForm.noOfBrothersMarried} onChange={handleExtraDetailsChange}>{siblingOptions.map(num => <option key={num} value={num}>{num}</option>)}</select></div>
-                     <div className="dash-form-group"><label className="dash-label">No. of Sisters</label><select name="noOfSisters" className="dash-input" value={extraDetailsForm.noOfSisters} onChange={handleExtraDetailsChange}>{siblingOptions.map(num => <option key={num} value={num}>{num}</option>)}</select></div>
-                     <div className="dash-form-group"><label className="dash-label">Sisters Married</label><select name="noOfSistersMarried" className="dash-input" value={extraDetailsForm.noOfSistersMarried} onChange={handleExtraDetailsChange}>{siblingOptions.map(num => <option key={num} value={num}>{num}</option>)}</select></div>
+                     <div className="dash-form-group"><label className="dash-label">No. of Brothers <span className="dash-required">*</span></label><select name="noOfBrothers" className="dash-input" value={extraDetailsForm.noOfBrothers} onChange={handleExtraDetailsChange} required>{siblingOptions.map(num => <option key={num} value={num}>{num}</option>)}</select></div>
+                     <div className="dash-form-group"><label className="dash-label">Brothers Married <span className="dash-required">*</span></label><select name="noOfBrothersMarried" className="dash-input" value={extraDetailsForm.noOfBrothersMarried} onChange={handleExtraDetailsChange} required>{siblingOptions.map(num => <option key={num} value={num}>{num}</option>)}</select></div>
+                     <div className="dash-form-group"><label className="dash-label">No. of Sisters <span className="dash-required">*</span></label><select name="noOfSisters" className="dash-input" value={extraDetailsForm.noOfSisters} onChange={handleExtraDetailsChange} required>{siblingOptions.map(num => <option key={num} value={num}>{num}</option>)}</select></div>
+                     <div className="dash-form-group"><label className="dash-label">Sisters Married <span className="dash-required">*</span></label><select name="noOfSistersMarried" className="dash-input" value={extraDetailsForm.noOfSistersMarried} onChange={handleExtraDetailsChange} required>{siblingOptions.map(num => <option key={num} value={num}>{num}</option>)}</select></div>
                    </div>
                  </div>
 
@@ -1527,3 +1527,4 @@ const UserDashboard = () => {
 };
 
 export default UserDashboard;
+
