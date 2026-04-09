@@ -190,34 +190,28 @@ const AgentDashboard = () => {
     let isScrollable = false;
     let isAtBottom = false;
 
-    // We increase the buffer slightly to account for production rendering differences
-    const BUFFER = activeTab === 'register' ? 250 : 200; 
+    const BUFFER = activeTab === 'register' ? 220 : 180; 
 
-    // 1. Prioritize checking the specific scrolling container first
     if (mainScrollRef.current) {
       const { scrollTop, scrollHeight, clientHeight } = mainScrollRef.current;
 
       if (scrollHeight > clientHeight + 10) {
         isScrollable = true;
-        // Use Math.ceil to prevent sub-pixel rendering bugs in production
-        if (Math.ceil(scrollTop + clientHeight) >= scrollHeight - BUFFER) {
+        if (scrollTop + clientHeight >= scrollHeight - BUFFER) {
           isAtBottom = true;
         }
       }
     }
 
-    // 2. ONLY check the window scroll if the main container isn't handling the scrolling.
-    // This prevents hidden production portals (like Toastify) from artificially inflating the body height
-    if (!isScrollable) {
-      const winHeight = window.innerHeight;
-      const docHeight = document.documentElement.scrollHeight; // Safer than document.body
+    const winHeight = window.innerHeight;
+    const docHeight = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+
+    if (docHeight > winHeight + 10) {
+      isScrollable = true;
       const scrollY = Math.ceil(window.scrollY || document.documentElement.scrollTop);
 
-      if (docHeight > winHeight + 10) {
-        isScrollable = true;
-        if (scrollY + winHeight >= docHeight - BUFFER) {
-          isAtBottom = true;
-        }
+      if (scrollY + winHeight >= docHeight - BUFFER) {
+        isAtBottom = true;
       }
     }
 
@@ -226,24 +220,36 @@ const AgentDashboard = () => {
 
   useEffect(() => {
     handleScrollCheck();
+    
+    // Listeners for manual scrolling & resizing
     window.addEventListener('scroll', handleScrollCheck, { passive: true });
     window.addEventListener('resize', handleScrollCheck);
 
-    let resizeObserver;
+    // FIXED: Robust Resize Observer that checks both the specific ref AND the entire document body
+    // This catches layout shifts in production that happen post-render.
+    const resizeObserver = new ResizeObserver(() => {
+      handleScrollCheck();
+    });
+
     if (mainScrollRef.current) {
-      resizeObserver = new ResizeObserver(() => handleScrollCheck());
       resizeObserver.observe(mainScrollRef.current);
     }
+    resizeObserver.observe(document.body); 
 
+    // Staggered fallbacks extended slightly for production network/CSS delays
     const t1 = setTimeout(handleScrollCheck, 150);
     const t2 = setTimeout(handleScrollCheck, 500);
-    const t3 = setTimeout(handleScrollCheck, 800);
+    const t3 = setTimeout(handleScrollCheck, 1000);
+    const t4 = setTimeout(handleScrollCheck, 2000);
 
     return () => {
       window.removeEventListener('scroll', handleScrollCheck);
       window.removeEventListener('resize', handleScrollCheck);
-      if (resizeObserver) resizeObserver.disconnect();
-      clearTimeout(t1); clearTimeout(t2); clearTimeout(t3);
+      resizeObserver.disconnect();
+      clearTimeout(t1); 
+      clearTimeout(t2); 
+      clearTimeout(t3); 
+      clearTimeout(t4);
     };
   }, [handleScrollCheck, activeTab, regStep, dashboardLoading, stats, usersList, interestsStatus, memPayments, premiumUsers]);
 
@@ -849,7 +855,7 @@ const AgentDashboard = () => {
               <div className="crm-form-body">
                 <form id="crm-agent-reg" onSubmit={handleRegisterSubmit}>
 
-                  {/* STEP 1: Basic Setup (2 inputs) */}
+                  {/* STEP 1: Basic Setup */}
                   {regStep === 1 && (
                     <div className="crm-step-panel crm-slide-up">
                       <div className="crm-step-top-icon">
@@ -882,7 +888,7 @@ const AgentDashboard = () => {
                     </div>
                   )}
 
-                  {/* STEP 2: Account (3 inputs) */}
+                  {/* STEP 2: Account */}
                   {regStep === 2 && (
                     <div className="crm-step-panel crm-slide-up">
                       <div className="crm-panel-header"><div className="crm-panel-icon crm-grad-red"><UserPlus size={24} /></div><div><h2>Account Credentials</h2><p>Contact and secure login details.</p></div></div>
@@ -908,7 +914,7 @@ const AgentDashboard = () => {
                     </div>
                   )}
 
-                  {/* STEP 3: Identity Details (3 inputs) */}
+                  {/* STEP 3: Identity Details */}
                   {regStep === 3 && (
                     <div className="crm-step-panel crm-slide-up">
                       <div className="crm-panel-header"><div className="crm-panel-icon crm-grad-amber"><UserCircle size={24} /></div><div><h2>Identity Details</h2><p>Basic personal information.</p></div></div>
@@ -929,7 +935,7 @@ const AgentDashboard = () => {
                     </div>
                   )}
 
-                  {/* STEP 4: Physical & Marital (3 inputs) */}
+                  {/* STEP 4: Physical & Marital */}
                   {regStep === 4 && (
                     <div className="crm-step-panel crm-slide-up">
                       <div className="crm-panel-header"><div className="crm-panel-icon crm-grad-blue"><Heart size={24} /></div><div><h2>Physical & Marital</h2><p>Lifestyle and status.</p></div></div>
@@ -943,7 +949,7 @@ const AgentDashboard = () => {
                     </div>
                   )}
 
-                  {/* STEP 5: Socio-Cultural (3 inputs) */}
+                  {/* STEP 5: Socio-Cultural */}
                   {regStep === 5 && (
                     <div className="crm-step-panel crm-slide-up">
                       <div className="crm-panel-header"><div className="crm-panel-icon crm-grad-yellow"><Globe size={24} /></div><div><h2>Socio-Cultural</h2><p>Community specifics.</p></div></div>
@@ -958,13 +964,13 @@ const AgentDashboard = () => {
                     </div>
                   )}
 
-                  {/* STEP 6: Education (2 inputs) */}
+                  {/* STEP 6: Education */}
                   {regStep === 6 && (
                     <div className="crm-step-panel crm-slide-up">
                       <div className="crm-panel-header"><div className="crm-panel-icon crm-grad-green"><GraduationCap size={24} /></div><div><h2>Education</h2><p>Academic background.</p></div></div>
                       <div className="mt-4">
                           <AgentComboInput label="Highest Qualification" name="highestQualification" value={regData.highestQualification} onChange={handleRegChange} options={dynamicOptions.Education} required={true} icon={GraduationCap} />
-                      </div>
+                          </div>
                       <div className="crm-input-wrap crm-with-icon mt-4">
                         <label>College/University</label>
                         <div className="crm-input-inner"><GraduationCap size={18} className="crm-field-icon" /><input type="text" name="collegeName" value={regData.collegeName} onChange={handleRegChange} placeholder="Highest degree college"/></div>
@@ -972,7 +978,7 @@ const AgentDashboard = () => {
                     </div>
                   )}
 
-                  {/* STEP 7: Career Details (3 inputs) */}
+                  {/* STEP 7: Career Details */}
                   {regStep === 7 && (
                     <div className="crm-step-panel crm-slide-up">
                       <div className="crm-panel-header"><div className="crm-panel-icon crm-grad-amber"><Briefcase size={24} /></div><div><h2>Career Details</h2><p>Professional background.</p></div></div>
@@ -987,7 +993,7 @@ const AgentDashboard = () => {
                     </div>
                   )}
 
-                  {/* STEP 8: Income & Residency (3 inputs) */}
+                  {/* STEP 8: Income & Residency */}
                   {regStep === 8 && (
                     <div className="crm-step-panel crm-slide-up">
                       <div className="crm-panel-header"><div className="crm-panel-icon crm-grad-blue"><Wallet size={24} /></div><div><h2>Income & Residency</h2><p>Financial and living status.</p></div></div>
@@ -1008,7 +1014,7 @@ const AgentDashboard = () => {
                     </div>
                   )}
 
-                  {/* STEP 9: Location (3 inputs) */}
+                  {/* STEP 9: Location */}
                   {regStep === 9 && ( 
                     <div className="crm-step-panel crm-slide-up">
                       <div className="crm-panel-header"><div className="crm-panel-icon crm-grad-red"><MapPin size={24} /></div><div><h2>Location</h2><p>Current geographic details.</p></div></div>
