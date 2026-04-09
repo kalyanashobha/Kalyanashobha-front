@@ -1,313 +1,375 @@
 /* --- 1. VARIABLES & RESET --- */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
 :root {
-  --vp-bg: #F8F9FA; 
+  /* Core Brand Colors */
+  --vp-red: #D32F2F;        /* Brand Red */
+  --vp-amber: #FFCA28;      /* Brand Amber */
+  --vp-gold-text: #B7791F;  /* Dark Gold text */
+  
+  /* UI Colors */
+  --vp-bg: #FFFFFF;
+  --vp-card-bg: #FFFFFF;
   --vp-text-main: #111827;
   --vp-text-sub: #6B7280;
   --vp-border: #E5E7EB;
-  --vp-orange: #F59E0B;
-  --vp-dark: #0F172A;
-  --vp-red: #EF4444;
-  --vp-red-light: #FEE2E2;
+  
+  /* Effects */
+  --vp-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  --vp-hover-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --vp-radius: 12px;
+  --vp-transition: all 0.3s ease-in-out;
 }
-
-@keyframes spin { 100% { transform: rotate(360deg); } }
-.v-spin { animation: spin 1s linear infinite; }
 
 /* --- 2. LAYOUT CONTAINER --- */
-.v-admin-container {
-  max-width: 600px; /* Reduced to match mobile-first view */
+.v-premium-container {
+  max-width: 1200px;        
   width: 100%;
-  margin: 90px auto 60px;  
-  padding: 20px 16px !important;
+  margin: 100px auto 60px;  /* Top margin clears Navbar */
+  padding: 25px 24px !important;
   box-sizing: border-box;
   font-family: 'Poppins', sans-serif;
-  background-color: var(--vp-bg);
-  min-height: 80vh;
-}
-
-/* --- 3. TOP CONTROLS --- */
-.v-add-vendor-btn {
-  width: 100%;
-  background-color: var(--vp-dark);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 14px;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  margin-bottom: 20px;
-}
-
-.v-tabs-container {
-  display: flex;
-  background: white;
-  border-radius: 12px;
-  padding: 6px;
-  margin-bottom: 24px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-}
-
-.v-tab {
-  flex: 1;
-  text-align: center;
-  padding: 10px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: var(--vp-text-sub);
-  border-radius: 8px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-}
-
-.v-tab.active {
-  background-color: #fff;
   color: var(--vp-text-main);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  background-color: var(--vp-bg);
+  display: block;           /* Ensures it behaves as a block */
 }
 
-.v-badge-count {
-  background: #E0E7FF;
-  color: #4F46E5;
-  font-size: 0.75rem;
-  padding: 2px 8px;
-  border-radius: 12px;
-  font-weight: 600;
+/* --- 3. HEADER (Renamed & Fixed) --- */
+.v-premium-header {
+  display: flex;            
+  flex-direction: column;   /* FORCE VERTICAL STACK */
+  align-items: center;      /* Center Horizontally */
+  justify-content: center;  
+  text-align: center;       /* Text Center */
+  margin-bottom: 50px;
+  width: 100%;
+  clear: both;              /* Clears any floats */
 }
 
-/* --- 4. LIST WRAPPER --- */
-.v-list-wrapper {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+.v-premium-header h1 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: black;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 0 0 12px 0;
+  position: relative;
+  display: inline-block;
+  line-height: 1.2;
+}
+
+/* Decorative Underline */
+.v-premium-header h1::after {
+  content: '';
+  display: block;
+  width: 70px;
+  height: 4px;
+  background: var(--vp-amber);
+  margin: 10px auto 0;      /* Auto margin centers it */
+  border-radius: 2px;
+}
+
+.v-premium-header p {
+  font-size: 1.1rem;
+  color: var(--vp-text-sub);
+  max-width: 600px;
+  margin: 0 auto;           /* Center the paragraph itself */
+  line-height: 1.6;
+}
+
+/* --- 4. GRID SYSTEM --- */
+.v-premium-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 32px;
+  width: 100%;
 }
 
 .v-no-data {
+  grid-column: 1 / -1;
   text-align: center;
-  padding: 40px;
+  padding: 80px;
+  border: 2px dashed var(--vp-border);
+  border-radius: var(--vp-radius);
   color: var(--vp-text-sub);
 }
 
-/* --- 5. CARD DESIGN (MATCHING IMAGE) --- */
-.v-vendor-card {
-  background: white;
+/* --- 5. CARD DESIGN --- */
+.v-premium-card {
+  background: var(--vp-card-bg);
   border: 1px solid var(--vp-border);
-  border-radius: 12px;
+  border-radius: var(--vp-radius);
   overflow: hidden;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.03);
-}
-
-.v-card-img-wrapper {
-  width: 100%;
-  height: 220px;
+  transition: var(--vp-transition);
+  display: flex;
+  flex-direction: column;
   position: relative;
-  background: #E5E7EB;
+  height: 100%; 
 }
 
-.v-card-img-wrapper img {
+.v-premium-card:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--vp-hover-shadow);
+  border-color: var(--vp-amber); 
+}
+
+/* Image Area */
+.v-card-image {
+  height: 220px;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  background: #f9fafb;
+}
+
+.v-card-image img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: top center;
+  transition: transform 0.6s ease;
 }
 
-.v-placeholder-img {
+.v-premium-card:hover .v-card-image img {
+  transform: scale(1.08); 
+}
+
+.v-placeholder {
   width: 100%;
   height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2rem;
-  color: #9CA3AF;
-  font-weight: 600;
+  color: var(--vp-text-sub);
 }
 
-.v-cat-badge {
+/* Category Badge */
+.v-badge-category {
   position: absolute;
-  top: 16px;
-  right: 16px;
-  background: var(--vp-orange);
-  color: white;
+  top: 12px;
+  right: 12px;
+  background: var(--vp-amber);
+  color: #000;
   font-size: 0.75rem;
   font-weight: 700;
-  padding: 4px 12px;
-  border-radius: 4px;
+  padding: 6px 12px;
+  border-radius: 20px;
   text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+  z-index: 10;
 }
 
-.v-card-details {
-  padding: 20px;
+/* Content Area */
+.v-card-content {
+  padding: 24px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
 }
 
-.v-vendor-id {
-  display: inline-block;
-  background: #F3F4F6;
-  color: #4B5563;
-  padding: 4px 10px;
-  border-radius: 4px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  margin-bottom: 12px;
-}
-
-.v-vendor-name {
-  font-size: 1.3rem;
+.v-card-title {
+  font-size: 1.25rem;
   font-weight: 700;
   color: var(--vp-text-main);
-  margin: 0 0 16px 0;
+  margin: 0 0 10px 0;
+  line-height: 1.3;
 }
 
-.v-vendor-info {
+.v-card-desc {
+  font-size: 0.95rem;
+  color: var(--vp-text-sub);
+  margin-bottom: 20px;
+  line-height: 1.6;
+  flex-grow: 1;
+}
+
+/* Details Row */
+.v-card-details {
+  padding-top: 16px;
+  border-top: 1px solid var(--vp-border);
   display: flex;
   flex-direction: column;
   gap: 12px;
-  margin-bottom: 20px;
+  margin-top: auto;
 }
 
-.v-info-row {
+.v-detail-row {
   display: flex;
   align-items: center;
   gap: 12px;
-  color: #4B5563;
-  font-size: 0.95rem;
-}
-
-.v-info-icon {
-  color: #D97706; /* Orange/Brownish icon color */
-}
-
-.v-vendor-desc {
   font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--vp-text-main);
+}
+
+.v-icon-gold {
+  color: var(--vp-gold-text);
+  min-width: 18px;
+}
+
+/* --- 6. SKELETON --- */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.v-skeleton {
+  height: 420px;
+  background: #f6f7f8;
+  background-image: linear-gradient(to right, #f6f7f8 0%, #edeef1 20%, #f6f7f8 40%, #f6f7f8 100%);
+  background-repeat: no-repeat;
+  background-size: 200% 100%; 
+  animation: shimmer 1.5s infinite linear;
+  border: none;
+}
+
+/* --- 7. RESPONSIVE --- */
+@media (max-width: 768px) {
+  .v-premium-container {
+    padding: 0 16px;
+    margin-top: 80px;
+  }
+  
+  .v-premium-header h1 {
+    margin-top:15px;
+    font-size: 1.2rem;
+  }
+
+  .v-premium-grid {
+    grid-template-columns: 1fr; 
+  }
+  .v-premium-header p {
+  font-size: 0.7rem;
   color: var(--vp-text-sub);
-  margin-bottom: 20px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid var(--vp-border);
+  max-width: 600px;
+  margin: 0 auto;           /* Center the paragraph itself */
+  line-height: 1.6;
 }
-
-.v-card-actions {
-  display: flex;
 }
-
-.v-remove-btn {
+/* --- New Contact Button --- */
+.v-contact-btn {
   width: 100%;
   padding: 12px;
-  background-color: white;
-  color: var(--vp-red);
-  border: 1px solid var(--vp-red-light);
-  border-radius: 8px;
+  margin-top: 15px;
+  background-color: #1a1a1a; /* Corporate dark */
+  color: white;
+  border: none;
+  border-radius: 6px;
   font-weight: 600;
-  font-size: 0.95rem;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  transition: background 0.2s;
+  transition: background-color 0.2s ease;
 }
 
-.v-remove-btn:hover {
-  background-color: #FEF2F2;
+.v-contact-btn:hover {
+  background-color: #333;
 }
 
-/* --- 6. PAGINATION --- */
-.v-pagination {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  margin-top: 30px;
-}
-
-.v-page-btn {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  border: 1px solid var(--vp-border);
-  background: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: var(--vp-text-main);
-}
-
-.v-page-text {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--vp-text-main);
-}
-
-/* --- 7. MODALS (Retained styling) --- */
+/* --- Minimal Modal Overlay --- */
 .v-modal-overlay {
   position: fixed;
-  top: 0; left: 0;
-  width: 100vw; height: 100dvh; 
-  background-color: rgba(17, 24, 39, 0.7);
-  display: flex; justify-content: center; align-items: center; 
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
   z-index: 1000;
   backdrop-filter: blur(4px);
-  padding: 20px;
+}
+
+/* --- Modal Content Box --- */
+.v-modal-content {
+  background-color: white;
+  width: 90%;
+  max-width: 450px;
+  padding: 30px;
+  border-radius: 8px;
+  position: relative;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.v-modal-content h2 {
+  margin: 0 0 5px 0;
+  font-size: 20px;
+  color: #1a1a1a;
+}
+
+.v-modal-content p {
+  margin: 0 0 20px 0;
+  font-size: 14px;
+  color: #666;
+}
+
+.v-modal-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #666;
+  padding: 5px;
+}
+
+.v-modal-close:hover {
+  color: #000;
+}
+
+/* --- Form Elements --- */
+.v-lead-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.v-lead-form input,
+.v-lead-form textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 14px;
   box-sizing: border-box;
 }
 
-.v-modal-content {
-  background-color: white;
-  width: 100%;
-  max-width: 480px;
-  padding: 24px;
-  border-radius: 16px;
-  position: relative;
-  max-height: 90dvh; 
-  overflow-y: auto;
+.v-lead-form input:focus,
+.v-lead-form textarea:focus {
+  outline: none;
+  border-color: #1a1a1a;
 }
-
-.v-modal-large { max-width: 500px; }
-
-.v-modal-content h2 { margin: 0 0 8px 0; font-size: 1.3rem; font-weight: 700; }
-.v-modal-content p { margin: 0 0 20px 0; font-size: 0.9rem; color: var(--vp-text-sub); }
-
-.v-modal-close {
-  position: absolute; top: 20px; right: 20px;
-  background: #F3F4F6; border: none; cursor: pointer;
-  padding: 6px; border-radius: 50%; display: flex;
-}
-
-.v-lead-form { display: flex; flex-direction: column; gap: 12px; }
-.v-form-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
-
-.v-lead-form input, .v-lead-form textarea, .v-lead-form select {
-  width: 100%; padding: 12px; border: 1px solid var(--vp-border);
-  border-radius: 8px; font-family: inherit; font-size: 0.9rem;
-  box-sizing: border-box; background: #F9FAFB;
-}
-
-.v-file-upload { padding: 16px; border: 2px dashed #D1D5DB; border-radius: 8px; background: #F9FAFB; text-align: center; }
 
 .v-submit-btn {
-  padding: 14px; background-color: var(--vp-dark); color: white;
-  border: none; border-radius: 8px; font-weight: 600;
-  width: 100%; cursor: pointer; margin-top: 10px;
+  padding: 14px;
+  background-color: #1a1a1a;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
 }
 
-/* --- 8. SKELETON ANIMATION --- */
-@keyframes shimmer-sweep {
-  0% { background-position: -1000px 0; }
-  100% { background-position: 1000px 0; }
+.v-submit-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }
-.shimmer {
-  animation: shimmer-sweep 2s infinite linear;
-  background: linear-gradient(to right, #f0f0f0 8%, #e0e0e0 18%, #f0f0f0 33%);
-  background-size: 1000px 100%;
+
+/* --- Status Messages --- */
+.v-success-message {
+  padding: 20px;
+  background-color: #f0fdf4;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+  border-radius: 6px;
+  text-align: center;
+  font-weight: 500;
 }
-.v-skeleton-img { height: 220px; width: 100%; }
-.v-skeleton-text { height: 16px; width: 100%; border-radius: 4px; margin-bottom: 8px; }
-.v-skeleton-btn { height: 44px; width: 100%; border-radius: 8px; }
+
+.v-error-message {
+  color: #dc2626;
+  font-size: 13px;
+  margin-top: -5px;
+}
