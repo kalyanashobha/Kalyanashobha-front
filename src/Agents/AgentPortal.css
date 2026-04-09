@@ -66,7 +66,7 @@ body {
 .crm-mobile-topbar, .crm-show-mobile, .crm-bottom-nav { display: none; }
 
 /* --- BRAND LOGOS --- */
-.crm-brand-img { max-height: 45px; max-width: 100%; object-fit: contain; }
+.crm-brand-img { max-height: 48px; max-width: 100%; object-fit: contain; }
 .crm-mob-brand-img { max-height: 45px; max-width: 180px; object-fit: contain; margin-left: 4px; }
 
 /* --- CUSTOM BURGER ANIMATION --- */
