@@ -21,21 +21,21 @@ const FALLBACK_SECTOR = ["Private", "Govt", "Business", "Self-Employed"];
 const formatHeight = (val) => {
   if (!val) return val;
   const strVal = val.toString();
-  
+
   if (strVal.toLowerCase().includes('ft')) return strVal;
-  
+
   const cm = parseInt(strVal.replace(/\D/g, ''), 10);
   if (isNaN(cm) || cm <= 0) return strVal;
-  
+
   const totalInches = Math.round(cm / 2.54);
   let feet = Math.floor(totalInches / 12);
   let inches = totalInches % 12;
-  
+
   if (inches === 12) {
     feet += 1;
     inches = 0;
   }
-  
+
   return `${feet}ft ${inches}in (${cm}cm)`;
 };
 
@@ -58,7 +58,8 @@ const HeaderIcons = {
     Heart: () => <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>,
     Book: () => <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>,
     Briefcase: () => <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>,
-    Pen: () => <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"></path><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path><path d="M2 2l7.586 7.586"></path><circle cx="11" cy="11" r="2"></circle></svg>
+    Pen: () => <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"></path><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path><path d="M2 2l7.586 7.586"></path><circle cx="11" cy="11" r="2"></circle></svg>,
+    Home: () => <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
 };
 
 // Standard Dropdown (Only for Strict DB Enum Fields)
@@ -135,7 +136,7 @@ const KsComboInput = ({ label, name, value, onChange, options, error, placeholde
         <div style={{ position: 'absolute', right: '18px', top: '50%', transform: 'translateY(-50%)', cursor: disabled ? 'not-allowed' : 'pointer', zIndex: 2, display: 'flex', alignItems: 'center' }} onClick={() => { if(!disabled) setIsOpen(!isOpen); }}>
           <UI_Icons.ChevronDown />
         </div>
-        
+
         {isOpen && filtered && filtered.length > 0 && (
           <ul style={{
             position: 'absolute', 
@@ -198,8 +199,8 @@ const KsInput = ({ label, name, type="text", placeholder, value, onChange, error
 
 const Register = () => {
   const [step, setStep] = useState(1);
-  const stepRef = useRef(step); // ADDED: To track the step inside event listeners without closure staleness
-  
+  const stepRef = useRef(step); 
+
   const [animDirection, setAnimDirection] = useState('ks-reg-new-slide-fwd');
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
@@ -211,8 +212,7 @@ const Register = () => {
 
   const [masterCommunities, setMasterCommunities] = useState([]); 
   const [availableSubCommunities, setAvailableSubCommunities] = useState([]); 
-  
-  // States to hold the dynamically fetched states and cities
+
   const [filterStates, setFilterStates] = useState([]);
   const [filterCities, setFilterCities] = useState([]);
 
@@ -241,28 +241,19 @@ const Register = () => {
     highestQualification: '', college: '', annualIncome: '', workWith: '', workAs: '', companyName: '', nri: 'No'
   });
 
-  // --- NEW: Keep ref synced with current step ---
   useEffect(() => {
     stepRef.current = step;
   }, [step]);
 
-  // --- NEW: History Interception Logic ---
   useEffect(() => {
     const handlePopState = () => {
-      // If we are on step 2 or higher, intercept the back button and go back one step 
-      // instead of leaving the page
       if (stepRef.current > 1) {
         setAnimDirection('ks-reg-new-slide-bck');
         setStep((prev) => prev - 1);
       }
     };
-    
-    // Listen to the browser's hardware/software back navigation
     window.addEventListener('popstate', handlePopState);
-    
-    return () => {
-      window.removeEventListener('popstate', handlePopState);
-    };
+    return () => { window.removeEventListener('popstate', handlePopState); };
   }, []);
 
   useEffect(() => {
@@ -281,9 +272,9 @@ const Register = () => {
         'Country', 'MaritalStatus', 'Height', 
         'Diet', 'Education', 'Income', 'Sector', 'Designation'
       ];
-      
+
       const newOptions = { ...dynamicOptions };
-      
+
       await Promise.all(categories.map(async (category) => {
         try {
           const res = await fetch(`https://kalyanashobha-back.vercel.app/api/public/master-data/${category}`);
@@ -299,7 +290,7 @@ const Register = () => {
           console.error(`Failed to fetch master data for ${category}`);
         }
       }));
-      
+
       setDynamicOptions(newOptions);
     };
 
@@ -311,7 +302,7 @@ const Register = () => {
   const handleCommunityChange = (e) => {
     const selectedComm = e.target.value;
     setFormData(prev => ({ ...prev, community: selectedComm, subCommunity: '' })); 
-    
+
     const found = masterCommunities.find(c => c.name.toLowerCase() === selectedComm.toLowerCase());
     if (found) {
       setAvailableSubCommunities(found.subCommunities || []);
@@ -334,7 +325,7 @@ const Register = () => {
       setFormData(prev => ({ ...prev, country: val, state: '', city: '' }));
       setFilterStates([]);
       setFilterCities([]);
-      
+
       if (val) {
          try {
            const res = await fetch(`https://kalyanashobha-back.vercel.app/api/public/master-data/State?parent=${val}`);
@@ -345,7 +336,7 @@ const Register = () => {
     } else if (name === 'state') {
       setFormData(prev => ({ ...prev, state: val, city: '' }));
       setFilterCities([]);
-      
+
       if (val) {
          try {
            const res = await fetch(`https://kalyanashobha-back.vercel.app/api/public/master-data/City?parent=${val}`);
@@ -391,7 +382,9 @@ const Register = () => {
     };
 
     switch (currentStep) {
-      case 1: require("profileFor"); require("gender"); break;
+      case 1: 
+        require("profileFor"); require("gender"); 
+        break;
       case 2: 
         require("firstName"); require("lastName"); require("dobDay"); require("dobMonth"); require("dobYear"); 
         if (formData.dobDay && formData.dobMonth && formData.dobYear) {
@@ -412,7 +405,9 @@ const Register = () => {
             }
         }
         break;
-      case 3: require("community"); require("subCommunity"); require("country"); break;
+      case 3: 
+        require("community"); require("subCommunity"); require("country"); 
+        break;
       case 4: 
         require("email");
         if (formData.email) {
@@ -430,18 +425,31 @@ const Register = () => {
         }
         require("password");
         if(formData.password && formData.password.length < 6) { newErrors.password = "Minimum 6 characters required"; isValid = false; }
-        
         require("mobileNumber");
         if(formData.mobileNumber && formData.mobileNumber.length < 10) { 
             newErrors.mobileNumber = "Please enter a valid mobile number"; 
             isValid = false; 
         }
         break;
-      case 5: require("state"); require("city"); break;
-      case 6: require("maritalStatus"); require("height"); require("diet"); require("gothra"); require("residentsIn"); break;
-      case 7: require("highestQualification"); require("college"); break;
-      case 8: require("annualIncome"); require("workWith"); require("workAs"); require("companyName"); require("nri"); break;
-      case 9:
+      case 5: 
+        require("state"); require("city"); 
+        break;
+      case 6: 
+        require("maritalStatus"); require("height"); require("diet"); 
+        break;
+      case 7: 
+        require("gothra"); require("residentsIn"); 
+        break;
+      case 8: 
+        require("highestQualification"); require("college"); 
+        break;
+      case 9: 
+        require("workWith"); require("workAs"); require("companyName"); 
+        break;
+      case 10: 
+        require("annualIncome"); require("nri"); 
+        break;
+      case 11:
         if (sigRef.current.isEmpty()) { toast.error("Please provide your signature."); isValid = false; }
         if (!termsAccepted) { toast.error("Please accept the Terms & Conditions."); isValid = false; }
         break;
@@ -453,30 +461,26 @@ const Register = () => {
 
   const nextStep = () => {
     if (validateStep(step)) {
-      // --- UPDATED: Push a new history state to intercept the back button ---
       window.history.pushState(null, '', window.location.href);
-      
       setAnimDirection('ks-reg-new-slide-fwd');
       setStep(step + 1);
     }
   };
 
   const prevStep = () => {
-    // --- UPDATED: Native browser back to maintain a clean history stack ---
-    // This will trigger the 'popstate' listener above, which safely decrements the step.
     window.history.back();
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault(); 
-    if (!validateStep(9)) return;
+    if (!validateStep(11)) return;
 
     setLoading(true);
     const toastId = toast.loading("Processing profile setup..."); 
 
     try {
       const dobDate = new Date(`${formData.dobYear}-${formData.dobMonth}-${formData.dobDay}`);
-      
+
       const today = new Date();
       let calculatedAge = today.getFullYear() - dobDate.getFullYear();
       const m = today.getMonth() - dobDate.getMonth();
@@ -486,7 +490,7 @@ const Register = () => {
       const signatureFile = dataURLtoFile(signatureDataURL, "signature.png");
 
       const data = new FormData();
-      
+
       data.append('firstName', formData.firstName);
       data.append('lastName', formData.lastName);
       data.append('email', formData.email);
@@ -498,18 +502,18 @@ const Register = () => {
       data.append('age', calculatedAge); 
       data.append('religion', 'Hindu'); 
       data.append('maritalStatus', formData.maritalStatus);
-      
+
       if(formData.diet) data.append('diet', formData.diet);
       if(formData.residentsIn) data.append('residentsIn', formData.residentsIn);
-      
+
       const heightVal = parseInt(formData.height ? formData.height.toString().match(/\d+/g)?.pop() || 0 : 0);
       data.append('height', heightVal);
-      
+
       if(formData.college) data.append('collegeName', formData.college);
       if (formData.workWith) data.append('workType', formData.workWith);
       if(formData.companyName) data.append('companyName', formData.companyName);
       if(formData.annualIncome) data.append('annualIncome', formData.annualIncome);
-      
+
       data.append('nri', formData.nri);
 
       data.append('community', formData.community);
@@ -574,12 +578,14 @@ const Register = () => {
         4: { Component: HeaderIcons.Shield, color: 'ks-reg-new-icon-gold' },
         5: { Component: HeaderIcons.MapPin, color: 'ks-reg-new-icon-red' },
         6: { Component: HeaderIcons.Heart, color: 'ks-reg-new-icon-pink' },
-        7: { Component: HeaderIcons.Book, color: 'ks-reg-new-icon-indigo' },
-        8: { Component: HeaderIcons.Briefcase, color: 'ks-reg-new-icon-teal' },
-        9: { Component: HeaderIcons.Pen, color: 'ks-reg-new-icon-dark' }
+        7: { Component: HeaderIcons.Home, color: 'ks-reg-new-icon-teal' },
+        8: { Component: HeaderIcons.Book, color: 'ks-reg-new-icon-indigo' },
+        9: { Component: HeaderIcons.Briefcase, color: 'ks-reg-new-icon-teal' },
+        10: { Component: HeaderIcons.Briefcase, color: 'ks-reg-new-icon-gold' },
+        11: { Component: HeaderIcons.Pen, color: 'ks-reg-new-icon-dark' }
     };
     const { Component, color } = iconMap[currentStep] || iconMap[1];
-    
+
     return (
         <div className={`ks-reg-new-header-icon ks-reg-new-stagger ${color}`}>
             <Component />
@@ -590,7 +596,7 @@ const Register = () => {
   const renderStep = () => {
     return (
         <div key={step} className={`ks-reg-new-form-body ${animDirection}`}>
-            
+
             <div className="ks-reg-new-title-area">
                 {renderStepIcon(step)}
                 <h2 className="ks-reg-new-step-heading ks-reg-new-stagger">
@@ -600,9 +606,11 @@ const Register = () => {
                     {step === 4 && "Contact & Security"}
                     {step === 5 && "Current Location"}
                     {step === 6 && "Personal Details"}
-                    {step === 7 && "Education"}
-                    {step === 8 && "Career & Lifestyle"}
-                    {step === 9 && "Identity Verification"}
+                    {step === 7 && "Background & Living"}
+                    {step === 8 && "Education"}
+                    {step === 9 && "Career Details"}
+                    {step === 10 && "Income & Status"}
+                    {step === 11 && "Identity Verification"}
                 </h2>
                 {step === 1 && <p className="ks-reg-new-step-sub ks-reg-new-stagger">Let's start your journey to finding happiness.</p>}
                 {step === 4 && <p className="ks-reg-new-step-sub ks-reg-new-stagger">An active email and phone number are required.</p>}
@@ -652,7 +660,7 @@ const Register = () => {
             {step === 4 && (
                 <>
                 <KsInput label="Email Address" name="email" type="email" value={formData.email} onChange={handleChange} error={errors.email} placeholder="name@example.com" />
-                
+
                 <div className={`ks-reg-new-input-block ks-reg-new-stagger ${errors.password ? 'ks-reg-new-error-state' : ''}`}>
                     <label className="ks-reg-new-label">Secure Password</label>
                     <div className="ks-reg-new-password-wrap">
@@ -733,29 +741,39 @@ const Register = () => {
                 <KsSelect label="Marital Status" name="maritalStatus" value={formData.maritalStatus} onChange={handleChange} error={errors.maritalStatus} options={dynamicOptions.MaritalStatus} />
                 <KsSelect label="Height" name="height" value={formData.height} onChange={handleChange} error={errors.height} options={dynamicOptions.Height} />
                 <KsSelect label="Dietary Preference" name="diet" value={formData.diet} onChange={handleChange} error={errors.diet} options={dynamicOptions.Diet} />
+                </>
+            )}
+
+            {step === 7 && (
+                <>
                 <KsInput label="Gothra" name="gothra" value={formData.gothra} onChange={handleChange} error={errors.gothra} placeholder="Enter your Gothra" />
                 <KsSelect label="Residents In" name="residentsIn" value={formData.residentsIn} onChange={handleChange} error={errors.residentsIn} options={['Own', 'Rent']} />
                 </>
             )}
 
-            {step === 7 && (
+            {step === 8 && (
                 <>
                 <KsComboInput label="Highest Qualification" name="highestQualification" value={formData.highestQualification} onChange={handleChange} error={errors.highestQualification} options={dynamicOptions.Education} />
                 <KsInput label="College / University" name="college" value={formData.college} onChange={handleChange} error={errors.college} placeholder="e.g. IIT Bombay" />
                 </>
             )}
 
-            {step === 8 && (
+            {step === 9 && (
                 <>
-                <KsSelect label="Annual Income" name="annualIncome" value={formData.annualIncome} onChange={handleChange} error={errors.annualIncome} options={dynamicOptions.Income} />
                 <KsSelect label="Employment Sector" name="workWith" value={formData.workWith} onChange={handleChange} error={errors.workWith} options={dynamicOptions.Sector} />
                 <KsComboInput label="Current Designation" name="workAs" value={formData.workAs} onChange={handleChange} error={errors.workAs} options={dynamicOptions.Designation} />
                 <KsInput label="Organization Name" name="companyName" value={formData.companyName} onChange={handleChange} error={errors.companyName} placeholder="e.g. Google, TCS" />
+                </>
+            )}
+
+            {step === 10 && (
+                <>
+                <KsSelect label="Annual Income" name="annualIncome" value={formData.annualIncome} onChange={handleChange} error={errors.annualIncome} options={dynamicOptions.Income} />
                 <KsSelect label="NRI Status" name="nri" value={formData.nri} onChange={handleChange} error={errors.nri} options={['Yes', 'No']} />
                 </>
             )}
 
-            {step === 9 && (
+            {step === 11 && (
                 <>
                 <p className="ks-reg-new-stagger ks-reg-new-sig-instruct">Please provide your digital signature below to accept the Terms & Conditions.</p>
                 <div className="ks-reg-new-sig-wrapper ks-reg-new-stagger">
@@ -803,22 +821,22 @@ const Register = () => {
         containerStyle={{ zIndex: 9999999 }} 
         toastOptions={{ style: { background: '#1F2937', color: '#fff', borderRadius: '10px' } }} 
       />
-      
+
       <div className="ks-reg-new-main-wrapper">
           <div className="ks-reg-new-auth-card">
-            
+
             <div className="ks-reg-new-progress-header">
-               <div className="ks-reg-new-progress-text">Step {step} of 9</div>
+               <div className="ks-reg-new-progress-text">Step {step} of 11</div>
                <div className="ks-reg-new-progress-bar-container">
-                  <div className="ks-reg-new-progress-fill" style={{ width: `${(step / 9) * 100}%` }}></div>
+                  <div className="ks-reg-new-progress-fill" style={{ width: `${(step / 11) * 100}%` }}></div>
                </div>
             </div>
 
             <div className="ks-reg-new-form-content">
-              <form onSubmit={step === 9 ? handleSubmit : (e) => { e.preventDefault(); nextStep(); }}>
-                
+              <form onSubmit={step === 11 ? handleSubmit : (e) => { e.preventDefault(); nextStep(); }}>
+
                 {renderStep()}
-                
+
                 <div className="ks-reg-new-action-footer">
                   {step > 1 ? (
                     <button type="button" className="ks-reg-new-btn ks-reg-new-btn-secondary" onClick={prevStep} disabled={loading}>Back</button>
@@ -826,7 +844,7 @@ const Register = () => {
                     <div></div> 
                   )}
 
-                  {step === 9 ? (
+                  {step === 11 ? (
                      <button type="submit" className="ks-reg-new-btn ks-reg-new-btn-primary" disabled={loading}>
                        {loading ? 'Submitting...' : 'Complete Profile'} <UI_Icons.ArrowRight />
                      </button>
