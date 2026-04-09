@@ -140,6 +140,7 @@ const AgentDashboard = () => {
   const [interestsStatus, setInterestsStatus] = useState([]); 
   const [premiumUsers, setPremiumUsers] = useState([]); 
   const [dashboardLoading, setDashboardLoading] = useState(false);
+  
   const [showScroll, setShowScroll] = useState(false);
 
   const [masterCommunities, setMasterCommunities] = useState([]); 
@@ -185,36 +186,40 @@ const AgentDashboard = () => {
     navigate('/agent', { replace: true });
   }, [navigate]);
 
-  // --- GUARANTEED SCROLL HIDING LOGIC (UPDATED FOR PRODUCTION) ---
+  // --- GUARANTEED SCROLL HIDING LOGIC ---
   const handleScrollCheck = useCallback(() => {
-    let show = false;
-    
-    // Increased buffer specifically to accommodate mobile nav bars & production layouts
-    const BUFFER = activeTab === 'register' ? 300 : 250; 
+    let isScrollable = false;
+    let isAtBottom = false;
 
-    // 1. Check fallback Window/Document scroll
-    const winHeight = window.innerHeight;
-    const docHeight = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
-    const scrollY = Math.ceil(window.scrollY || document.documentElement.scrollTop);
+    const BUFFER = activeTab === 'register' ? 220 : 180; 
 
-    if (docHeight > winHeight + 20) { // 20px tolerance for sub-pixel accuracy
-      if (docHeight - winHeight - scrollY > BUFFER) {
-        show = true;
-      }
-    }
-
-    // 2. Main Scroll Container Check (Prioritized)
+    // Check main container scroll
     if (mainScrollRef.current) {
       const { scrollTop, scrollHeight, clientHeight } = mainScrollRef.current;
-      
-      // If the main area is the true scroller
-      if (scrollHeight > clientHeight + 20) {
-        // Evaluate based on the element's actual scroll distance
-        show = (scrollHeight - clientHeight - Math.ceil(scrollTop)) > BUFFER;
+      if (scrollHeight > clientHeight + 10) {
+        isScrollable = true;
+        if (scrollTop + clientHeight >= scrollHeight - BUFFER) {
+          isAtBottom = true;
+        }
       }
     }
 
-    setShowScroll(show);
+    // Fallback to window scroll if main ref isn't the active scroller
+    if (!isScrollable) {
+      const winHeight = window.innerHeight;
+      const docHeight = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+
+      if (docHeight > winHeight + 10) {
+        isScrollable = true;
+        const scrollY = Math.ceil(window.scrollY || document.documentElement.scrollTop);
+
+        if (scrollY + winHeight >= docHeight - BUFFER) {
+          isAtBottom = true;
+        }
+      }
+    }
+
+    setShowScroll(isScrollable && !isAtBottom);
   }, [activeTab]);
 
   useEffect(() => {
@@ -223,29 +228,39 @@ const AgentDashboard = () => {
     window.addEventListener('resize', handleScrollCheck);
 
     let resizeObserver;
+    let mutationObserver;
+
     if (mainScrollRef.current) {
+      // Observe size changes
       resizeObserver = new ResizeObserver(() => handleScrollCheck());
       resizeObserver.observe(mainScrollRef.current);
+      
+      // Observe DOM node injections (crucial for Production API data rendering)
+      mutationObserver = new MutationObserver(() => handleScrollCheck());
+      mutationObserver.observe(mainScrollRef.current, { childList: true, subtree: true });
     }
 
+    // Fallback timeouts to catch trailing renders
     const t1 = setTimeout(handleScrollCheck, 150);
     const t2 = setTimeout(handleScrollCheck, 500);
-    const t3 = setTimeout(handleScrollCheck, 800);
+    const t3 = setTimeout(handleScrollCheck, 1000);
 
     return () => {
       window.removeEventListener('scroll', handleScrollCheck);
       window.removeEventListener('resize', handleScrollCheck);
       if (resizeObserver) resizeObserver.disconnect();
+      if (mutationObserver) mutationObserver.disconnect();
       clearTimeout(t1); clearTimeout(t2); clearTimeout(t3);
     };
   }, [handleScrollCheck, activeTab, regStep, dashboardLoading, stats, usersList, interestsStatus, memPayments, premiumUsers]);
 
+  // Changed to scroll fully to the bottom instead of just 400px
   const scrollToBottom = () => {
     const el = mainScrollRef.current;
     if (el && el.scrollHeight > el.clientHeight + 5) {
-      el.scrollBy({ top: 400, behavior: 'smooth' });
+      el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
     } else {
-      window.scrollBy({ top: 400, behavior: 'smooth' });
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
     }
   };
 
