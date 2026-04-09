@@ -140,7 +140,6 @@ const AgentDashboard = () => {
   const [interestsStatus, setInterestsStatus] = useState([]); 
   const [premiumUsers, setPremiumUsers] = useState([]); 
   const [dashboardLoading, setDashboardLoading] = useState(false);
-  
   const [showScroll, setShowScroll] = useState(false);
 
   const [masterCommunities, setMasterCommunities] = useState([]); 
@@ -191,28 +190,31 @@ const AgentDashboard = () => {
     let isScrollable = false;
     let isAtBottom = false;
 
-    const BUFFER = activeTab === 'register' ? 220 : 180; 
+    // We increase the buffer slightly to account for production rendering differences
+    const BUFFER = activeTab === 'register' ? 250 : 200; 
 
-    // Check main container scroll
+    // 1. Prioritize checking the specific scrolling container first
     if (mainScrollRef.current) {
       const { scrollTop, scrollHeight, clientHeight } = mainScrollRef.current;
+
       if (scrollHeight > clientHeight + 10) {
         isScrollable = true;
-        if (scrollTop + clientHeight >= scrollHeight - BUFFER) {
+        // Use Math.ceil to prevent sub-pixel rendering bugs in production
+        if (Math.ceil(scrollTop + clientHeight) >= scrollHeight - BUFFER) {
           isAtBottom = true;
         }
       }
     }
 
-    // Fallback to window scroll if main ref isn't the active scroller
+    // 2. ONLY check the window scroll if the main container isn't handling the scrolling.
+    // This prevents hidden production portals (like Toastify) from artificially inflating the body height
     if (!isScrollable) {
       const winHeight = window.innerHeight;
-      const docHeight = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+      const docHeight = document.documentElement.scrollHeight; // Safer than document.body
+      const scrollY = Math.ceil(window.scrollY || document.documentElement.scrollTop);
 
       if (docHeight > winHeight + 10) {
         isScrollable = true;
-        const scrollY = Math.ceil(window.scrollY || document.documentElement.scrollTop);
-
         if (scrollY + winHeight >= docHeight - BUFFER) {
           isAtBottom = true;
         }
@@ -228,39 +230,29 @@ const AgentDashboard = () => {
     window.addEventListener('resize', handleScrollCheck);
 
     let resizeObserver;
-    let mutationObserver;
-
     if (mainScrollRef.current) {
-      // Observe size changes
       resizeObserver = new ResizeObserver(() => handleScrollCheck());
       resizeObserver.observe(mainScrollRef.current);
-      
-      // Observe DOM node injections (crucial for Production API data rendering)
-      mutationObserver = new MutationObserver(() => handleScrollCheck());
-      mutationObserver.observe(mainScrollRef.current, { childList: true, subtree: true });
     }
 
-    // Fallback timeouts to catch trailing renders
     const t1 = setTimeout(handleScrollCheck, 150);
     const t2 = setTimeout(handleScrollCheck, 500);
-    const t3 = setTimeout(handleScrollCheck, 1000);
+    const t3 = setTimeout(handleScrollCheck, 800);
 
     return () => {
       window.removeEventListener('scroll', handleScrollCheck);
       window.removeEventListener('resize', handleScrollCheck);
       if (resizeObserver) resizeObserver.disconnect();
-      if (mutationObserver) mutationObserver.disconnect();
       clearTimeout(t1); clearTimeout(t2); clearTimeout(t3);
     };
   }, [handleScrollCheck, activeTab, regStep, dashboardLoading, stats, usersList, interestsStatus, memPayments, premiumUsers]);
 
-  // Changed to scroll fully to the bottom instead of just 400px
   const scrollToBottom = () => {
     const el = mainScrollRef.current;
     if (el && el.scrollHeight > el.clientHeight + 5) {
-      el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
+      el.scrollBy({ top: 400, behavior: 'smooth' });
     } else {
-      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+      window.scrollBy({ top: 400, behavior: 'smooth' });
     }
   };
 
@@ -566,7 +558,6 @@ const AgentDashboard = () => {
           <img src="/Kalyanashobha.png" alt="KalyanaShobha Logo" className="crm-mob-brand-img" />
         </div>
 
-        {/* NEW ANIMATED HAMBURGER TO X BUTTON */}
         <button 
           className={`crm-burger-btn ${isMobileMenuOpen ? 'is-open' : ''}`} 
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
