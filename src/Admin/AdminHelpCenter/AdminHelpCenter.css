@@ -158,23 +158,15 @@
 }
 .kah-btn-outline-primary:hover { background: #c7d2fe; transform: translateY(-1px); }
 
-/* --- SKELETON --- */
-.kah-skeleton-stack { padding: 24px; display: flex; flex-direction: column; gap: 20px; }
-.kah-skeleton-row { display: flex; gap: 24px; align-items: center; }
+/* --- UPDATED CLEAN SKELETON --- */
 .kah-sk-box {
   background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
   background-size: 200% 100%;
   animation: kah-shimmer 1.5s infinite;
-  height: 20px;
-  border-radius: 6px;
+  height: 18px;
+  border-radius: 4px;
 }
 @keyframes kah-shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
-
-.kah-sk-date { width: 120px; }
-.kah-sk-user { width: 180px; }
-.kah-sk-subject { width: 250px; height: 36px; }
-.kah-sk-status { width: 100px; border-radius: 20px; }
-.kah-sk-action { width: 100px; margin-left: auto; }
 
 /* --- STATE VIEWS --- */
 .kah-empty-cell { padding: 0 !important; border: none !important; }
@@ -311,11 +303,10 @@
 
 
 /* =========================================================
-   MOBILE RESPONSIVENESS (NO HORIZONTAL SCROLLING)
+   MOBILE RESPONSIVENESS
    ========================================================= */
 @media (max-width: 768px) {
   .kah-layout { padding: 16px; }
-
   .kah-scroll-indicator { display: flex; }
 
   /* Header elements */
@@ -325,7 +316,6 @@
 
   /* TABLE -> CARDS TRANSFORMATION */
   .kah-table-wrapper { overflow-x: hidden; }
-
   .kah-table thead { display: none; }
   .kah-data-card { background: transparent; border: none; box-shadow: none; }
 
@@ -344,6 +334,17 @@
       display: flex; justify-content: space-between; align-items: flex-start;
       padding: 12px 0; border-bottom: 1px dashed var(--kah-border);
       text-align: right; word-break: break-word; 
+  }
+
+  /* NEW: Fix specifically for the Empty State Row on mobile */
+  .kah-table td.kah-empty-cell {
+      display: block; /* Turns OFF flexbox for this one cell */
+      padding: 32px 16px;
+      text-align: center;
+      border: none;
+  }
+  .kah-table td.kah-empty-cell::before {
+      display: none; /* Removes the empty pseudo-label from messing up spacing */
   }
 
   .kah-table td:last-child { border-bottom: none; padding-bottom: 0; }
@@ -367,7 +368,7 @@
   .kah-summary-text { 
       font-size: 13px; 
       max-width: 100%; 
-      white-space: normal; /* Allow text to wrap on mobile instead of cutting off */
+      white-space: normal; 
       text-align: right;
   }
 
@@ -375,12 +376,6 @@
 
   .kah-action-group { width: 100%; justify-content: flex-end; }
   .kah-btn-outline-primary { font-size: 12px; padding: 6px 12px;}
-
-  /* Skeletons on Mobile */
-  .kah-skeleton-row { flex-direction: column; align-items: stretch; gap: 12px; background: white; padding: 16px; border-radius: 16px; border: 1px solid var(--kah-border); }
-  .kah-sk-date, .kah-sk-user, .kah-sk-subject { width: 100%; height: 16px; }
-  .kah-sk-status { width: 100px; }
-  .kah-sk-action { width: 100%; height: 36px; margin-top: 8px;}
 
   /* Modal Adjustments */
   .kah-info-grid { grid-template-columns: 1fr; gap: 12px; }
@@ -435,7 +430,6 @@
     letter-spacing: 0.3px;
 }
 
-/* Mobile Adjustments for Pagination */
 @media (max-width: 768px) {
     .kah-pagination-container {
         padding: 16px 0;
