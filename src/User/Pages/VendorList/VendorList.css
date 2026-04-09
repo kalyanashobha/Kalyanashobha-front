@@ -134,7 +134,7 @@
 }
 
 .v-premium-header h1 {
-  font-size: 2.2rem;
+  font-size: 1.8rem; /* Reduced from 2.2rem */
   font-weight: 700;
   color: var(--vp-text-main);
   text-transform: uppercase;
@@ -166,10 +166,10 @@
 /* --- 4. GRID SYSTEM --- */
 .v-premium-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); /* Reduced from 300px to make cards smaller globally */
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); /* Reduced from 260px */
   gap: 32px;
   width: 100%;
-  justify-items: center; /* Ensures cards don't stretch excessively if few items exist */
+  justify-items: center; 
 }
 
 .v-no-data {
@@ -195,7 +195,7 @@
   position: relative;
   height: 100%; 
   width: 100%;
-  max-width: 320px; /* Restricts maximum width of the card */
+  max-width: 280px; /* Reduced from 320px */
   box-shadow: var(--vp-shadow);
 }
 
@@ -206,7 +206,7 @@
 }
 
 .v-card-image {
-  height: 220px; /* Reduced slightly to match smaller width proportionately */
+  height: 180px; /* Reduced from 220px to match narrower card width */
   width: 100%;
   position: relative;
   overflow: hidden;
@@ -260,7 +260,7 @@
 }
 
 .v-card-title {
-  font-size: 1.15rem; /* Scaled down slightly to match smaller card */
+  font-size: 1.15rem; 
   font-weight: 700;
   color: var(--vp-text-main);
   margin: 0 0 8px 0;
@@ -268,7 +268,7 @@
 }
 
 .v-card-desc {
-  font-size: 0.9rem; /* Scaled down slightly */
+  font-size: 0.9rem; 
   color: var(--vp-text-sub);
   margin-bottom: 24px;
   line-height: 1.6;
@@ -278,7 +278,7 @@
 /* --- 6. BUTTONS (PREMIUM STYLING) --- */
 .v-contact-btn {
   width: 100%;
-  padding: 12px; /* Reduced padding slightly for smaller card */
+  padding: 12px; 
   margin-top: auto;
   background-color: #1e2330; 
   color: var(--vp-amber); 
@@ -473,7 +473,7 @@
 }
 
 .v-skeleton-img {
-  height: 220px;
+  height: 180px; /* Reduced from 220px to match new image height */
   width: 100%;
 }
 
@@ -574,7 +574,7 @@
   }
 
   .v-premium-header h1 {
-    font-size: 1.2rem; 
+    font-size: 1.1rem; /* Reduced from 1.2rem for mobile */
   }
 
   .v-premium-header p {
@@ -586,16 +586,16 @@
   .v-premium-grid {
     grid-template-columns: 1fr; 
     gap: 20px; 
-    justify-items: center; /* This centers the smaller cards in the mobile view */
+    justify-items: center; 
   }
 
   .v-premium-card {
-    max-width: 320px; /* Constrains the width on mobile so it doesn't stretch edge-to-edge */
+    max-width: 280px; /* Reduced from 320px */
     width: 100%;
   }
 
   .v-card-image {
-    height: 200px; /* Adjusted to fit the narrower mobile card */
+    height: 180px; /* Reduced from 200px */
   }
 
   .v-card-content {
@@ -678,4 +678,3 @@
     border-radius: 8px;
   }
 }
-
