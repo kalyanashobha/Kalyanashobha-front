@@ -560,17 +560,13 @@ const AgentDashboard = () => {
         <button 
           className={`crm-burger-btn ${isMobileMenuOpen ? 'is-open' : ''}`} 
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 0 }}
         >
-          {isMobileMenuOpen ? (
-            <X size={26} color="#000" strokeWidth={2.5} />
-          ) : (
-            <svg width="24" height="18" viewBox="0 0 24 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect width="24" height="2" fill="#000000"/>
-              <rect y="8" width="24" height="2" fill="#000000"/>
-              <rect y="16" width="24" height="2" fill="#000000"/>
-            </svg>
-          )}
+          <div className="crm-custom-burger" style={{ width: '28px', height: '19px', position: 'relative' }}>
+            <span style={{ display: 'block', position: 'absolute', height: '3px', width: '100%', background: '#0f172a', borderRadius: '3px', opacity: 1, left: 0, transform: isMobileMenuOpen ? 'rotate(45deg)' : 'rotate(0deg)', top: isMobileMenuOpen ? '8px' : '0px', transition: '.25s ease-in-out' }}></span>
+            <span style={{ display: 'block', position: 'absolute', height: '3px', width: isMobileMenuOpen ? '0%' : '60%', background: '#0f172a', borderRadius: '3px', opacity: isMobileMenuOpen ? 0 : 1, right: 0, top: '8px', transition: '.25s ease-in-out' }}></span>
+            <span style={{ display: 'block', position: 'absolute', height: '3px', width: '100%', background: '#0f172a', borderRadius: '3px', opacity: 1, left: 0, transform: isMobileMenuOpen ? 'rotate(-45deg)' : 'rotate(0deg)', top: isMobileMenuOpen ? '8px' : '16px', transition: '.25s ease-in-out' }}></span>
+          </div>
         </button>
       </header>
 
