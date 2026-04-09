@@ -352,9 +352,6 @@ const UserDashboard = () => {
   const [filterStates, setFilterStates] = useState([]);
   const [filterCities, setFilterCities] = useState([]);
 
-  const [extraDetailsStates, setExtraDetailsStates] = useState([]);
-  const [extraDetailsCities, setExtraDetailsCities] = useState([]);
-
   const [dynamicOptions, setDynamicOptions] = useState({
     Moonsign: [], Star: [], Pada: [], MotherTongue: [], Complexion: [],
     Education: [], Designation: [], MaritalStatus: [], Diet: [], Income: [], Country: []
@@ -384,7 +381,6 @@ const UserDashboard = () => {
 
   const [extraDetailsForm, setExtraDetailsForm] = useState({
       moonsign: '', star: '', pada: '', motherTongue: '', timeOfBirth: '', placeOfBirth: '', nativeLocation: '', complexion: '',
-      country: '', state: '', city: '',
       familyType: '', fatherName: '', fatherOccupation: '', motherName: '', motherOccupation: '', noOfBrothers: 0, noOfBrothersMarried: 0, noOfSisters: 0, noOfSistersMarried: 0
   });
 
@@ -544,30 +540,6 @@ const UserDashboard = () => {
           const extraData = await extraRes.json();
           if (extraData.success && !extraData.hasAstrologyAndFamilyDetails) {
               setNeedsExtraDetails(true);
-
-              if (profileData.success && profileData.user) {
-                  const u = profileData.user;
-                  setExtraDetailsForm(prev => ({
-                      ...prev,
-                      country: u.country || '',
-                      state: u.state || '',
-                      city: u.city || ''
-                  }));
-
-                  if (u.country) {
-                      fetch(`${PUBLIC_API_BASE}/master-data/State?parent=${u.country}`)
-                          .then(r => r.json())
-                          .then(j => { if(j.success) setExtraDetailsStates(j.data.map(d=>d.name)); })
-                          .catch(e => {});
-                  }
-                  if (u.state) {
-                      fetch(`${PUBLIC_API_BASE}/master-data/City?parent=${u.state}`)
-                          .then(r => r.json())
-                          .then(j => { if(j.success) setExtraDetailsCities(j.data.map(d=>d.name)); })
-                          .catch(e => {});
-                  }
-              }
-
               if (!missingTerms) setShowExtraDetailsModal(true); 
           }
 
@@ -771,35 +743,7 @@ const UserDashboard = () => {
   const handleExtraDetailsChange = async (e) => {
       const { name, value } = e.target;
       const safeValue = value || "";
-
-      if (name === 'country') {
-        setExtraDetailsForm(prev => ({ ...prev, country: safeValue, state: '', city: '' }));
-        setExtraDetailsCities([]); 
-        if (safeValue) {
-           try {
-             const res = await fetch(`${PUBLIC_API_BASE}/master-data/State?parent=${safeValue}`);
-             const json = await res.json();
-             if (json.success) setExtraDetailsStates(json.data.map(d => d.name));
-           } catch(e) { setExtraDetailsStates([]); }
-        } else {
-           setExtraDetailsStates([]);
-        }
-      } 
-      else if (name === 'state') {
-        setExtraDetailsForm(prev => ({ ...prev, state: safeValue, city: '' }));
-        if (safeValue) {
-           try {
-             const res = await fetch(`${PUBLIC_API_BASE}/master-data/City?parent=${safeValue}`);
-             const json = await res.json();
-             if (json.success) setExtraDetailsCities(json.data.map(d => d.name));
-           } catch(e) { setExtraDetailsCities([]); }
-        } else {
-           setExtraDetailsCities([]);
-        }
-      } 
-      else {
-        setExtraDetailsForm(prev => ({ ...prev, [name]: safeValue }));
-      }
+      setExtraDetailsForm(prev => ({ ...prev, [name]: safeValue }));
   };
 
   const handleEnterToNext = (e) => {
@@ -818,6 +762,47 @@ const UserDashboard = () => {
       e.preventDefault();
       setSubmittingExtraDetails(true);
 
+      // --- EXPLICIT FIELD-BY-FIELD VALIDATION ---
+      const requiredTextFields = [
+          { key: 'moonsign', label: 'Moonsign' },
+          { key: 'star', label: 'Star (Nakshatram)' },
+          { key: 'pada', label: 'Pada/Quarter' },
+          { key: 'motherTongue', label: 'Mother Tongue' },
+          { key: 'timeOfBirth', label: 'Time of Birth' }, // Explicit check
+          { key: 'placeOfBirth', label: 'Place of Birth' },
+          { key: 'nativeLocation', label: 'Native Location' },
+          { key: 'complexion', label: 'Complexion' },
+          { key: 'familyType', label: 'Family Type' },
+          { key: 'fatherName', label: "Father's Name" },
+          { key: 'fatherOccupation', label: "Father's Occupation" },
+          { key: 'motherName', label: "Mother's Name" },
+          { key: 'motherOccupation', label: "Mother's Occupation" }
+      ];
+      
+      for (const field of requiredTextFields) {
+          if (!extraDetailsForm[field.key] || extraDetailsForm[field.key].trim() === '') {
+              toast.error(`Please provide your ${field.label} before continuing.`);
+              setSubmittingExtraDetails(false);
+              return;
+          }
+      }
+
+      const requiredNumberFields = [
+          { key: 'noOfBrothers', label: 'No. of Brothers' },
+          { key: 'noOfBrothersMarried', label: 'Brothers Married' },
+          { key: 'noOfSisters', label: 'No. of Sisters' },
+          { key: 'noOfSistersMarried', label: 'Sisters Married' }
+      ];
+
+      for (const field of requiredNumberFields) {
+          if (extraDetailsForm[field.key] === '' || extraDetailsForm[field.key] === null || extraDetailsForm[field.key] === undefined) {
+               toast.error(`Please select the ${field.label} before continuing.`);
+               setSubmittingExtraDetails(false);
+               return;
+          }
+      }
+      // --- END OF VALIDATION ---
+
       let userId = localStorage.getItem('userId');
       if (!userId) {
           const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
@@ -832,9 +817,6 @@ const UserDashboard = () => {
 
       const payload = {
           userId: userId,
-          country: extraDetailsForm.country,
-          state: extraDetailsForm.state,
-          city: extraDetailsForm.city,
           astrologyDetails: {
               moonsign: extraDetailsForm.moonsign,
               star: extraDetailsForm.star,
@@ -1256,50 +1238,52 @@ const UserDashboard = () => {
           <div className="dash-container">
 
             {/* --- PREMIUM UPGRADE BANNER --- */}
-            <div className={`dash-premium-banner-card ${premiumRequested || premiumStatus === 'Pending' || premiumStatus === 'Contacted' || premiumStatus === 'Resolved' ? 'requested' : ''}`}>
-              <div className="dash-premium-bg-shape"></div>
+            {isPremium && (
+              <div className={`dash-premium-banner-card ${premiumRequested || premiumStatus === 'Pending' || premiumStatus === 'Contacted' || premiumStatus === 'Resolved' ? 'requested' : ''}`}>
+                <div className="dash-premium-bg-shape"></div>
 
-              {premiumStatus === 'Resolved' ? (
-                <div className="dash-premium-content requested-content">
-                  <div className="dash-premium-icon-box gold-icon">
-                    <Icons.Diamond />
+                {premiumStatus === 'Resolved' ? (
+                  <div className="dash-premium-content requested-content">
+                    <div className="dash-premium-icon-box gold-icon">
+                      <Icons.Diamond />
+                    </div>
+                    <div className="dash-premium-text-col">
+                      <h3>Premium Member</h3>
+                      <p>Welcome to Premium! You now have full access to advanced features, and our expert matchmaking team is here to assist you personally.</p>
+                    </div>
                   </div>
-                  <div className="dash-premium-text-col">
-                    <h3>Premium Member</h3>
-                    <p>Welcome to Premium! You now have full access to advanced features, and our expert matchmaking team is here to assist you personally.</p>
+                ) : (premiumRequested || premiumStatus === 'Pending' || premiumStatus === 'Contacted') ? (
+                  <div className="dash-premium-content requested-content">
+                    <div className="dash-premium-icon-box success-icon">
+                      <Icons.CheckCircle />
+                    </div>
+                    <div className="dash-premium-text-col">
+                      <h3>Request Received</h3>
+                      <p>Our support team will contact you shortly to process your premium upgrade.</p>
+                    </div>
                   </div>
-                </div>
-              ) : (premiumRequested || premiumStatus === 'Pending' || premiumStatus === 'Contacted') ? (
-                <div className="dash-premium-content requested-content">
-                  <div className="dash-premium-icon-box success-icon">
-                    <Icons.CheckCircle />
+                ) : (
+                  <div className="dash-premium-content default-content">
+                    <div className="dash-premium-icon-box gold-icon">
+                      <Icons.Diamond />
+                    </div>
+                    <div className="dash-premium-text-col">
+                      <h3>Upgrade to Premium</h3>
+                      <p>Get personalized assistance from our expert matchmaking team. Request your exclusive upgrade today.</p>
+                    </div>
+                    <div className="dash-premium-action">
+                      <button 
+                        className="dash-premium-btn" 
+                        onClick={handlePremiumRequest} 
+                        disabled={premiumRequestLoading}
+                      >
+                        {premiumRequestLoading ? "Processing..." : <>Request Upgrade <Icons.ArrowRight /></>}
+                      </button>
+                    </div>
                   </div>
-                  <div className="dash-premium-text-col">
-                    <h3>Request Received</h3>
-                    <p>Our support team will contact you shortly to process your premium upgrade.</p>
-                  </div>
-                </div>
-              ) : (
-                <div className="dash-premium-content default-content">
-                  <div className="dash-premium-icon-box gold-icon">
-                    <Icons.Diamond />
-                  </div>
-                  <div className="dash-premium-text-col">
-                    <h3>Upgrade to Premium</h3>
-                    <p>Get personalized assistance from our expert matchmaking team. Request your exclusive upgrade today.</p>
-                  </div>
-                  <div className="dash-premium-action">
-                    <button 
-                      className="dash-premium-btn" 
-                      onClick={handlePremiumRequest} 
-                      disabled={premiumRequestLoading}
-                    >
-                      {premiumRequestLoading ? "Processing..." : <>Request Upgrade <Icons.ArrowRight /></>}
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
+                )}
+              </div>
+            )}
 
             {/* --- PENDING VERIFICATION BANNER --- */}
             {!isPremium && regPaymentStatus?.status === 'PendingVerification' && (
@@ -1421,10 +1405,24 @@ const UserDashboard = () => {
                      <DashboardComboInput label="Pada/Quarter" name="pada" value={extraDetailsForm.pada} onChange={handleExtraDetailsChange} options={dynamicOptions.Pada} required={true} onKeyDown={handleEnterToNext}/>
                      <DashboardComboInput label="Mother Tongue" name="motherTongue" value={extraDetailsForm.motherTongue} onChange={handleExtraDetailsChange} options={dynamicOptions.MotherTongue} required={true} onKeyDown={handleEnterToNext}/>
 
+                     {/* FIX: Removed readOnly so HTML5 validation works, but blocked typing with onKeyDown */}
                      <div className="dash-form-group">
                        <label className="dash-label">Time of Birth <span className="dash-required">*</span></label>
                        <div style={{ position: 'relative' }}>
-                         <input type="text" name="timeOfBirth" className="dash-input" placeholder="02:30 PM" value={extraDetailsForm.timeOfBirth} readOnly onClick={() => setShowTimePicker(true)} style={{ cursor: 'pointer' }} required />
+                         <input 
+                           type="text" 
+                           name="timeOfBirth" 
+                           className="dash-input" 
+                           placeholder="02:30 PM" 
+                           value={extraDetailsForm.timeOfBirth} 
+                           onChange={() => {}} 
+                           onKeyDown={(e) => {
+                             if (e.key !== 'Tab') e.preventDefault(); // Prevent manual typing
+                           }}
+                           onClick={() => setShowTimePicker(true)} 
+                           style={{ cursor: 'pointer', caretColor: 'transparent' }} 
+                           required 
+                         />
                          <div style={{ position: 'absolute', right: '12px', top: '12px', color: '#64748b', pointerEvents: 'none' }}><Icons.ChevronDown /></div>
                        </div>
                      </div>
@@ -1527,4 +1525,3 @@ const UserDashboard = () => {
 };
 
 export default UserDashboard;
-
