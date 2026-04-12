@@ -11,11 +11,9 @@ export default function AdminVendorLeads() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All"); 
 
-  // Fixed Pagination States
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 4; // Changed to 4 for both Desktop and Mobile
+  const itemsPerPage = 4; 
 
-  // Mobile Scroll Indicator State
   const [showMainScroll, setShowMainScroll] = useState(false);
 
   const fetchLeads = async () => {
@@ -46,7 +44,6 @@ export default function AdminVendorLeads() {
     setCurrentPage(1);
   }, [searchTerm, statusFilter]);
 
-  // --- FILTERING & PAGINATION ---
   let processedLeads = leads.filter((lead) => {
     const searchLower = searchTerm.toLowerCase();
     const clientName = lead.name?.toLowerCase() || "";
@@ -70,16 +67,13 @@ export default function AdminVendorLeads() {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const currentLeads = processedLeads.slice(startIndex, startIndex + itemsPerPage);
 
-  // --- MOBILE ONLY SCROLL INDICATOR LOGIC ---
   useEffect(() => {
     const checkMainScroll = () => {
-        // 1. Hide on desktop entirely
         if (window.innerWidth > 768) {
             setShowMainScroll(false);
             return;
         }
 
-        // 2. Hide if there is 1 or fewer items
         if (currentLeads.length <= 1) {
             setShowMainScroll(false);
             return;
@@ -89,13 +83,9 @@ export default function AdminVendorLeads() {
         const windowHeight = window.innerHeight;
         const documentHeight = document.documentElement.scrollHeight;
 
-        // 3. Check if the document is taller than the viewport. 
         const isScrollable = documentHeight > windowHeight + 80;
-
-        // 4. Check if we haven't scrolled to the very bottom yet
         const isNotAtBottom = scrollY + windowHeight < documentHeight - 30;
 
-        // 5. Only show the indicator if it's scrollable AND we aren't at the bottom
         setShowMainScroll(isScrollable && isNotAtBottom);
     };
 
@@ -142,21 +132,35 @@ export default function AdminVendorLeads() {
 
   const SkeletonRow = () => (
     <tr className="avl-skeleton-row">
-      <td data-label="Date"><div className="avl-skel-box avl-skel-date"></div></td>
+      <td data-label="Date">
+        <div className="avl-skel-content">
+          <div className="avl-skel-box avl-skel-date"></div>
+        </div>
+      </td>
       <td data-label="Client Details">
-        <div className="avl-skel-box avl-skel-title"></div>
-        <div className="avl-skel-box avl-skel-text"></div>
+        <div className="avl-skel-content">
+          <div className="avl-skel-box avl-skel-title"></div>
+          <div className="avl-skel-box avl-skel-text"></div>
+        </div>
       </td>
       <td data-label="Requested Vendor">
-        <div className="avl-skel-box avl-skel-badge"></div>
-        <div className="avl-skel-box avl-skel-title"></div>
-        <div className="avl-skel-box avl-skel-text short"></div>
+        <div className="avl-skel-content">
+          <div className="avl-skel-box avl-skel-badge"></div>
+          <div className="avl-skel-box avl-skel-title"></div>
+          <div className="avl-skel-box avl-skel-text short"></div>
+        </div>
       </td>
       <td data-label="Requirements">
-        <div className="avl-skel-box avl-skel-desc"></div>
-        <div className="avl-skel-box avl-skel-desc half"></div>
+        <div className="avl-skel-content">
+          <div className="avl-skel-box avl-skel-desc"></div>
+          <div className="avl-skel-box avl-skel-desc half"></div>
+        </div>
       </td>
-      <td data-label="Status Action"><div className="avl-skel-box avl-skel-status"></div></td>
+      <td data-label="Status Action">
+        <div className="avl-skel-content">
+          <div className="avl-skel-box avl-skel-status"></div>
+        </div>
+      </td>
     </tr>
   );
 
@@ -220,7 +224,6 @@ export default function AdminVendorLeads() {
             </thead>
             <tbody>
               {loading ? (
-                // Reduced from 6 to 4 to match the new page size
                 [...Array(4)].map((_, index) => <SkeletonRow key={index} />)
               ) : currentLeads.length === 0 ? (
                 <tr>
@@ -289,7 +292,6 @@ export default function AdminVendorLeads() {
           </table>
         </div>
 
-        {/* ALWAYS VISIBLE CIRCULAR PAGINATION DESIGN */}
         {!loading && totalPages >= 1 && (
             <div className="avl-pagination-container">
                 <button 
@@ -315,14 +317,12 @@ export default function AdminVendorLeads() {
         )}
       </div>
 
-      {/* MOBILE ONLY SCROLL INDICATOR */}
       {showMainScroll && (
           <div className="avl-scroll-indicator">
               <ChevronDown size={18} />
               <span>Scroll for more</span>
           </div>
       )}
-
     </div>
   );
 }
