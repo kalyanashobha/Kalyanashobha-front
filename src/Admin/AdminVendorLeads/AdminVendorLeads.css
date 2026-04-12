@@ -1,7 +1,9 @@
-/* --- PREMIUM VARIABLES --- */
+/* --- PREMIUM VARIABLES (KalyanaShobha Palette) --- */
 :root {
-  --avl-primary: #4f46e5;
-  --avl-primary-dark: #4338ca;
+  --avl-primary: #dc2626; /* Deep Red */
+  --avl-primary-light: #fef2f2;
+  --avl-accent: #d97706; /* Amber */
+  --avl-accent-light: #fffbeb;
   --avl-bg: #f8fafc;
   --avl-card-bg: #ffffff;
   --avl-text-main: #0f172a;
@@ -49,13 +51,13 @@
 }
 
 .avl-count-badge {
-  background: #f1f5f9;
-  color: var(--avl-text-main);
+  background: var(--avl-primary-light);
+  color: var(--avl-primary);
   padding: 8px 16px;
   border-radius: 20px;
   font-size: 14px;
   font-weight: 700;
-  border: 1px solid var(--avl-border);
+  border: 1px solid #fecaca;
 }
 
 /* --- CONTROLS --- */
@@ -93,7 +95,7 @@
 }
 .avl-search-input:focus {
   border-color: var(--avl-primary);
-  box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+  box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.1);
 }
 
 .avl-filter-group {
@@ -127,7 +129,7 @@
 }
 .avl-filter-select:focus {
   border-color: var(--avl-primary);
-  box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+  box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.1);
   outline: none;
 }
 
@@ -201,17 +203,17 @@
 }
 .avl-vendor-category {
   display: inline-block;
-  background: #eff6ff;
-  color: var(--avl-primary-dark);
+  background: var(--avl-accent-light);
+  color: var(--avl-accent);
   padding: 2px 8px;
   border-radius: 12px;
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
   width: fit-content;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
-.avl-vendor-contact { font-size: 13px; color: var(--avl-primary-dark); font-weight: 600; margin-top: 4px;}
+.avl-vendor-contact { font-size: 13px; color: var(--avl-primary); font-weight: 600; margin-top: 4px;}
 
 .avl-message-box p {
   margin: 0 0 10px 0;
@@ -254,13 +256,13 @@
 }
 .avl-status-select:hover { transform: translateY(-1px); box-shadow: var(--avl-shadow-md); }
 
-/* Status Colors */
+/* Status Colors - Kept Semantic */
 .status-new { background-color: #eff6ff; color: #1e40af; border-color: #bfdbfe; stroke: #1e40af; }
 .status-contacted { background-color: #fffbeb; color: #b45309; border-color: #fde68a; stroke: #b45309; }
 .status-forwarded { background-color: #dcfce7; color: #15803d; border-color: #bbf7d0; stroke: #15803d; }
 .status-closed { background-color: #f1f5f9; color: #475569; border-color: #e2e8f0; stroke: #475569; }
 
-/* --- NEW CIRCULAR PAGINATION UI --- */
+/* --- PAGINATION UI --- */
 .avl-pagination-container {
   display: flex;
   justify-content: center;
@@ -287,9 +289,9 @@
 }
 
 .avl-page-btn-circle:hover:not(:disabled) {
-  background: #f8fafc;
-  color: #0f172a;
-  border-color: #cbd5e1;
+  background: var(--avl-primary-light);
+  color: var(--avl-primary);
+  border-color: #fecaca;
   box-shadow: 0 4px 6px rgba(0,0,0,0.05);
   transform: translateY(-1px);
 }
@@ -331,6 +333,8 @@
   border-radius: 6px;
   margin-bottom: 8px;
 }
+
+.avl-skel-content { width: 100%; }
 .avl-skel-date { height: 16px; width: 80px; }
 .avl-skel-title { height: 20px; width: 140px; margin-bottom: 6px; }
 .avl-skel-text { height: 14px; width: 100px; }
@@ -338,11 +342,11 @@
 .avl-skel-badge { height: 22px; width: 80px; border-radius: 4px; margin-bottom: 6px; }
 .avl-skel-desc { height: 16px; width: 100%; margin-bottom: 6px; }
 .avl-skel-desc.half { width: 60%; }
-.avl-skel-status { height: 32px; width: 110px; border-radius: 20px; margin-left: auto;}
+.avl-skel-status { height: 32px; width: 110px; border-radius: 20px; margin-left: auto; }
 
 /* --- SCROLL INDICATOR UI --- */
 .avl-scroll-indicator {
-  display: flex; /* Kept visible globally on Desktop/Mobile when needed */
+  display: flex; 
   position: fixed;
   bottom: 24px;
   left: 50%;
@@ -367,7 +371,7 @@
 }
 
 /* =========================================================
-   MOBILE RESPONSIVENESS (NO HORIZONTAL SCROLLING)
+   MOBILE RESPONSIVENESS
    ========================================================= */
 @media (max-width: 768px) {
   .avl-layout { padding: 16px; }
@@ -382,15 +386,14 @@
   .avl-table-wrapper { overflow-x: hidden; }
   .avl-data-table thead { display: none; }
   .avl-data-card { background: transparent; border: none; box-shadow: none; }
-  
-  /* Force all table elements to strict block/100% widths */
+
   .avl-data-table, .avl-data-table tbody, .avl-data-table tr, .avl-data-table td {
       display: block; 
       width: 100%; 
       box-sizing: border-box;
       min-width: unset; 
   }
-  
+
   .avl-data-table tr {
       margin-bottom: 16px;
       background: var(--avl-card-bg);
@@ -399,10 +402,8 @@
       padding: 12px; 
       box-shadow: var(--avl-shadow-sm);
   }
-  
-  .avl-empty-cell { padding: 0 !important; border: none !important; }
 
-  /* Flex alignment for Mobile Cells */
+  /* Data Cells */
   .avl-data-table td {
       display: flex;
       justify-content: space-between;
@@ -411,11 +412,11 @@
       border-bottom: 1px dashed var(--avl-border);
       text-align: right;
   }
-  
+
   .avl-data-table td:last-child { border-bottom: none; padding-bottom: 0; }
   .avl-data-table td[data-label="Status Action"] { padding-top: 12px; margin-top: 4px; align-items: center; }
-  
-  /* Inject Labels as the Left Flex Item */
+
+  /* Inject Labels */
   .avl-data-table td::before {
       content: attr(data-label);
       font-size: 11px;
@@ -439,7 +440,7 @@
       align-items: flex-end; 
       text-align: right; 
   }
-  
+
   .avl-info-stack strong, .avl-text-muted, .avl-message-box p, .avl-vendor-id, .avl-vendor-contact {
       word-break: break-word;
       white-space: pre-wrap;
@@ -450,19 +451,41 @@
 
   .avl-message-box p { font-size: 13px; margin-bottom: 6px; text-align: right;}
   .avl-meta-tags { justify-content: flex-end; }
-  
-  .avl-status-select { font-size: 11px; padding: 6px 24px 6px 12px; background-position: right 8px center;}
-  
-  /* Circular Pagination Stack Mobile */
-  .avl-pagination-container {
-      padding: 16px 0;
-      gap: 16px;
-  }
-  .avl-page-btn-circle { width: 40px; height: 40px; }
-  .avl-page-text { font-size: 14px; }
 
-  /* Skeletons on Mobile */
-  .avl-skeleton-row td { display: flex; flex-direction: column; align-items: flex-end; }
+  .avl-status-select { font-size: 11px; padding: 6px 24px 6px 12px; background-position: right 8px center;}
+
+  /* --- FIXED: EMPTY STATE & SKELETON ALIGNMENT --- */
+  
+  .avl-empty-cell { padding: 0 !important; border: none !important; }
+
+  .avl-data-table td.avl-empty-cell {
+      display: block;
+      text-align: center;
+      border: none;
+  }
+  
+  .avl-data-table td.avl-empty-cell::before {
+      display: none; /* Removes the pseudo-label causing the off-center bug */
+  }
+  
+  .avl-data-table .avl-empty-cell .avl-state-view {
+      max-width: 100%;
+      align-items: center;
+  }
+
+  .avl-skel-content {
+      flex: 1;
+      max-width: calc(100% - 100px);
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+  }
+
   .avl-skel-status { margin-left: 0; }
   .avl-skel-desc.half { width: 100%; }
+
+  /* Pagination */
+  .avl-pagination-container { padding: 16px 0; gap: 16px; }
+  .avl-page-btn-circle { width: 40px; height: 40px; }
+  .avl-page-text { font-size: 14px; }
 }
